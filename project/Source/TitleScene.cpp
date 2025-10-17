@@ -10,7 +10,7 @@ TitleScene::~TitleScene()
 
 void TitleScene::Update()
 {
-	if (CheckHitKey(KEY_INPUT_P)) {
+	if (CheckHitKey(KEY_INPUT_LSHIFT) || CheckHitKey(KEY_INPUT_RSHIFT)) {
 		SceneManager::ChangeScene("PLAY");
 	}
 	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
