@@ -16,6 +16,7 @@ public:
 	void SetScrollX(int s) { scrollX = s; }
 private:
 	int hImage;
+	int kabehImage;
 	float x, y;
 	int scrollX;
 

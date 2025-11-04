@@ -84,13 +84,13 @@ void Player::Update()
 			}
 		
 	}
-	//ここでスクロールを書く
-	Field* field = FindGameObject<Field>();
-	int sc = field->GetScrollX();
-	if (x-sc >= 300) {
-		field->SetScrollX(x-300);
+	////ここでスクロールを書く
+	//Field* field = FindGameObject<Field>();
+	//int sc = field->GetScrollX();
+	//if (x-sc >= 300) {
+	//	field->SetScrollX(x-300);
 
-	}
+	//}
 
 }
 //表示するところ
