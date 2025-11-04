@@ -10,7 +10,7 @@ vector<vector<int>> maps = {
 					{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0},
 					{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 					{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0},
-					{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+					{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 					{1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
 					{1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1},
 					{1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
@@ -20,24 +20,23 @@ vector<vector<int>> maps = {
 };
 Field::Field()
 {
-	hImage = LoadGraph("data/image/bgchar.png");
+	kabehImage = LoadGraph("data/image/kabe.png");
+	hImage = LoadGraph("data/image/New Blo.png");
 	x = 0;
 	y = 0;
 	scrollX = 0;
-	for (int y = 0; y < maps.size(); y++) {
+	for (int y = 0; y < maps.size(); y++)
+	{
+		for (int x = 0; x < maps[y].size(); x++)
 		{
-			for (int x = 0; x < maps[y].size(); x++)
-
+			if (maps[y][x] == 2)
 			{
-				if (maps[y][x] == 2)
-				{
 					new Player(x * 64, y * 64 + 400);
-				}
 			}
-
 		}
-
 	}
+	
+	
 }
 Field::~Field()
 {
@@ -59,25 +58,17 @@ void Update()
 
 void Field::Draw()
 {
-	
-	for (int y = 0; y<maps.size(); y++) {
-	 {
-			for (int x = 0; x < maps[y].size(); x++)
-
+	DrawGraph(0, 0, kabehImage, TRUE);
+	for (int y = 0; y < maps.size(); y++)
+	{
+		for (int x = 0; x < maps[y].size(); x++)
+		{
+			if (maps[y][x] == 1)
 			{
-				if (maps[y][x] == 1)
-				{
-					DrawRectGraph(x * 64-scrollX, y*64+2, 0, 32, 64, 64, hImage, 1);
-				}
+				DrawRectGraph(x * 64 - scrollX, y * 64 + 2, 0, 0, 64, 64, hImage, 1);
 			}
-			
 		}
 	}
-	
-	
-	
-	
-	
 }
 
 
