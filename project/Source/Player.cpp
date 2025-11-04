@@ -5,14 +5,14 @@ static const float V0 = -10.0;
 
 //コンストラクタ―
 //最初に1回だけ必ず呼ばれる。
-//Player::Player()
-//{
-//	hImage = LoadGraph("data/image/おまえ歩き.png");
-//	x = 200;
-//	y = 500;
-//	velocity =0;
-//	onGround = false;
-//}
+Player::Player()
+{
+	hImage = LoadGraph("data/image/おまえ歩き.png");
+	x = 200;
+	y = 500;
+	velocity =0;
+	onGround = false;
+}
 Player::Player(int sx, int sy)
 {
 	hImage = LoadGraph("data/image/おまえ歩き.png");

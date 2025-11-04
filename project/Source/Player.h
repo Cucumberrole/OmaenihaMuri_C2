@@ -4,7 +4,7 @@
 class Player : public GameObject
 {
 public:
-	//Player();
+	Player();
 	Player(int sx,int sy);
 	~Player();
 	void Update()override;
