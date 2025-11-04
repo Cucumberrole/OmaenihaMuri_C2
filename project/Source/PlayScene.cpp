@@ -5,7 +5,6 @@
 PlayScene::PlayScene()
 {
 	new Field();
-	new Player();
 }
 
 PlayScene::~PlayScene()
@@ -16,6 +15,10 @@ void PlayScene::Update()
 {
 	if (CheckHitKey(KEY_INPUT_F2)) {
 		SceneManager::ChangeScene("TITLE");
+	}
+
+	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
+		SceneManager::Exit();
 	}
 }
 
