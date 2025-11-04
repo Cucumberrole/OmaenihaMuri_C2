@@ -99,7 +99,7 @@ void Player::Draw()
 	Field* field = FindGameObject<Field>();
 	int sc = field->GetScrollX();
 	//DrawRectGraph(x, y,0,0,64,64 ,hImage, 1);
-	DrawRectGraph(0, 0, 0, 0, 64, 64, hImage, 1);
+	DrawRectGraph(x, y, 0, 0, 64, 64, hImage, 1);
 	DrawFormatString(0, 100, GetColor(255, 255, 255), "x::%4f", x);
 	DrawFormatString(0, 120, GetColor(255, 255, 255), "y::%4f", y);
 
