@@ -56,6 +56,9 @@
     <ClCompile Include="Source\PlayScene.cpp">
       <Filter>PlayScene</Filter>
     </ClCompile>
+    <ClCompile Include="Library\Trigger.cpp">
+      <Filter>Library</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Screen.h" />
@@ -125,6 +128,9 @@
     </ClInclude>
     <ClInclude Include="Source\PlayScene.h">
       <Filter>PlayScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Library\Trigger.h">
+      <Filter>Library</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

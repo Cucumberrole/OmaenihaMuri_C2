@@ -152,6 +152,7 @@
     <ClInclude Include="Library\SceneBase.h" />
     <ClInclude Include="Library\SceneManager.h" />
     <ClInclude Include="Library\Time.h" />
+    <ClInclude Include="Library\Trigger.h" />
     <ClInclude Include="Source\BootScene.h" />
     <ClInclude Include="Source\Field.h" />
     <ClInclude Include="Source\Player.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="Library\ObjectManager.cpp" />
     <ClCompile Include="Library\SceneManager.cpp" />
     <ClCompile Include="Library\Time.cpp" />
+    <ClCompile Include="Library\Trigger.cpp" />
     <ClCompile Include="Source\BootScene.cpp" />
     <ClCompile Include="Source\Field.cpp" />
     <ClCompile Include="Source\Player.cpp" />
