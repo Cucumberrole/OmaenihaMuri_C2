@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "Field.h"
+#include "../Library/Trigger.h"
 static const float Gravity = 0.2;
 static const float V0 = -10.0;
 
@@ -20,6 +21,9 @@ Player::Player(int sx, int sy)
 	y = sy;
 	velocity = 0;
 	onGround = false;
+
+	jumpcount = 0;
+	Maxjumpcount = 1;
 }
 //デストラクタ―
 //最後に1回だけ呼ばれる
@@ -29,6 +33,13 @@ Player::~Player()
 //計算するところ
 void Player::Update()
 {
+	if (onGround == true) {
+		if (jumpcount < Maxjumpcount) {
+			jumpcount += 1;
+		}
+	}
+
+
 	if (CheckHitKey(KEY_INPUT_D)) {
 		x += 2;
 		Field* field = FindGameObject<Field>();
@@ -49,10 +60,20 @@ void Player::Update()
 
 	
 	if (onGround == true) {
-		if (CheckHitKey(KEY_INPUT_SPACE)) {
+		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
 			velocity = V0;
+			onGround = false;
 		}
 
+	}
+
+	if (onGround == false) {
+		if (jumpcount == Maxjumpcount) {
+			if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
+				jumpcount -= 1;
+				velocity = V0;
+			}
+		}
 	}
 	y += velocity;
 	velocity += Gravity;
