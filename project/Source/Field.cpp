@@ -9,7 +9,7 @@ vector<vector<int>> maps = {
 					{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0},
 					{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 					{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0},
-					{1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+					{0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 					{1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
 					{1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1},
 					{1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
@@ -76,7 +76,7 @@ int Field::HitCheckRight(int px, int py)
 		return 0;
 	}
 	int x = px / 64;
-	int y = (py - 0) / 64;
+	int y = py / 64;
 	if (maps[y][x] == 1)
 	{
 		return px % 64 + 1;
@@ -89,11 +89,11 @@ int Field::HitCheckLeft(int px, int py)
 	if (py < 0) {
 		return 0;
 	}
-	int x = (px / 64);
-	int y = (py - 0) / 64;
+	int x = px / 64;
+	int y = py / 64;
 	if (maps[y][x] == 1)
 	{
-		return 64 - px %64;
+		return 64 - px % 64;
 	}
 	return 0;
 }
@@ -104,10 +104,10 @@ int Field::HitCheckDown(int px, int py)
 		return 0;
 	}
 	int x = px / 64;
-	int y = (py - 0) / 64;
+	int y = py / 64;
 	if (maps[y][x] == 1)
 	{
-		return (py-0)%64+1;
+		return py % 64 + 1;
 	}
 	return 0;
 }
@@ -118,8 +118,8 @@ int Field::HitCheckUp(int px, int py)
 		return 0;
 	}
 	int x = px / 64;
-	int y = (py - 0) / 64;
+	int y = py / 64;
 	if (maps[y][x] == 1)
-		return 64 -(py - 0) % 64;
+		return 64 - py % 64;
 	return 0;
 }
