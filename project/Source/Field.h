@@ -12,8 +12,6 @@ public:
 	int HitCheckLeft(int px, int py);
 	int HitCheckDown(int px, int py);
 	int HitCheckUp(int px, int py);
-	int GetScrollX() { return scrollX; }
-	void SetScrollX(int s) { scrollX = s; }
 private:
 	int hImage;
 	int kabehImage;
