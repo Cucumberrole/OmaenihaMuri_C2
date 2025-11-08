@@ -1,5 +1,6 @@
 #include "Field.h"
 #include "Player.h"
+#include "CsvReader.h"
 #include <vector>
 using namespace std;
 
@@ -10,8 +11,8 @@ using namespace std;
 // 0: 空間
 // 2: プレイヤー
 //------------------------------------------------------------
-vector<vector<int>> maps = {
-					{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+vector<vector<int>> maps;
+/*					{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 					{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 					{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0},
 					{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -23,10 +24,29 @@ vector<vector<int>> maps = {
 					{1,1,0,1,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,1},
 					{1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1},
 					{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-};
+*/
 
-Field::Field()
+Field::Field(int stage)
 {
+	char filename[60];
+	sprintf_s<60>(filename, "data/stage%02d.csv", stage);  // 例: data/stage01.csv
+
+	// --- CSVからマップを読み込む ---
+	CsvReader* csv = new CsvReader(filename);
+	int lines = csv->GetLines();          // 行数（縦のマス数）
+	maps.resize(lines);                   // マップ行数を設定
+
+	for (int y = 0; y < lines; y++) {
+		int cols = csv->GetColumns(y);    // 列数（横のマス数）
+		maps[y].resize(cols);             // 行の列数を設定
+
+		for (int x = 0; x < cols; x++) {
+			int num = csv->GetInt(y, x);  // CSVの整数値を取得
+			maps[y][x] = num;             // mapsに格納
+		}
+	}
+	delete csv;
+
 	// 背景画像とブロック画像を読み込む
 	kabehImage = LoadGraph("data/image/kabe.png");
 	hImage = LoadGraph("data/image/New Blo.png");
