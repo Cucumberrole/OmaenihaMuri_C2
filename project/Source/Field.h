@@ -14,7 +14,7 @@ public:
 	int HitCheckUp(int px, int py);
 private:
 	int hImage;
-	int kabehImage;
+	int bgImage;
 	float x, y;
 	int scrollX;
 
