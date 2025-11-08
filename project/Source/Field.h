@@ -1,21 +1,26 @@
 #pragma once
-#include"../Library/GameObject.h"
+#include "../Library/GameObject.h"
 
 class Field : public GameObject
 {
 public:
-	Field(int stage);
-	~Field();
-	void Update()override;
-	void Draw()override;
-	int HitCheckRight(int px, int py);
-	int HitCheckLeft(int px, int py);
-	int HitCheckDown(int px, int py);
-	int HitCheckUp(int px, int py);
-private:
-	int hImage;
-	int bgImage;
-	float x, y;
-	int scrollX;
+    Field(int stage);
+    ~Field();
 
+    void Update() override;
+    void Draw() override;
+
+    //--------------------------------------------------------
+    // 当たり判定（衝突チェック）
+    //--------------------------------------------------------
+    int HitCheckRight(int px, int py);  // 右方向の当たり判定
+    int HitCheckLeft(int px, int py);   // 左方向の当たり判定
+    int HitCheckDown(int px, int py);   // 下方向の当たり判定（床）
+    int HitCheckUp(int px, int py);     // 上方向の当たり判定（天井）
+
+private:
+    int hImage;     // 地形（ブロック）画像ハンドル
+    int bgImage;    // 背景画像ハンドル
+    float x, y;     // ステージの座標（主にスクロール時に使用）
+    int scrollX;    // 横スクロール量（カメラ位置）
 };
