@@ -121,6 +121,23 @@ void Player::Draw()
 	int sc = field->GetScrollX();
 	//DrawRectGraph(x, y,0,0,64,64 ,hImage, 1);
 	DrawRectGraph(x, y, 0, 0, 64, 64, hImage, 1);
+
+	//--- 当たり判定 ---
+	int colorCorner = GetColor(255, 0, 0);
+
+	//四隅の座標
+	int left = x - sc;
+	int right = x + 63 - sc;
+	int top = y;
+	int bottom = y + 63;
+
+	//円表示
+	DrawCircle(left, top, 3, colorCorner, TRUE);//左上
+	DrawCircle(right, top, 3, colorCorner, TRUE);//右下
+	DrawCircle(left, bottom, 3, colorCorner, TRUE);//左上
+	DrawCircle(right, bottom, 3, colorCorner, TRUE);//右下
+
+	//--- 座標表示 ---
 	DrawFormatString(0, 100, GetColor(255, 255, 255), "x::%4f", x);
 	DrawFormatString(0, 120, GetColor(255, 255, 255), "y::%4f", y);
 
