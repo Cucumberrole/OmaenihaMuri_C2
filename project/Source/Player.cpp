@@ -1,142 +1,207 @@
 #include "Player.h"
 #include "Field.h"
 #include "../Library/Trigger.h"
-static const float Gravity = 0.2;
-static const float V0 = -10.0;
+#include <assert.h>
 
-//コンストラクタ―
-//最初に1回だけ必ず呼ばれる。
+
+// --- 定数 ---
+static const float Gravity = 0.2f;  // 重力加速度
+static const float V0 = -10.0f;     // ジャンプ初速度（上方向）
+
+//--------------------------------------
+// デフォルトコンストラクタ
+//--------------------------------------
 Player::Player()
 {
-	hImage = LoadGraph("data/image/おまえ歩き.png");
-	x = 200;
-	y = 500;
-	velocity =0;
-	onGround = false;
+    hImage = LoadGraph("data/image/おまえ歩き.png");
+    assert(hImage != -1);
+
+    x = 200;
+    y = 500;
+    velocity = 0;
+    onGround = false;
+
+    jumpcount = 0;
+    Maxjumpcount = 1;
+
+    // アニメーション初期化
+    animIndex = 0;
+    animFrame = 0;
+    direction = true;
 }
+
+//--------------------------------------
+// 座標指定コンストラクタ
+//--------------------------------------
 Player::Player(int sx, int sy)
 {
-	hImage = LoadGraph("data/image/おまえ歩き.png");
-	x = sx;
-	y = sy;
-	velocity = 0;
-	onGround = false;
+    hImage = LoadGraph("data/image/おまえ歩き.png");
+    assert(hImage != -1);
 
-	jumpcount = 0;
-	Maxjumpcount = 1;
+    x = static_cast<float>(sx);
+    y = static_cast<float>(sy);
+    velocity = 0;
+    onGround = false;
+
+    jumpcount = 0;
+    Maxjumpcount = 1;
+
+    // アニメーション初期化
+    animIndex = 0;
+    animFrame = 0;
+    direction = true;
 }
-//デストラクタ―
-//最後に1回だけ呼ばれる
+
+//--------------------------------------
+// デストラクタ
+//--------------------------------------
 Player::~Player()
 {
+    DeleteGraph(hImage);
 }
-//計算するところ
+
+//--------------------------------------
+// Update()
+//--------------------------------------
 void Player::Update()
 {
-	if (onGround == true) {
-		if (jumpcount < Maxjumpcount) {
-			jumpcount += 1;
-		}
-	}
+    // --- 地面にいるときはジャンプ回数をリセット ---
+    if (onGround && jumpcount < Maxjumpcount) {
+        jumpcount += 1;
+    }
 
+    int moveX = 0; // 横移動量
 
-	if (CheckHitKey(KEY_INPUT_D)) {
-		x += 2;
-		Field* field = FindGameObject<Field>();
-		if (y >= 400) {
-			int push2 = field->HitCheckRight(x + 50, y + 63);
-			x -= push2;
-		}
-	}
-	if (CheckHitKey(KEY_INPUT_A)) {
-		x -= 2;
-		Field* field = FindGameObject<Field>();
-		if (y >= 400) {
-			int push1 = field->HitCheckLeft(x + 14, y + 5);
+    //--------------------------------------
+    // 右移動（Dキー）
+    //--------------------------------------
+    if (CheckHitKey(KEY_INPUT_D)) {
+        moveX = WALK_SPEED;
+        direction = false; // 右向き
 
-			x += push1;
-		}
-	}
+        Field* field = FindGameObject<Field>();
+        if (y >= 400) {
+            int push2 = field->HitCheckRight(x + 50, y + 63);
+            x -= push2; // 壁にめり込まないよう押し戻す
+        }
+    }
 
-	
-	if (onGround == true) {
-		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
-			velocity = V0;
-			onGround = false;
-		}
+    //--------------------------------------
+    // 左移動（Aキー）
+    //--------------------------------------
+    if (CheckHitKey(KEY_INPUT_A)) {
+        moveX = -WALK_SPEED;
+        direction = true; // 左向き
 
-	}
+        Field* field = FindGameObject<Field>();
+        if (y >= 400) {
+            int push1 = field->HitCheckLeft(x + 14, y + 5);
+            x += push1;
+        }
+    }
 
-	if (onGround == false) {
-		if (jumpcount == Maxjumpcount) {
-			if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
-				jumpcount -= 1;
-				velocity = V0;
-			}
-		}
-	}
-	y += velocity;
-	velocity += Gravity;
-	if (velocity >= 0) {
-		Field* field = FindGameObject<Field>();
-		
-				int push1 = field->HitCheckDown(x + 14, y + 64);
-				int push2 = field->HitCheckDown(x + 50, y + 64);
-				int push = max(push1, push2);
-				if (push > 0) {
-					y -= push - 1;
-					velocity = 0;
-					onGround = true;
-				}
-				else {
-					onGround = false;
-				}
-			
-		
-	}
-	else {
-		Field* field = FindGameObject<Field>();
-			int push1 = field->HitCheckUp(x + 14, y + 5);
-			int push2 = field->HitCheckUp(x + 50, y + 5);
-			int push = max(push1, push2);
-			if (push > 0) {
-				y += push;
-				velocity = 0;
-			}
-		
-	}
-	////ここでスクロールを書く
-	//Field* field = FindGameObject<Field>();
-	//int sc = field->GetScrollX();
-	//if (x-sc >= 300) {
-	//	field->SetScrollX(x-300);
+    //--------------------------------------
+    // 歩行アニメーション更新
+    //--------------------------------------
+    if (moveX != 0) {
+        // 一定間隔で次のコマに切り替える
+        animFrame = (animFrame + 1) % ANIM_FRAME_INTERVAL;
+        if (animFrame == 0) {
+            animIndex = (animIndex + 1) % ANIM_FRAME_COUNT;
+        }
 
-	//}
+        // 実際の位置を更新
+        x += moveX;
+    }
 
+    //--------------------------------------
+    // ジャンプ処理（接地中）
+    //--------------------------------------
+    if (onGround) {
+        if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
+            velocity = V0;     // 上方向に加速
+            onGround = false;  // 空中へ
+        }
+    }
+
+    //--------------------------------------
+    // 二段ジャンプ処理
+    //--------------------------------------
+    if (!onGround && jumpcount == Maxjumpcount) {
+        if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
+            jumpcount -= 1;
+            velocity = V0;
+        }
+    }
+
+    //--------------------------------------
+    // 重力適用
+    //--------------------------------------
+    y += velocity;
+    velocity += Gravity;
+
+    //--------------------------------------
+    // 当たり判定（下方向：床）
+    //--------------------------------------
+    Field* field = FindGameObject<Field>();
+
+    if (velocity >= 0) { // 落下中
+        int push1 = field->HitCheckDown(x + 14, y + 64);
+        int push2 = field->HitCheckDown(x + 50, y + 64);
+        int push = max(push1, push2);
+
+        if (push > 0) {
+            y -= push - 1;   // 床に押し戻す
+            velocity = 0;
+            onGround = true;
+        }
+        else {
+            onGround = false;
+        }
+    }
+    else { // 上昇中
+        int push1 = field->HitCheckUp(x + 14, y + 5);
+        int push2 = field->HitCheckUp(x + 50, y + 5);
+        int push = max(push1, push2);
+        if (push > 0) {
+            y += push;       // 天井に当たったので押し戻す
+            velocity = 0;
+        }
+    }
 }
-//表示するところ
+
+//--------------------------------------
+// Draw()
+//--------------------------------------
 void Player::Draw()
 {
-	Field* field = FindGameObject<Field>();
-	DrawRectGraph(x, y, 0, 0, 64, 64, hImage, 1);
-	/*
-	//--- 当たり判定 ---
-	int colorCorner = GetColor(255, 0, 0);
+    Field* field = FindGameObject<Field>();
 
-	////四隅の座標
-	int left = x - ;
-	int right = x + 63;
-	int top = y;
-	int bottom = y + 63;
+    //--------------------------------------
+    // 現在のスプライトシート上での位置を算出
+    //--------------------------------------
+    int xRect = (animIndex % ATLAS_WIDTH) * CHARACTER_WIDTH;
+    int yRect = (animIndex / ATLAS_WIDTH) * CHARACTER_HEIGHT;
 
-	//円表示
-	DrawCircle(left, top, 3, colorCorner, TRUE);//左上
-	DrawCircle(right, top, 3, colorCorner, TRUE);//右下
-	DrawCircle(left, bottom, 3, colorCorner, TRUE);//左上
-	DrawCircle(right, bottom, 3, colorCorner, TRUE);//右下
-	*/
-	//--- 座標表示 ---
-	DrawFormatString(0, 100, GetColor(255, 255, 255), "x::%4f", x);
-	DrawFormatString(0, 120, GetColor(255, 255, 255), "y::%4f", y);
+    //--------------------------------------
+    // キャラクター描画
+    // DrawRectGraph(x, y, 切り出しX, 切り出しY, 幅, 高さ, 画像, 透過, 左右反転)
+    //--------------------------------------
+    DrawRectGraph(
+        static_cast<int>(x),
+        static_cast<int>(y),
+        xRect,
+        yRect,
+        CHARACTER_WIDTH,
+        CHARACTER_HEIGHT,
+        hImage,
+        TRUE,
+        direction
+    );
 
+    //--------------------------------------
+    // デバッグ用座標表示
+    //--------------------------------------
+    DrawFormatString(0, 100, GetColor(255, 255, 255), "x: %.2f", x);
+    DrawFormatString(0, 120, GetColor(255, 255, 255), "y: %.2f", y);
 }
