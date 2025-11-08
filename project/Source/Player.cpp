@@ -118,8 +118,6 @@ void Player::Update()
 void Player::Draw()
 {
 	Field* field = FindGameObject<Field>();
-	int sc = field->GetScrollX();
-	//DrawRectGraph(x, y,0,0,64,64 ,hImage, 1);
 	DrawRectGraph(x, y, 0, 0, 64, 64, hImage, 1);
 
 	//--- “–‚½‚è”»’è ---
