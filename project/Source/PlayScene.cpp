@@ -2,10 +2,12 @@
 #include "Field.h"
 #include "Player.h"
 #include "Background.h"
+#include "FallingFloor.h"
 
 PlayScene::PlayScene()
 {
 	new Background();
+	new FallingFloor(64, 64);
 	new Field(0);
 }
 
