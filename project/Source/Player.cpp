@@ -50,6 +50,8 @@ Player::Player(int sx, int sy)
     animIndex = 0;
     animFrame = 0;
     direction = false;
+
+	SetDrawOrder(0); // •`‰æ‡‚ğ•ÏX
 }
 
 //--------------------------------------
