@@ -161,6 +161,7 @@
     <ClInclude Include="Source\Screen.h" />
     <ClInclude Include="Source\SceneFactory.h" />
     <ClInclude Include="Source\TitleScene.h" />
+    <ClInclude Include="Source\Trap.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\あおいちゃん\project\Source\CsvReader.cpp" />
@@ -184,6 +185,7 @@
     <ClCompile Include="Source\PlayScene.cpp" />
     <ClCompile Include="Source\SceneFactory.cpp" />
     <ClCompile Include="Source\TitleScene.cpp" />
+    <ClCompile Include="Source\Trap.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

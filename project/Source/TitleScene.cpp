@@ -1,4 +1,5 @@
 #include "TitleScene.h"
+#include "Screen.h"
 
 TitleScene::TitleScene()
 {
@@ -21,6 +22,7 @@ void TitleScene::Update()
 
 void TitleScene::Draw()
 {
+	SetFontSize(25);
 	int h = GetFontSize();
 	extern const char* Version();
 
@@ -28,6 +30,9 @@ void TitleScene::Draw()
 	DrawString(0, 0 + h * 1, Version(), GetColor(255, 255, 255));
 	DrawFormatString(0, 0 + h * 2, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
 	DrawFormatString(0, 0 + h * 3, GetColor(255, 255, 255), "FontSize:%d", h);
-	DrawString(100, 400, "Push [SHIFT]Key To Play", GetColor(255, 255, 255));
+
+
+	int DrawWidth = GetDrawStringWidth("Push [SHIFT]Key To Play", -1);
+	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2, "Push [SHIFT]Key To Play", GetColor(255, 255, 255));
 
 }

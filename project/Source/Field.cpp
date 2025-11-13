@@ -1,6 +1,7 @@
 #include "Field.h"
 #include "Player.h"
 #include "CsvReader.h"
+#include "Trap.h"
 #include <vector>
 using namespace std;
 
@@ -72,6 +73,11 @@ Field::Field(int stage)
                 // CSVで「2」と指定された位置にプレイヤーを生成
                 new Player(x * 64, y * 64);
             }
+
+            if (maps[y][x] == 3)
+            {
+                new Trap(x * 64, y * 64);
+            }
         }
     }
 }
@@ -130,83 +136,66 @@ void Field::Draw()
 // 戻り値 : 押し戻すべきピクセル数（0なら衝突なし）
 //------------------------------------------------------------
 
-//--------------------------------------
 // 右方向の当たり判定
-//--------------------------------------
 int Field::HitCheckRight(int px, int py)
 {
     if (py < 0) return 0;
 
     int x = px / 64;
     int y = py / 64;
+    if (y >= maps.size()) return 0;
 
-    // 範囲外アクセス防止
-    if (y < 0 || y >= maps.size() || x < 0 || x >= maps[y].size()) return 0;
-
-    if (maps[y][x] == 1)
-    {
-        // ブロック右端にめり込んだ分を押し戻す距離
+    if (maps[y][x] == 1) {
+        // ブロック右端を超えた分だけ押し戻す
         return px % 64 + 1;
     }
     return 0;
 }
 
-//--------------------------------------
 // 左方向の当たり判定
-//--------------------------------------
 int Field::HitCheckLeft(int px, int py)
 {
     if (py < 0) return 0;
 
     int x = px / 64;
     int y = py / 64;
+    if (y >= maps.size()) return 0;
 
-    if (y < 0 || y >= maps.size() || x < 0 || x >= maps[y].size()) return 0;
-
-    if (maps[y][x] == 1)
-    {
-        // ブロック左端との重なり距離
-        return 64 - px % 64;
+    if (maps[y][x] == 1) {
+        // ブロック左側にめり込んだ分を返す
+        return 64 - (px % 64);
     }
     return 0;
 }
 
-//--------------------------------------
-// 下方向の当たり判定（床）
-//--------------------------------------
-int Field::HitCheckDown(int px, int py)
-{
-    if (py < 0) return 0;
-
-    int x = px / 64;
-    int y = py / 64;
-
-    if (y < 0 || y >= maps.size() || x < 0 || x >= maps[y].size()) return 0;
-
-    if (maps[y][x] == 1)
-    {
-        // 床にめり込んだ分の距離
-        return py % 64 + 1;
-    }
-    return 0;
-}
-
-//--------------------------------------
-// 上方向の当たり判定（天井）
-//--------------------------------------
+// 上方向の当たり判定
 int Field::HitCheckUp(int px, int py)
 {
     if (py < 0) return 0;
 
     int x = px / 64;
     int y = py / 64;
+    if (y >= maps.size()) return 0;
 
-    if (y < 0 || y >= maps.size() || x < 0 || x >= maps[y].size()) return 0;
+    if (maps[y][x] == 1) {
+        // ブロックの下端にぶつかった分を返す
+        return 64 - (py % 64);
+    }
+    return 0;
+}
 
-    if (maps[y][x] == 1)
-    {
-        // 天井との衝突時の押し戻し距離
-        return 64 - py % 64;
+// 下方向の当たり判定
+int Field::HitCheckDown(int px, int py)
+{
+    if (py < 0) return 0;
+
+    int x = px / 64;
+    int y = py / 64;
+    if (y >= maps.size()) return 0;
+
+    if (maps[y][x] == 1) {
+        // 床ブロックにめり込んだ距離を返す
+        return (py % 64) + 1;
     }
     return 0;
 }
