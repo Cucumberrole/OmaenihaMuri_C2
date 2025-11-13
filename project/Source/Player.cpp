@@ -49,7 +49,7 @@ Player::Player(int sx, int sy)
     // アニメーション初期化
     animIndex = 0;
     animFrame = 0;
-    direction = true;
+    direction = false;
 }
 
 //--------------------------------------
@@ -79,10 +79,9 @@ void Player::Update()
         direction = false; // 右向き
 
         Field* field = FindGameObject<Field>();
-        if (y >= 400) {
-            int push2 = field->HitCheckRight(x + 50, y + 63);
-            x -= push2; // 壁にめり込まないよう押し戻す
-        }
+		int push1 = field->HitCheckRight(x + 60, y + 5);
+        int push2 = field->HitCheckRight(x + 60, y + 63);
+        x -= max(push1, push2); // 壁にめり込まないよう押し戻す
     }
 
     //--------------------------------------
@@ -93,10 +92,9 @@ void Player::Update()
         direction = true; // 左向き
 
         Field* field = FindGameObject<Field>();
-        if (y >= 400) {
-            int push1 = field->HitCheckLeft(x + 14, y + 5);
-            x += push1;
-        }
+        int push1 = field->HitCheckLeft(x + 4, y + 5);
+		int push2 = field->HitCheckLeft(x + 4, y + 63);
+		x += max(push1, push2); // 壁にめり込まないよう押し戻す
     }
 
     //--------------------------------------
@@ -112,6 +110,9 @@ void Player::Update()
         // 実際の位置を更新
         x += moveX;
     }
+
+	//マップクラスの取得
+	Field* field = FindGameObject<Field>(); 
 
     //--------------------------------------
     // ジャンプ処理（接地中）
@@ -142,7 +143,6 @@ void Player::Update()
     //--------------------------------------
     // 当たり判定（下方向：床）
     //--------------------------------------
-    Field* field = FindGameObject<Field>();
 
     if (velocity >= 0) { // 落下中
         int push1 = field->HitCheckDown(x + 14, y + 64);
@@ -203,4 +203,14 @@ void Player::Draw()
     //--------------------------------------
     DrawFormatString(0, 100, GetColor(255, 255, 255), "x: %.2f", x);
     DrawFormatString(0, 120, GetColor(255, 255, 255), "y: %.2f", y);
+}
+
+float Player::GetX() const
+{
+    return x;
+}
+
+float Player::GetY() const
+{
+    return y;
 }

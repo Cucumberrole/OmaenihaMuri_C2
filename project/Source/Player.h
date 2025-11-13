@@ -12,6 +12,9 @@ public:
     void Update() override;   // 状態更新（入力処理・物理計算など）
     void Draw() override;     // 描画処理
 
+    float GetX() const;
+    float GetY() const;
+
 private:
     // --- 基本パラメータ ---
     int hImage;         // プレイヤー画像ハンドル
