@@ -156,6 +156,7 @@
     <ClInclude Include="Library\Trigger.h" />
     <ClInclude Include="Source\Background.h" />
     <ClInclude Include="Source\BootScene.h" />
+    <ClInclude Include="Source\FallingFloor.h" />
     <ClInclude Include="Source\Field.h" />
     <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\PlayScene.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="Library\Trigger.cpp" />
     <ClCompile Include="Source\Background.cpp" />
     <ClCompile Include="Source\BootScene.cpp" />
+    <ClCompile Include="Source\FallingFloor.cpp" />
     <ClCompile Include="Source\Field.cpp" />
     <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\PlayScene.cpp" />
