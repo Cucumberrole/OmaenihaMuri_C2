@@ -55,7 +55,7 @@ Field::Field(int stage)
     //--------------------------------------------------------
     // --- 背景画像とブロック画像を読み込み ---
     //--------------------------------------------------------
-    bgImage = LoadGraph("data/image/kabe.png");       // 背景
+	SetDrawOrder(50);  // 描画順序を設定
     hImage = LoadGraph("data/image/New Blo.png");        // ブロック
     x = 0;
     y = 0;
@@ -68,16 +68,17 @@ Field::Field(int stage)
     {
         for (int x = 0; x < maps[y].size(); x++)
         {
+            if (maps[y][x] == 3)
+            {
+                new Trap(x * 64, y * 64 + 64);
+            }
+
             if (maps[y][x] == 2)
             {
                 // CSVで「2」と指定された位置にプレイヤーを生成
                 new Player(x * 64, y * 64);
             }
 
-            if (maps[y][x] == 3)
-            {
-                new Trap(x * 64, y * 64);
-            }
         }
     }
 }
@@ -105,8 +106,6 @@ void Update() {}
 //------------------------------------------------------------
 void Field::Draw()
 {
-    // 背景を描画
-    DrawGraph(0, 0, bgImage, TRUE);
 
     // --- マップ走査してブロック描画 ---
     for (int y = 0; y < maps.size(); y++)
