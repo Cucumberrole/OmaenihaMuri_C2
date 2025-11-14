@@ -31,7 +31,7 @@ private:
     static const int ATLAS_HEIGHT = 1;         // スプライトシートの縦方向のコマ数
     static const int ANIM_FRAME_COUNT = 12;    // 使用するアニメーションコマ数
     static const int ANIM_FRAME_INTERVAL = 5;  // コマを切り替えるフレーム間隔
-    static const int WALK_SPEED = 2;           // プレイヤーの横移動速度（ドット/フレーム）
+    static const int WALK_SPEED = 3;           // プレイヤーの横移動速度（ドット/フレーム）
 
     // --- アニメーション関連変数 ---
     int animIndex;      // 現在のアニメーションフレーム番号

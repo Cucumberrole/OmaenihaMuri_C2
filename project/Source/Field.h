@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "../Library/GameObject.h"
 
 class Field : public GameObject
@@ -20,7 +21,6 @@ public:
 
 private:
     int hImage;     // 地形（ブロック）画像ハンドル
-    int bgImage;    // 背景画像ハンドル
     float x, y;     // ステージの座標（主にスクロール時に使用）
     int scrollX;    // 横スクロール量（カメラ位置）
 };
