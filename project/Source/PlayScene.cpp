@@ -7,7 +7,6 @@
 PlayScene::PlayScene()
 {
 	new Background();
-	new FallingFloor(64, 64);
 	new Field(0);
 }
 

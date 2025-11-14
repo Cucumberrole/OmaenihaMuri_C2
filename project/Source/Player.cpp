@@ -1,12 +1,13 @@
 #include "Player.h"
 #include "Field.h"
+#include "FallingFloor.h"
 #include "../Library/Trigger.h"
 #include <assert.h>
 
 
 // --- 定数 ---
 static const float Gravity = 0.2f;  // 重力加速度
-static const float V0 = -10.0f;     // ジャンプ初速度（上方向）
+static const float V0 = -5.0f;     // ジャンプ初速度（上方向）
 
 //--------------------------------------
 // デフォルトコンストラクタ
@@ -78,12 +79,23 @@ void Player::Update()
     //--------------------------------------
     if (CheckHitKey(KEY_INPUT_D)) {
         moveX = WALK_SPEED;
-        direction = false; // 右向き
+        direction = false;
 
+        // --- Field 判定 ---
         Field* field = FindGameObject<Field>();
-		int push1 = field->HitCheckRight(x + 60, y + 5);
+        int push1 = field->HitCheckRight(x + 60, y + 5);
         int push2 = field->HitCheckRight(x + 60, y + 63);
-        x -= max(push1, push2); // 壁にめり込まないよう押し戻す
+        int push = max(push1, push2);
+
+        // --- 落下床 判定（複数床対応） ---
+        auto floors = FindGameObjects<FallingFloor>();
+        for (auto f : floors) {
+            int p1 = f->HitCheckRight(x + 60, y + 5);
+            int p2 = f->HitCheckRight(x + 60, y + 63);
+            push = max(push, max(p1, p2));
+        }
+
+        x -= push;
     }
 
     //--------------------------------------
@@ -91,12 +103,21 @@ void Player::Update()
     //--------------------------------------
     if (CheckHitKey(KEY_INPUT_A)) {
         moveX = -WALK_SPEED;
-        direction = true; // 左向き
+        direction = true;
 
         Field* field = FindGameObject<Field>();
         int push1 = field->HitCheckLeft(x + 4, y + 5);
-		int push2 = field->HitCheckLeft(x + 4, y + 63);
-		x += max(push1, push2); // 壁にめり込まないよう押し戻す
+        int push2 = field->HitCheckLeft(x + 4, y + 63);
+        int push = max(push1, push2);
+
+        auto floors = FindGameObjects<FallingFloor>();
+        for (auto f : floors) {
+            int p1 = f->HitCheckLeft(x + 4, y + 5);
+            int p2 = f->HitCheckLeft(x + 4, y + 63);
+            push = max(push, max(p1, p2));
+        }
+
+        x += push;
     }
 
     //--------------------------------------
@@ -151,8 +172,16 @@ void Player::Update()
         int push2 = field->HitCheckDown(x + 50, y + 64);
         int push = max(push1, push2);
 
+        // --- 落下床との当たり判定 ---
+        auto floors = FindGameObjects<FallingFloor>();
+        for (auto f : floors) {
+            int p1 = f->HitCheckDown(x + 14, y + 64);
+            int p2 = f->HitCheckDown(x + 50, y + 64);
+            push = max(push, max(p1, p2));
+        }
+
         if (push > 0) {
-            y -= push - 1;   // 床に押し戻す
+            y -= push - 1;
             velocity = 0;
             onGround = true;
         }
@@ -164,11 +193,21 @@ void Player::Update()
         int push1 = field->HitCheckUp(x + 14, y + 5);
         int push2 = field->HitCheckUp(x + 50, y + 5);
         int push = max(push1, push2);
+
+        // --- 落下床との当たり判定 ---
+        auto floors = FindGameObjects<FallingFloor>();
+        for (auto f : floors) {
+            int p1 = f->HitCheckUp(x + 14, y + 5);
+            int p2 = f->HitCheckUp(x + 50, y + 5);
+            push = max(push, max(p1, p2));
+        }
+
         if (push > 0) {
-            y += push;       // 天井に当たったので押し戻す
+            y += push;
             velocity = 0;
         }
     }
+
 }
 
 //--------------------------------------

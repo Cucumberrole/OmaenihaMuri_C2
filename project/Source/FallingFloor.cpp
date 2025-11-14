@@ -1,6 +1,7 @@
 #include "FallingFloor.h"
 #include "Player.h"
 #include "Field.h"
+#include <vector>
 #include <DxLib.h>
 
 FallingFloor::FallingFloor(int sx, int sy)
@@ -12,9 +13,9 @@ FallingFloor::FallingFloor(int sx, int sy)
     velocityY = 0.0f;
     isFalling = false;
     isLanded = false;
-    gravity = 0.4f;
+    gravity = 0.8f;
 
-    SetDrawOrder(90); // Field(100)より手前、Player(0)より奥
+    SetDrawOrder(-1); // 描画順位
 }
 
 FallingFloor::~FallingFloor()
@@ -72,4 +73,54 @@ void FallingFloor::StartFalling()
 void FallingFloor::Draw()
 {
     DrawRectGraph(static_cast<int>(x), static_cast<int>(y), 0, 0, 64, 64, hImage, TRUE);
+}
+
+int FallingFloor::HitCheckRight(int px, int py)
+{
+    // px,py → プレイヤーの判定点
+    if (py < y || py >= y + 64) return 0; // 縦方向が重なっていない
+
+    int localX = px - x;
+    if (localX >= 0 && localX < 64)
+    {
+        return localX + 1;
+    }
+    return 0;
+}
+
+int FallingFloor::HitCheckLeft(int px, int py)
+{
+    if (py < y || py >= y + 64) return 0;
+
+    int localX = px - x;
+    if (localX >= 0 && localX < 64)
+    {
+        return 64 - localX;
+    }
+    return 0;
+}
+
+int FallingFloor::HitCheckDown(int px, int py)
+{
+    // px が床の横範囲にない
+    if (px < x || px >= x + 64) return 0;
+
+    int localY = py - y;
+    if (localY >= 0 && localY < 64)
+    {
+        return localY + 1;
+    }
+    return 0;
+}
+
+int FallingFloor::HitCheckUp(int px, int py)
+{
+    if (px < x || px >= x + 64) return 0;
+
+    int localY = py - y;
+    if (localY >= 0 && localY < 64)
+    {
+        return 64 - localY;
+    }
+    return 0;
 }
