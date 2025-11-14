@@ -3,6 +3,7 @@
 #include "CsvReader.h"
 #include "Trap.h"
 #include "FallingFloor.h"
+#include "FakeFloor.h"
 #include <vector>
 using namespace std;
 
@@ -79,6 +80,12 @@ Field::Field(int stage)
             {
                 // 床落ちるトラップ
                 new FallingFloor(x * 64, y * 64);
+            }
+
+            if (maps[y][x] == 6)
+            {
+                // フェイク床トラップ
+                new FakeFloor(x * 64, y * 64);
             }
 
             if (maps[y][x] == 2)
