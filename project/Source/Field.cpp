@@ -4,6 +4,7 @@
 #include "Trap.h"
 #include "FallingFloor.h"
 #include "FakeFloor.h"
+#include "FlyingSpike.h"
 #include <vector>
 using namespace std;
 
@@ -13,6 +14,11 @@ using namespace std;
 // 1 : ブロック（当たり判定あり）
 // 0 : 空間（通過可）
 // 2 : プレイヤー初期位置
+// 3 : 針がにゅって出てくるトラップ
+// 4 : 床落ちるトラップ
+// 5 : 針が飛んでくるトラップ
+// 6 : フェイクの床トラップ
+// 9 : ゴール
 //------------------------------------------------------------
 vector<vector<int>> maps;
 /*					{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},　マップ元データ
@@ -34,7 +40,7 @@ vector<vector<int>> maps;
 Field::Field(int stage)
 {
     char filename[60];
-    sprintf_s<60>(filename, "data/stage%02d.csv", stage);  // 例: data/stage01.csv
+    sprintf_s<60>(filename, "data/stage%02d.csv", stage);
 
     //--------------------------------------------------------
     // --- CSVファイルからマップデータを読み込み ---
@@ -70,6 +76,12 @@ Field::Field(int stage)
     {
         for (int x = 0; x < maps[y].size(); x++)
         {
+            if (maps[y][x] == 2)
+            {
+                // CSVで「2」と指定された位置にプレイヤーを生成
+                new Player(x * 64, y * 64);
+            }
+
             if (maps[y][x] == 3)
             {
                 // トラップ設置
@@ -88,11 +100,6 @@ Field::Field(int stage)
                 new FakeFloor(x * 64, y * 64);
             }
 
-            if (maps[y][x] == 2)
-            {
-                // CSVで「2」と指定された位置にプレイヤーを生成
-                new Player(x * 64, y * 64);
-            }
 
         }
     }
@@ -108,13 +115,24 @@ Field::~Field() {}
 //------------------------------------------------------------
 void Field::Update()
 {
-    // 強制的に右にスクロールさせたい場合の例：
-    // scrollX += 1;
-}
+    Player* player = FindGameObject<Player>();
+    if (player == nullptr) return;
 
-// ※ この下の void Update() は不要。誤って定義されている。
-//   グローバル関数扱いになってしまうため削除推奨。
-void Update() {}
+    float px = player->GetX();
+    float py = player->GetY();
+
+    int tx = int (px + 32) / 64;  // プレイヤー中央
+    int ty = int (py + 63) / 64;  // 足元
+
+    if (maps[ty][tx] == 5)  // トリガーブロック
+    {
+        // --- 針を発射する ---
+        SpawnFlyingSpike(tx * 64, ty * 64, -1.0f); // 左向き
+
+        // １度踏んだら空白に書き換える
+        //maps[ty][tx] = 0;
+    }
+}
 
 //------------------------------------------------------------
 // Draw()
@@ -212,4 +230,20 @@ int Field::HitCheckDown(int px, int py)
         return (py % 64) + 1;
     }
     return 0;
+}
+
+bool Field::IsBlock(int tx, int ty)
+{
+    if (ty < 0 || ty >= maps.size()) return false;
+    if (tx < 0 || tx >= maps[ty].size()) return false;
+
+    return maps[ty][tx] == 1;
+}
+
+void Field::SpawnFlyingSpike(float x, float y, float direction)
+{
+    float speed = 10.0f * direction; // 方向付きスピード
+
+    // 針が飛んでくる
+    new FlyingSpike(x + (direction < 0 ? 64 : -64), y * 64, speed);
 }

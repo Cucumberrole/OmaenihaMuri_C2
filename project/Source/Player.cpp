@@ -64,6 +64,19 @@ Player::~Player()
 }
 
 //--------------------------------------
+// ç¿ïWéÊìæóp
+//--------------------------------------
+float Player::GetX() const
+{
+    return x;
+}
+
+float Player::GetY() const
+{
+    return y;
+}
+
+//--------------------------------------
 // Update()
 //--------------------------------------
 void Player::Update()
@@ -244,14 +257,4 @@ void Player::Draw()
     //--------------------------------------
     DrawFormatString(0, 100, GetColor(255, 255, 255), "x: %.2f", x);
     DrawFormatString(0, 120, GetColor(255, 255, 255), "y: %.2f", y);
-}
-
-float Player::GetX() const
-{
-    return x;
-}
-
-float Player::GetY() const
-{
-    return y;
 }

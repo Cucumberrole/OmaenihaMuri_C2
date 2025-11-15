@@ -74,6 +74,12 @@
     <ClCompile Include="Source\FakeFloor.cpp">
       <Filter>PlayScene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\FlyingSpike.cpp">
+      <Filter>PlayScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ClearScene.cpp">
+      <Filter>ClearScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Screen.h" />
@@ -162,6 +168,12 @@
     <ClInclude Include="Source\FakeFloor.h">
       <Filter>PlayScene</Filter>
     </ClInclude>
+    <ClInclude Include="Source\FlyingSpike.h">
+      <Filter>PlayScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ClearScene.h">
+      <Filter>ClearScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">
@@ -178,6 +190,9 @@
     </Filter>
     <Filter Include="ImGui">
       <UniqueIdentifier>{a717257b-67b3-4bfa-834c-1e34032b33b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ClearScene">
+      <UniqueIdentifier>{92a63fa5-8db1-48e8-8a26-c9ee49f8359a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
