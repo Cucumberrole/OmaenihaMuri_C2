@@ -11,6 +11,9 @@ public:
     void Update() override;
     void Draw() override;
 
+    bool IsBlock(int tx, int ty);
+    void SpawnFlyingSpike(float x, float y, float direction);
+
     //--------------------------------------------------------
     // 当たり判定（衝突チェック）
     //--------------------------------------------------------

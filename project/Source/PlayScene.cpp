@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Background.h"
 #include "FallingFloor.h"
+#include <iostream>
 
 PlayScene::PlayScene()
 {
