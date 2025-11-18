@@ -161,6 +161,7 @@
     <ClInclude Include="Source\FallingFloor.h" />
     <ClInclude Include="Source\Field.h" />
     <ClInclude Include="Source\FlyingSpike.h" />
+    <ClInclude Include="Source\GameOver.h" />
     <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\PlayScene.h" />
     <ClInclude Include="Source\Screen.h" />
@@ -191,6 +192,7 @@
     <ClCompile Include="Source\FallingFloor.cpp" />
     <ClCompile Include="Source\Field.cpp" />
     <ClCompile Include="Source\FlyingSpike.cpp" />
+    <ClCompile Include="Source\GameOver.cpp" />
     <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\PlayScene.cpp" />
     <ClCompile Include="Source\SceneFactory.cpp" />

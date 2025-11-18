@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "Field.h"
 #include "FallingFloor.h"
+#include "GameOver.h"
 #include "../Library/Trigger.h"
 #include <assert.h>
 
@@ -60,7 +61,7 @@ Player::Player(int sx, int sy)
 //--------------------------------------
 Player::~Player()
 {
-    DeleteGraph(hImage);
+   DeleteGraph(hImage);
 }
 
 //--------------------------------------
@@ -220,7 +221,6 @@ void Player::Update()
             velocity = 0;
         }
     }
-
 }
 
 //--------------------------------------
