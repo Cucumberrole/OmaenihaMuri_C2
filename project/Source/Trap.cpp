@@ -82,6 +82,7 @@ void Trap::Update()
         if (r1.HitFlag || r2.HitFlag || r3.HitFlag || r4.HitFlag)
         {
             player->DestroyMe();
+            SceneManager::ChangeScene("TITLE");
         }
     }
 }
