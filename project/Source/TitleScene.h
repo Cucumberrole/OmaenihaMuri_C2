@@ -1,5 +1,6 @@
 #pragma once
 #include "../Library/SceneBase.h"
+#include "../Library/GameObject.h"
 
 /// <summary>
 /// タイトルシーン
@@ -13,4 +14,6 @@ public:
 	~TitleScene();
 	void Update() override;
 	void Draw() override;
+private:
+	int TitleImage;
 };
