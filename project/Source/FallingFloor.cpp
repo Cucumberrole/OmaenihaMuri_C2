@@ -14,7 +14,6 @@ FallingFloor::FallingFloor(int sx, int sy)
     isFalling = false;
     isLanded = false;
     gravity = 0.8f;
-
     SetDrawOrder(-1); // 描画順位
 }
 
@@ -62,6 +61,33 @@ void FallingFloor::Update()
             }
         }
     }
+    // --- 落下中のプレイヤー潰し判定 ---
+    if (isFalling)
+    {
+        // 床の矩形
+        float fx1 = x;
+        float fx2 = x + 64;
+        float fy1 = y;
+        float fy2 = y + 64;
+
+        // プレイヤーの矩形
+        float px1 = px;
+        float px2 = px + 64;
+        float py1 = py;
+        float py2 = py + 64;
+
+        // --- 条件：床が上からプレイヤーに重なったら即死 ---
+        bool hit =
+            (fx1 < px2) && (fx2 > px1) &&  // 横重なり
+            (fy1 < py2) && (fy2 > py1) &&  // 縦重なり
+            (velocityY > 0);               // 落下中のみ判定
+
+        if (hit)
+        {
+            player->DestroyMe();  // 即死
+        }
+    }
+
 }
 
 void FallingFloor::StartFalling()

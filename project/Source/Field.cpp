@@ -130,7 +130,7 @@ void Field::Update()
         SpawnFlyingSpike(tx * 64, ty * 64, -1.0f); // 左向き
 
         // １度踏んだら空白に書き換える
-        //maps[ty][tx] = 0;
+        maps[ty][tx] = 0;
     }
 }
 
@@ -242,8 +242,8 @@ bool Field::IsBlock(int tx, int ty)
 
 void Field::SpawnFlyingSpike(float x, float y, float direction)
 {
-    float speed = 10.0f * direction; // 方向付きスピード
+    float speed = 8.0f * direction; // 方向付きスピード
 
     // 針が飛んでくる
-    new FlyingSpike(x + (direction < 0 ? 64 : -64), y * 64, speed);
+    new FlyingSpike(x + 64 * 4, y, speed);
 }
