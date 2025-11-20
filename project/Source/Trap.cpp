@@ -36,7 +36,7 @@ void Trap::Update()
     // --- プレイヤーが上のブロックを踏んだら発動 ---
     if (!isActive && !isExtended)
     {
-        float trapTop = y - offsetY;        // ← 修正点（描画位置と一致）
+        float trapTop = y - offsetY;
         float trapBottom = trapTop + height;
 
         if (px + pw > x && px < x + width &&
@@ -61,7 +61,7 @@ void Trap::Update()
     // --- 当たり判定（出ている間だけ） ---
     if (isExtended)
     {
-        float baseY = y - offsetY; // ← 描画位置と完全一致
+        float baseY = y - offsetY;
 
         VECTOR tri1 = VGet(x, baseY + height, 0);          // 左下
         VECTOR tri2 = VGet(x + width, baseY + height, 0);  // 右下
