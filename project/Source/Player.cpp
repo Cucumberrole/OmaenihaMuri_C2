@@ -233,7 +233,7 @@ void Player::Update()
 
     }
     else if (hp == 5) {
-        SceneManager::ChangeScene("GameOver");
+        SceneManager::ChangeScene("GAMEOVER");
     }
 
 }
