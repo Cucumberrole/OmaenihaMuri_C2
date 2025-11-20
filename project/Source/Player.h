@@ -15,6 +15,7 @@ public:
     float GetX() const;
     float GetY() const;
 
+    float GetRadius() const { return CHARACTER_WIDTH * 0.35f; }
 private:
     // --- 基本パラメータ ---
     int hImage;         // プレイヤー画像ハンドル
