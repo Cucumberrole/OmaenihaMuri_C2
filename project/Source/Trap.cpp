@@ -36,10 +36,13 @@ void Trap::Update()
     // --- プレイヤーが上のブロックを踏んだら発動 ---
     if (!isActive && !isExtended)
     {
+        float trapTop = y - offsetY;        // ← 修正点（描画位置と一致）
+        float trapBottom = trapTop + height;
+
         if (px + pw > x && px < x + width &&
-            py + ph > y - height && py + ph < y)
+            py + ph > trapTop && py + ph < trapBottom)
         {
-            Activate(); // 発動開始
+            Activate();
         }
     }
 
@@ -58,10 +61,11 @@ void Trap::Update()
     // --- 当たり判定（出ている間だけ） ---
     if (isExtended)
     {
-        // 針（三角形の頂点）
-        VECTOR tri1 = VGet(x, y + height - offsetY, 0);       // 左下
-        VECTOR tri2 = VGet(x + width, y + height - offsetY, 0); // 右下
-        VECTOR tri3 = VGet(x + width / 2, y - offsetY, 0);    // 上の先端
+        float baseY = y - offsetY; // ← 描画位置と完全一致
+
+        VECTOR tri1 = VGet(x, baseY + height, 0);          // 左下
+        VECTOR tri2 = VGet(x + width, baseY + height, 0);  // 右下
+        VECTOR tri3 = VGet(x + width / 2, baseY, 0);       // 上先端
 
         // プレイヤーの矩形を4辺に分解
         VECTOR top1 = VGet(px, py, 0);
@@ -73,7 +77,6 @@ void Trap::Update()
         VECTOR right1 = VGet(px + pw, py, 0);
         VECTOR right2 = VGet(px + pw, py + ph, 0);
 
-        // 各辺との交差判定
         HITRESULT_LINE r1 = HitCheck_Line_Triangle(top1, top2, tri1, tri2, tri3);
         HITRESULT_LINE r2 = HitCheck_Line_Triangle(bottom1, bottom2, tri1, tri2, tri3);
         HITRESULT_LINE r3 = HitCheck_Line_Triangle(left1, left2, tri1, tri2, tri3);
@@ -82,10 +85,10 @@ void Trap::Update()
         if (r1.HitFlag || r2.HitFlag || r3.HitFlag || r4.HitFlag)
         {
             player->DestroyMe();
-            
         }
     }
 }
+
 
 void Trap::Activate()
 {
