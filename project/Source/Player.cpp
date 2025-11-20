@@ -7,8 +7,8 @@
 
 
 // --- 定数 ---
-static const float Gravity = 0.2f;  // 重力加速度
-static const float V0 = -5.0f;     // ジャンプ初速度（上方向）
+static const float Gravity = 0.4f;  // 重力加速度
+static const float V0 = -10.0f;     // ジャンプ初速度（上方向）
 
 //--------------------------------------
 // デフォルトコンストラクタ
