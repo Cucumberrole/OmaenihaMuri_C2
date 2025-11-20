@@ -23,6 +23,7 @@ private:
     bool onGround;      // 地面に接地しているかどうかのフラグ
     int jumpcount;      // 残りジャンプ回数（二段ジャンプ制御用）
     int Maxjumpcount;   // 最大ジャンプ回数
+    int hp;             // 残機
 
     // --- アニメーション設定 ---
     static const int CHARACTER_WIDTH = 64;     // 1コマの横幅（ピクセル）
