@@ -1,5 +1,6 @@
 #pragma once
 #include "../Library/SceneBase.h"
+#include "../Library/GameObject.h"
 
 class GameOver:public SceneBase
 {
