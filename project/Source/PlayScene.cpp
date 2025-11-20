@@ -21,6 +21,14 @@ void PlayScene::Update()
 		SceneManager::ChangeScene("TITLE");
 	}
 
+	if (CheckHitKey(KEY_INPUT_G)) {
+		SceneManager::ChangeScene("GAMEOVER");
+	}
+
+	if (CheckHitKey(KEY_INPUT_H)) {
+		SceneManager::ChangeScene("CLEAR");
+	}
+
 	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
 		SceneManager::Exit();
 	}
