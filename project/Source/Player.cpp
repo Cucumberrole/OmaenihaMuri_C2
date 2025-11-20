@@ -30,6 +30,8 @@ Player::Player()
     animIndex = 0;
     animFrame = 0;
     direction = true;
+
+    hp = 0;
 }
 
 //--------------------------------------
@@ -52,6 +54,8 @@ Player::Player(int sx, int sy)
     animIndex = 0;
     animFrame = 0;
     direction = false;
+
+    hp = 0;
 
 	SetDrawOrder(0); // •`‰æ‡‚ð•ÏX
 }
@@ -221,6 +225,17 @@ void Player::Update()
             velocity = 0;
         }
     }
+    //--------------------------------------
+    // Žc‹@
+    //--------------------------------------
+    if (hp > 0) {
+        hp += 1;
+
+    }
+    else if (hp == 5) {
+        SceneManager::ChangeScene("GameOver");
+    }
+
 }
 
 //--------------------------------------
