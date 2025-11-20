@@ -1,5 +1,6 @@
 #pragma once
 #include "../Library/SceneBase.h"
+#include "../Library/GameObject.h"
 
 /// <summary>
 /// ゲームプレイのシーンを制御する
