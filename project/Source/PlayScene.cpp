@@ -8,7 +8,7 @@
 PlayScene::PlayScene()
 {
 	new Background();
-	new Field(0);
+	new Field(8);
 }
 
 PlayScene::~PlayScene()

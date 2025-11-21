@@ -19,5 +19,7 @@ void Dokan::Update()
 
 void Dokan::Draw()
 {
-	DrawRectGraph(static_cast<int>(x), static_cast<int>(y), 0, 0, 64, 64, dImage, TRUE);
+	//DrawRectGraph(static_cast<int>(x), static_cast<int>(y), 0, 0, 500, 500, dImage, TRUE);
+	DrawExtendGraph(x, y, x + 64, y + 64, dImage, TRUE);
+
 }

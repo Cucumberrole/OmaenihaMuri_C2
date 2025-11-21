@@ -5,6 +5,7 @@
 #include "FallingFloor.h"
 #include "FakeFloor.h"
 #include "FlyingSpike.h"
+#include "Dokan.h"
 #include <vector>
 using namespace std;
 
@@ -18,10 +19,11 @@ using namespace std;
 // 4 : 床落ちるトラップ
 // 5 : 針が飛んでくるトラップ
 // 6 : フェイクの床トラップ
+// 8 : 土管
 // 9 : ゴール
 //------------------------------------------------------------
 vector<vector<int>> maps;
-/*					{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},　マップ元データ
+/*					{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},　マップ元データ。とりま残しておきます
                     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
                     {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0},
                     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
@@ -100,6 +102,20 @@ Field::Field(int stage)
                 new FakeFloor(x * 64, y * 64);
             }
 
+            if (maps[y][x] == 7)
+            {
+                // 土管入口
+                new Dokan(x * 64, y * 64);
+                POINT p = { x * 64, y * 64 };
+                pipesIn.push_back(p);
+            }
+            if (maps[y][x] == 8)
+            {
+                // 土管出口
+                new Dokan(x * 64, y * 64);
+                POINT p = { x * 64, y * 64 };
+                pipesOut.push_back(p);
+            }
 
         }
     }
