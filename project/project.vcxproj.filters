@@ -59,9 +59,6 @@
     <ClCompile Include="Library\Trigger.cpp">
       <Filter>Library</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\あおいちゃん\project\Source\CsvReader.cpp">
-      <Filter>PlayScene</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Trap.cpp">
       <Filter>PlayScene</Filter>
     </ClCompile>
@@ -81,6 +78,7 @@
       <Filter>ClearScene</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameOver.cpp" />
+    <ClCompile Include="Source\CsvReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Screen.h" />
@@ -154,9 +152,6 @@
     <ClInclude Include="Library\Trigger.h">
       <Filter>Library</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\あおいちゃん\project\Source\CsvReader.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Trap.h">
       <Filter>PlayScene</Filter>
     </ClInclude>
@@ -176,6 +171,7 @@
       <Filter>ClearScene</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameOver.h" />
+    <ClInclude Include="Source\CsvReader.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">
