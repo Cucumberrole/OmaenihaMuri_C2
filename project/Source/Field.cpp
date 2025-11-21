@@ -263,3 +263,18 @@ void Field::SpawnFlyingSpike(float x, float y, float direction)
     // 針が飛んでくる
     new FlyingSpike(x + 64 * 4, y, speed);
 }
+
+bool Field::IsGoal(int px, int py)
+{
+    if (py < 0) {
+        return 0;
+    }
+    int x = px / 64;
+    int y = (py - 0) / 64;
+    if (y >= maps.size())
+        return 0;
+    if (maps[y][x] == 9) {
+        return true;
+    }
+    return false;
+}

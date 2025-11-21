@@ -14,21 +14,24 @@ public:
 
 	bool IsBlock(int tx, int ty);
 	void SpawnFlyingSpike(float x, float y, float direction);
+    bool IsBlock(int tx, int ty);
+    void SpawnFlyingSpike(float x, float y, float direction);
+    bool IsGoal(int px, int py);
 
-	std::vector<POINT> pipesIn;   // “yŠÇ“ü‚èŒû(7)
-	std::vector<POINT> pipesOut;  // “yŠÇoŒû(8)
+	std::vector<POINT> pipesIn;   // åœŸç®¡å…¥ã‚Šå£(7)
+	std::vector<POINT> pipesOut;  // åœŸç®¡å‡ºå£(8)
 
 
 	//--------------------------------------------------------
-	// “–‚½‚è”»’èiÕ“Ëƒ`ƒFƒbƒNj
+	// å½“ãŸã‚Šåˆ¤å®šï¼ˆè¡çªãƒã‚§ãƒƒã‚¯ï¼‰
 	//--------------------------------------------------------
-	int HitCheckRight(int px, int py);  // ‰E•ûŒü‚Ì“–‚½‚è”»’è
-	int HitCheckLeft(int px, int py);   // ¶•ûŒü‚Ì“–‚½‚è”»’è
-	int HitCheckDown(int px, int py);   // ‰º•ûŒü‚Ì“–‚½‚è”»’èi°j
-	int HitCheckUp(int px, int py);     // ã•ûŒü‚Ì“–‚½‚è”»’èi“Vˆäj
+	int HitCheckRight(int px, int py);  // å³æ–¹å‘ã®å½“ãŸã‚Šåˆ¤å®š
+	int HitCheckLeft(int px, int py);   // å·¦æ–¹å‘ã®å½“ãŸã‚Šåˆ¤å®š
+	int HitCheckDown(int px, int py);   // ä¸‹æ–¹å‘ã®å½“ãŸã‚Šåˆ¤å®šï¼ˆåºŠï¼‰
+	int HitCheckUp(int px, int py);     // ä¸Šæ–¹å‘ã®å½“ãŸã‚Šåˆ¤å®šï¼ˆå¤©äº•ï¼‰
 
 private:
-	int hImage;     // ’nŒ`iƒuƒƒbƒNj‰æ‘œƒnƒ“ƒhƒ‹
-	float x, y;     // ƒXƒe[ƒW‚ÌÀ•Wiå‚ÉƒXƒNƒ[ƒ‹‚Ég—pj
-	int scrollX;    // ‰¡ƒXƒNƒ[ƒ‹—ÊiƒJƒƒ‰ˆÊ’uj
+	int hImage;     // åœ°å½¢ï¼ˆãƒ–ãƒ­ãƒƒã‚¯ï¼‰ç”»åƒãƒãƒ³ãƒ‰ãƒ«
+	float x, y;     // ã‚¹ãƒ†ãƒ¼ã‚¸ã®åº§æ¨™ï¼ˆä¸»ã«ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«æ™‚ã«ä½¿ç”¨ï¼‰
+	int scrollX;    // æ¨ªã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«é‡ï¼ˆã‚«ãƒ¡ãƒ©ä½ç½®ï¼‰
 };

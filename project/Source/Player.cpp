@@ -6,16 +6,16 @@
 #include <assert.h>
 
 
-// --- ’è” ---
-static const float Gravity = 0.4f;  // d—Í‰Á‘¬“x
-static const float V0 = -10.0f;     // ƒWƒƒƒ“ƒv‰‘¬“xiã•ûŒüj
+// --- å®šæ•° ---
+static const float Gravity = 0.4f;  // é‡åŠ›åŠ é€Ÿåº¦
+static const float V0 = -10.0f;     // ã‚¸ãƒ£ãƒ³ãƒ—åˆé€Ÿåº¦ï¼ˆä¸Šæ–¹å‘ï¼‰
 
 //--------------------------------------
-// ƒfƒtƒHƒ‹ƒgƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 //--------------------------------------
 Player::Player()
 {
-	hImage = LoadGraph("data/image/‚¨‚Ü‚¦•à‚«.png");
+	hImage = LoadGraph("data/image/ãŠã¾ãˆæ­©ã.png");
 	assert(hImage != -1);
 
 	x = 200;
@@ -26,7 +26,7 @@ Player::Player()
 	jumpcount = 0;
 	Maxjumpcount = 1;
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“‰Šú‰»
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³åˆæœŸåŒ–
 	animIndex = 0;
 	animFrame = 0;
 	direction = true;
@@ -35,11 +35,11 @@ Player::Player()
 }
 
 //--------------------------------------
-// À•Ww’èƒRƒ“ƒXƒgƒ‰ƒNƒ^
+// åº§æ¨™æŒ‡å®šã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 //--------------------------------------
 Player::Player(int sx, int sy)
 {
-	hImage = LoadGraph("data/image/‚¨‚Ü‚¦•à‚«.png");
+	hImage = LoadGraph("data/image/ãŠã¾ãˆæ­©ã.png");
 	assert(hImage != -1);
 
 	x = static_cast<float>(sx);
@@ -50,18 +50,18 @@ Player::Player(int sx, int sy)
 	jumpcount = 0;
 	Maxjumpcount = 1;
 
-	// ƒAƒjƒ[ƒVƒ‡ƒ“‰Šú‰»
+	// ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³åˆæœŸåŒ–
 	animIndex = 0;
 	animFrame = 0;
 	direction = false;
 
 	hp = 0;
 
-	SetDrawOrder(0); // •`‰æ‡‚ğ•ÏX
+	SetDrawOrder(0); // æç”»é †ã‚’å¤‰æ›´
 }
 
 //--------------------------------------
-// ƒfƒXƒgƒ‰ƒNƒ^
+// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
 //--------------------------------------
 Player::~Player()
 {
@@ -69,7 +69,7 @@ Player::~Player()
 }
 
 //--------------------------------------
-// À•Wæ“¾—p
+// åº§æ¨™å–å¾—ç”¨
 //--------------------------------------
 float Player::GetX() const
 {
@@ -86,26 +86,26 @@ float Player::GetY() const
 //--------------------------------------
 void Player::Update()
 {
-	// --- ’n–Ê‚É‚¢‚é‚Æ‚«‚ÍƒWƒƒƒ“ƒv‰ñ”‚ğƒŠƒZƒbƒg ---
+	// --- åœ°é¢ã«ã„ã‚‹ã¨ãã¯ã‚¸ãƒ£ãƒ³ãƒ—å›æ•°ã‚’ãƒªã‚»ãƒƒãƒˆ ---
 	if (onGround && jumpcount < Maxjumpcount) {
 		jumpcount += 1;
 	}
 
 	int moveX = 0;
 	//--------------------------------------
-	// ‰EˆÚ“®iDƒL[j
+	// å³ç§»å‹•ï¼ˆDã‚­ãƒ¼ï¼‰
 	//--------------------------------------
 	if (CheckHitKey(KEY_INPUT_D)) {
 		moveX = WALK_SPEED;
 		direction = false;
 
-		// --- Field ”»’è ---
+		// --- Field åˆ¤å®š ---
 		Field* field = FindGameObject<Field>();
 		int push1 = field->HitCheckRight(x + 60, y + 5);
 		int push2 = field->HitCheckRight(x + 60, y + 63);
 		int push = max(push1, push2);
 
-		// --- —‰º° ”»’èi•¡”°‘Î‰j ---
+		// --- è½ä¸‹åºŠ åˆ¤å®šï¼ˆè¤‡æ•°åºŠå¯¾å¿œï¼‰ ---
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
 			int p1 = f->HitCheckRight(x + 60, y + 5);
@@ -117,7 +117,7 @@ void Player::Update()
 	}
 
 	//--------------------------------------
-	// ¶ˆÚ“®iAƒL[j
+	// å·¦ç§»å‹•ï¼ˆAã‚­ãƒ¼ï¼‰
 	//--------------------------------------
 	if (CheckHitKey(KEY_INPUT_A)) {
 		moveX = -WALK_SPEED;
@@ -139,34 +139,34 @@ void Player::Update()
 	}
 
 	//--------------------------------------
-	// •àsƒAƒjƒ[ƒVƒ‡ƒ“XV
+	// æ­©è¡Œã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³æ›´æ–°
 	//--------------------------------------
 	if (moveX != 0) {
-		// ˆê’èŠÔŠu‚ÅŸ‚ÌƒRƒ}‚ÉØ‚è‘Ö‚¦‚é
+		// ä¸€å®šé–“éš”ã§æ¬¡ã®ã‚³ãƒã«åˆ‡ã‚Šæ›¿ãˆã‚‹
 		animFrame = (animFrame + 1) % ANIM_FRAME_INTERVAL;
 		if (animFrame == 0) {
 			animIndex = (animIndex + 1) % ANIM_FRAME_COUNT;
 		}
 
-		// ÀÛ‚ÌˆÊ’u‚ğXV
+		// å®Ÿéš›ã®ä½ç½®ã‚’æ›´æ–°
 		x += moveX;
 	}
 
-	//ƒ}ƒbƒvƒNƒ‰ƒX‚Ìæ“¾
+	//ãƒãƒƒãƒ—ã‚¯ãƒ©ã‚¹ã®å–å¾—
 	Field* field = FindGameObject<Field>();
 
 	//--------------------------------------
-	// ƒWƒƒƒ“ƒvˆ—iÚ’n’†j
+	// ã‚¸ãƒ£ãƒ³ãƒ—å‡¦ç†ï¼ˆæ¥åœ°ä¸­ï¼‰
 	//--------------------------------------
 	if (onGround) {
 		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
-			velocity = V0;     // ã•ûŒü‚É‰Á‘¬
-			onGround = false;  // ‹ó’†‚Ö
+			velocity = V0;     // ä¸Šæ–¹å‘ã«åŠ é€Ÿ
+			onGround = false;  // ç©ºä¸­ã¸
 		}
 	}
 
 	//--------------------------------------
-	// “ñ’iƒWƒƒƒ“ƒvˆ—
+	// äºŒæ®µã‚¸ãƒ£ãƒ³ãƒ—å‡¦ç†
 	//--------------------------------------
 	if (!onGround && jumpcount == Maxjumpcount) {
 		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
@@ -176,21 +176,21 @@ void Player::Update()
 	}
 
 	//--------------------------------------
-	// d—Í“K—p
+	// é‡åŠ›é©ç”¨
 	//--------------------------------------
 	y += velocity;
 	velocity += Gravity;
 
 	//--------------------------------------
-	// “–‚½‚è”»’èi‰º•ûŒüF°j
+	// å½“ãŸã‚Šåˆ¤å®šï¼ˆä¸‹æ–¹å‘ï¼šåºŠï¼‰
 	//--------------------------------------
 
-	if (velocity >= 0) { // —‰º’†
+	if (velocity >= 0) { // è½ä¸‹ä¸­
 		int push1 = field->HitCheckDown(x + 14, y + 64);
 		int push2 = field->HitCheckDown(x + 50, y + 64);
 		int push = max(push1, push2);
 
-		// --- —‰º°‚Æ‚Ì“–‚½‚è”»’è ---
+		// --- è½ä¸‹åºŠã¨ã®å½“ãŸã‚Šåˆ¤å®š ---
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
 			int p1 = f->HitCheckDown(x + 14, y + 64);
@@ -207,12 +207,12 @@ void Player::Update()
 			onGround = false;
 		}
 	}
-	else { // ã¸’†
+	else { // ä¸Šæ˜‡ä¸­
 		int push1 = field->HitCheckUp(x + 14, y + 5);
 		int push2 = field->HitCheckUp(x + 50, y + 5);
 		int push = max(push1, push2);
 
-		// --- —‰º°‚Æ‚Ì“–‚½‚è”»’è ---
+		// --- è½ä¸‹åºŠã¨ã®å½“ãŸã‚Šåˆ¤å®š ---
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
 			int p1 = f->HitCheckUp(x + 14, y + 5);
@@ -227,14 +227,14 @@ void Player::Update()
 	}
 
 	//--------------------------------------
-	// “yŠÇ‚Ì”»’è
+	// åœŸç®¡ã®åˆ¤å®š
 	//--------------------------------------
 	if (field)
 	{
 		float px = x;
 		float py = y;
 
-		// --- “yŠÇ‚É“ü‚Á‚½‚©”»’è ---
+		// --- åœŸç®¡ã«å…¥ã£ãŸã‹åˆ¤å®š ---
 		for (int i = 0; i < field->pipesIn.size(); i++)
 		{
 			POINT in = field->pipesIn[i];
@@ -247,23 +247,23 @@ void Player::Update()
 
 			if (hitPipe)
 			{
-				// oŒû‚ª‚ ‚é‚©
+				// å‡ºå£ãŒã‚ã‚‹ã‹
 				if (!field->pipesOut.empty())
 				{
 					POINT out = field->pipesOut[i % field->pipesOut.size()];
 
-					// ƒ[ƒv
+					// ãƒ¯ãƒ¼ãƒ—
 					x = out.x;
-					y = out.y - 64;  // “yŠÇ‚Ìã‚Éo‚·ˆÊ’u
+					y = out.y - 64;  // åœŸç®¡ã®ä¸Šã«å‡ºã™ä½ç½®
 				}
 
-				return; // ‚±‚êˆÈã”»’è‚µ‚È‚¢
+				return; // ã“ã‚Œä»¥ä¸Šåˆ¤å®šã—ãªã„
 			}
 		}
 	}
 
 	//--------------------------------------
-	// c‹@
+	// æ®‹æ©Ÿ
 	//--------------------------------------
 	if (hp > 0) {
 		hp += 1;
@@ -272,6 +272,98 @@ void Player::Update()
 	else if (hp == 5) {
 		SceneManager::ChangeScene("GAMEOVER");
 	}
+	Field* field = FindGameObject<Field>(); 
+
+    //--------------------------------------
+    // ã‚¸ãƒ£ãƒ³ãƒ—å‡¦ç†ï¼ˆæ¥åœ°ä¸­ï¼‰
+    //--------------------------------------
+    if (onGround) {
+        if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
+            velocity = V0;     // ä¸Šæ–¹å‘ã«åŠ é€Ÿ
+            onGround = false;  // ç©ºä¸­ã¸
+        }
+    }
+
+    //--------------------------------------
+    // äºŒæ®µã‚¸ãƒ£ãƒ³ãƒ—å‡¦ç†
+    //--------------------------------------
+    if (!onGround && jumpcount == Maxjumpcount) {
+        if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
+            jumpcount -= 1;
+            velocity = V0;
+        }
+    }
+
+    //--------------------------------------
+    // é‡åŠ›é©ç”¨
+    //--------------------------------------
+    y += velocity;
+    velocity += Gravity;
+
+    //--------------------------------------
+    // å½“ãŸã‚Šåˆ¤å®šï¼ˆä¸‹æ–¹å‘ï¼šåºŠï¼‰
+    //--------------------------------------
+
+    if (velocity >= 0) { // è½ä¸‹ä¸­
+        int push1 = field->HitCheckDown(x + 14, y + 64);
+        int push2 = field->HitCheckDown(x + 50, y + 64);
+        int push = max(push1, push2);
+
+        // --- è½ä¸‹åºŠã¨ã®å½“ãŸã‚Šåˆ¤å®š ---
+        auto floors = FindGameObjects<FallingFloor>();
+        for (auto f : floors) {
+            int p1 = f->HitCheckDown(x + 14, y + 64);
+            int p2 = f->HitCheckDown(x + 50, y + 64);
+            push = max(push, max(p1, p2));
+        }
+
+        if (push > 0) {
+            y -= push - 1;
+            velocity = 0;
+            onGround = true;
+        }
+        else {
+            onGround = false;
+        }
+    }
+    else { // ä¸Šæ˜‡ä¸­
+        int push1 = field->HitCheckUp(x + 14, y + 5);
+        int push2 = field->HitCheckUp(x + 50, y + 5);
+        int push = max(push1, push2);
+
+        // --- è½ä¸‹åºŠã¨ã®å½“ãŸã‚Šåˆ¤å®š ---
+        auto floors = FindGameObjects<FallingFloor>();
+        for (auto f : floors) {
+            int p1 = f->HitCheckUp(x + 14, y + 5);
+            int p2 = f->HitCheckUp(x + 50, y + 5);
+            push = max(push, max(p1, p2));
+        }
+
+        if (push > 0) {
+            y += push;
+            velocity = 0;
+        }
+    }
+
+    //--------------------------------------
+    // æ®‹æ©Ÿ
+    //--------------------------------------
+
+    if (hp > 0) {
+        hp += 1;
+
+    }
+    else if (hp == 5) {
+        SceneManager::ChangeScene("GAMEOVER");
+    }
+
+    //--------------------------------------
+    // ã‚¯ãƒªã‚¢
+    //--------------------------------------
+
+    if (field->IsGoal(x + 32, y + 32)) {
+        SceneManager::ChangeScene("CLEAR");
+    }
 
 }
 
@@ -283,14 +375,14 @@ void Player::Draw()
 	Field* field = FindGameObject<Field>();
 
 	//--------------------------------------
-	// Œ»İ‚ÌƒXƒvƒ‰ƒCƒgƒV[ƒgã‚Å‚ÌˆÊ’u‚ğZo
+	// ç¾åœ¨ã®ã‚¹ãƒ—ãƒ©ã‚¤ãƒˆã‚·ãƒ¼ãƒˆä¸Šã§ã®ä½ç½®ã‚’ç®—å‡º
 	//--------------------------------------
 	int xRect = (animIndex % ATLAS_WIDTH) * CHARACTER_WIDTH;
 	int yRect = (animIndex / ATLAS_WIDTH) * CHARACTER_HEIGHT;
 
 	//--------------------------------------
-	// ƒLƒƒƒ‰ƒNƒ^[•`‰æ
-	// DrawRectGraph(x, y, Ø‚èo‚µX, Ø‚èo‚µY, •, ‚‚³, ‰æ‘œ, “§‰ß, ¶‰E”½“])
+	// ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼æç”»
+	// DrawRectGraph(x, y, åˆ‡ã‚Šå‡ºã—X, åˆ‡ã‚Šå‡ºã—Y, å¹…, é«˜ã•, ç”»åƒ, é€é, å·¦å³åè»¢)
 	//--------------------------------------
 	DrawRectGraph(
 		static_cast<int>(x),
@@ -305,7 +397,7 @@ void Player::Draw()
 	);
 
 	//--------------------------------------
-	// ƒfƒoƒbƒO—pÀ•W•\¦
+	// ãƒ‡ãƒãƒƒã‚°ç”¨åº§æ¨™è¡¨ç¤º
 	//--------------------------------------
 	DrawFormatString(0, 100, GetColor(255, 255, 255), "x: %.2f", x);
 	DrawFormatString(0, 120, GetColor(255, 255, 255), "y: %.2f", y);
