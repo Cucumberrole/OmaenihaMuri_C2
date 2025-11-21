@@ -225,15 +225,25 @@ void Player::Update()
             velocity = 0;
         }
     }
+
     //--------------------------------------
     // 残機
     //--------------------------------------
+
     if (hp > 0) {
         hp += 1;
 
     }
     else if (hp == 5) {
         SceneManager::ChangeScene("GAMEOVER");
+    }
+
+    //--------------------------------------
+    // クリア
+    //--------------------------------------
+
+    if (field->IsGoal(x + 32, y + 32)) {
+        SceneManager::ChangeScene("CLEAR");
     }
 
 }
