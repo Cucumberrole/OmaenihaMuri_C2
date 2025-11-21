@@ -14,4 +14,6 @@ public:
 	void Draw() override;
 
 private:
+	int Ssound;
+	bool sound;
 };
