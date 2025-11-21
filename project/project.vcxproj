@@ -157,6 +157,7 @@
     <ClInclude Include="Source\Background.h" />
     <ClInclude Include="Source\BootScene.h" />
     <ClInclude Include="Source\ClearScene.h" />
+    <ClInclude Include="Source\Dokan.h" />
     <ClInclude Include="Source\FakeFloor.h" />
     <ClInclude Include="Source\FallingFloor.h" />
     <ClInclude Include="Source\Field.h" />
@@ -188,6 +189,7 @@
     <ClCompile Include="Source\Background.cpp" />
     <ClCompile Include="Source\BootScene.cpp" />
     <ClCompile Include="Source\ClearScene.cpp" />
+    <ClCompile Include="Source\Dokan.cpp" />
     <ClCompile Include="Source\FakeFloor.cpp" />
     <ClCompile Include="Source\FallingFloor.cpp" />
     <ClCompile Include="Source\Field.cpp" />
