@@ -13,6 +13,7 @@ public:
 
     bool IsBlock(int tx, int ty);
     void SpawnFlyingSpike(float x, float y, float direction);
+    bool IsGoal(int px, int py);
 
     //--------------------------------------------------------
     // 当たり判定（衝突チェック）
