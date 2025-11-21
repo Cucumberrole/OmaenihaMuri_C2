@@ -15,7 +15,7 @@ static const float V0 = -10.0f;     // ジャンプ初速度（上方向）
 //--------------------------------------
 Player::Player()
 {
-	hImage = LoadGraph("data/image/おまえ歩き.png");
+	hImage = LoadGraph("data/image/OMAEwalk.png");
 	assert(hImage != -1);
 
 	x = 200;
@@ -39,7 +39,7 @@ Player::Player()
 //--------------------------------------
 Player::Player(int sx, int sy)
 {
-	hImage = LoadGraph("data/image/おまえ歩き.png");
+	hImage = LoadGraph("data/image/OMAEwalk.png");
 	assert(hImage != -1);
 
 	x = static_cast<float>(sx);
@@ -272,90 +272,6 @@ void Player::Update()
 	else if (hp == 5) {
 		SceneManager::ChangeScene("GAMEOVER");
 	}
-	Field* field = FindGameObject<Field>(); 
-
-    //--------------------------------------
-    // ジャンプ処理（接地中）
-    //--------------------------------------
-    if (onGround) {
-        if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
-            velocity = V0;     // 上方向に加速
-            onGround = false;  // 空中へ
-        }
-    }
-
-    //--------------------------------------
-    // 二段ジャンプ処理
-    //--------------------------------------
-    if (!onGround && jumpcount == Maxjumpcount) {
-        if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
-            jumpcount -= 1;
-            velocity = V0;
-        }
-    }
-
-    //--------------------------------------
-    // 重力適用
-    //--------------------------------------
-    y += velocity;
-    velocity += Gravity;
-
-    //--------------------------------------
-    // 当たり判定（下方向：床）
-    //--------------------------------------
-
-    if (velocity >= 0) { // 落下中
-        int push1 = field->HitCheckDown(x + 14, y + 64);
-        int push2 = field->HitCheckDown(x + 50, y + 64);
-        int push = max(push1, push2);
-
-        // --- 落下床との当たり判定 ---
-        auto floors = FindGameObjects<FallingFloor>();
-        for (auto f : floors) {
-            int p1 = f->HitCheckDown(x + 14, y + 64);
-            int p2 = f->HitCheckDown(x + 50, y + 64);
-            push = max(push, max(p1, p2));
-        }
-
-        if (push > 0) {
-            y -= push - 1;
-            velocity = 0;
-            onGround = true;
-        }
-        else {
-            onGround = false;
-        }
-    }
-    else { // 上昇中
-        int push1 = field->HitCheckUp(x + 14, y + 5);
-        int push2 = field->HitCheckUp(x + 50, y + 5);
-        int push = max(push1, push2);
-
-        // --- 落下床との当たり判定 ---
-        auto floors = FindGameObjects<FallingFloor>();
-        for (auto f : floors) {
-            int p1 = f->HitCheckUp(x + 14, y + 5);
-            int p2 = f->HitCheckUp(x + 50, y + 5);
-            push = max(push, max(p1, p2));
-        }
-
-        if (push > 0) {
-            y += push;
-            velocity = 0;
-        }
-    }
-
-    //--------------------------------------
-    // 残機
-    //--------------------------------------
-
-    if (hp > 0) {
-        hp += 1;
-
-    }
-    else if (hp == 5) {
-        SceneManager::ChangeScene("GAMEOVER");
-    }
 
     //--------------------------------------
     // クリア
@@ -401,4 +317,5 @@ void Player::Draw()
 	//--------------------------------------
 	DrawFormatString(0, 100, GetColor(255, 255, 255), "x: %.2f", x);
 	DrawFormatString(0, 120, GetColor(255, 255, 255), "y: %.2f", y);
+	DrawFormatString(0, 140, GetColor(255, 255, 255), "HP: %d", hp);
 }
