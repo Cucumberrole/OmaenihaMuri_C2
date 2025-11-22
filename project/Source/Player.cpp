@@ -26,6 +26,8 @@ Player::Player()
 	jumpcount = 0;
 	Maxjumpcount = 1;
 
+	isDead = false;
+
 	// アニメーション初期化
 	animIndex = 0;
 	animFrame = 0;
@@ -49,6 +51,8 @@ Player::Player(int sx, int sy)
 
 	jumpcount = 0;
 	Maxjumpcount = 1;
+
+	isDead = false;
 
 	// アニメーション初期化
 	animIndex = 0;
@@ -86,6 +90,11 @@ float Player::GetY() const
 //--------------------------------------
 void Player::Update()
 {
+	// --- 死亡していたら完全固定 ---
+	if (isDead) {
+		return;  // 動きを何も更新しない
+	}
+
 	// --- 地面にいるときはジャンプ回数をリセット ---
 	if (onGround && jumpcount < Maxjumpcount) {
 		jumpcount += 1;
@@ -273,13 +282,13 @@ void Player::Update()
 		SceneManager::ChangeScene("GAMEOVER");
 	}
 
-    //--------------------------------------
-    // クリア
-    //--------------------------------------
+	//--------------------------------------
+	// クリア
+	//--------------------------------------
 
-    if (field->IsGoal(x + 32, y + 32)) {
-        SceneManager::ChangeScene("CLEAR");
-    }
+	if (field->IsGoal(x + 32, y + 32)) {
+		SceneManager::ChangeScene("CLEAR");
+	}
 
 }
 
@@ -318,4 +327,17 @@ void Player::Draw()
 	DrawFormatString(0, 100, GetColor(255, 255, 255), "x: %.2f", x);
 	DrawFormatString(0, 120, GetColor(255, 255, 255), "y: %.2f", y);
 	DrawFormatString(0, 140, GetColor(255, 255, 255), "HP: %d", hp);
+}
+
+void Player::ForceDie()
+{
+	x = -9999;
+	y = -9999;
+
+	// 動けなくする
+	velocity = 0;
+	onGround = false;
+
+	// ゲームオーバーに飛ぶならここで～
+	//SceneManager::ChangeScene("GAMEOVER");
 }

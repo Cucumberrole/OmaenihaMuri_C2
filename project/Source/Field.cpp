@@ -20,7 +20,8 @@ using namespace std;
 // 4 : 床落ちるトラップ
 // 5 : 針が飛んでくるトラップ
 // 6 : フェイクの床トラップ
-// 8 : 土管
+// 7 : 土管入口
+// 8 : 土管出口
 // 9 : ゴール
 //------------------------------------------------------------
 vector<vector<int>> maps;
@@ -138,15 +139,17 @@ void Field::Update()
 	float px = player->GetX();
 	float py = player->GetY();
 
-	int tx = int(px + 32) / 64;  // プレイヤー中央
-	int ty = int(py + 63) / 64;  // 足元
+	int tx = int(px + 32) / 64; // 中心X
+	int ty = int(py + 63) / 64; // 足元Y
 
-	if (maps[ty][tx] == 5)  // トリガーブロック
+	// --- 範囲チェック（超重要！） ---
+	if (ty < 0 || ty >= maps.size()) return;
+	if (tx < 0 || tx >= maps[ty].size()) return;
+
+	// --- 安全にアクセスできる ---
+	if (maps[ty][tx] == 5)
 	{
-		// --- 針を発射する ---
-		SpawnFlyingSpike(tx * 64, ty * 64, -1.0f); // 左向き
-
-		// １度踏んだら空白に書き換える
+		SpawnFlyingSpike(tx * 64, ty * 64, -1.0f);
 		maps[ty][tx] = 0;
 	}
 }
@@ -192,10 +195,11 @@ int Field::HitCheckRight(int px, int py)
 
 	int x = px / 64;
 	int y = py / 64;
-	if (y >= maps.size()) return 0;
+
+	if (y < 0 || y >= maps.size()) return 0;
+	if (x < 0 || x >= maps[y].size()) return 0;
 
 	if (maps[y][x] == 1) {
-		// ブロック右端を超えた分だけ押し戻す
 		return px % 64 + 1;
 	}
 	return 0;
@@ -208,10 +212,12 @@ int Field::HitCheckLeft(int px, int py)
 
 	int x = px / 64;
 	int y = py / 64;
-	if (y >= maps.size()) return 0;
 
-	if (maps[y][x] == 1) {
-		// ブロック左側にめり込んだ分を返す
+	if (y < 0 || y >= maps.size()) return 0;
+	if (x < 0 || x >= maps[y].size()) return 0;
+
+	if (maps[y][x] == 1)
+	{
 		return 64 - (px % 64);
 	}
 	return 0;
@@ -224,10 +230,12 @@ int Field::HitCheckUp(int px, int py)
 
 	int x = px / 64;
 	int y = py / 64;
-	if (y >= maps.size()) return 0;
 
-	if (maps[y][x] == 1) {
-		// ブロックの下端にぶつかった分を返す
+	if (y < 0 || y >= maps.size()) return 0;
+	if (x < 0 || x >= maps[y].size()) return 0;
+
+	if (maps[y][x] == 1)
+	{
 		return 64 - (py % 64);
 	}
 	return 0;
@@ -240,10 +248,12 @@ int Field::HitCheckDown(int px, int py)
 
 	int x = px / 64;
 	int y = py / 64;
-	if (y >= maps.size()) return 0;
 
-	if (maps[y][x] == 1) {
-		// 床ブロックにめり込んだ距離を返す
+	if (y < 0 || y >= maps.size()) return 0;
+	if (x < 0 || x >= maps[y].size()) return 0;
+
+	if (maps[y][x] == 1)
+	{
 		return (py % 64) + 1;
 	}
 	return 0;
@@ -259,10 +269,10 @@ bool Field::IsBlock(int tx, int ty)
 
 void Field::SpawnFlyingSpike(float x, float y, float direction)
 {
-	float speed = 8.0f * direction; // 方向付きスピード
+	float speed = 30.0f * direction; // 方向付きスピード
 
 	// 針が飛んでくる
-	new FlyingSpike(x + 64 * 4, y, speed);
+	new FlyingSpike(x + 64 * 5, y, speed);
 }
 
 bool Field::IsGoal(int px, int py)

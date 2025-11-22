@@ -28,19 +28,20 @@ void TitleScene::Update()
 void TitleScene::Draw()
 {
 	DrawGraph(0, 0, TitleImage, FALSE);
+	int color = GetColor(0, 0, 0);
 
-	SetFontSize(25);
+	SetFontSize(30);
 	int h = GetFontSize();
 	extern const char* Version();
 
-	DrawString(0, 0 + h * 0, "TITLE SCENE", GetColor(0, 255, 255));
-	DrawString(0, 0 + h * 1, Version(), GetColor(0, 255, 255));
-	DrawFormatString(0, 0 + h * 2, GetColor(0, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
-	DrawFormatString(0, 0 + h * 3, GetColor(0, 255, 255), "FontSize:%d", h);
+	DrawString(0, 0 + h * 0, "TITLE SCENE", color);
+	DrawString(0, 0 + h * 1, Version(), color);
+	DrawFormatString(0, 0 + h * 2, color, "%4.1f", 1.0f / Time::DeltaTime());
+	DrawFormatString(0, 0 + h * 3, color, "FontSize:%d", h);
 
 
 	int DrawWidth = GetDrawStringWidth("Push [SHIFT]Key To Play", -1);
-	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2, "Push [SHIFT]Key To Play", GetColor(0, 255, 255));
+	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2, "Push [SHIFT]Key To Play", color);
 
 	
 

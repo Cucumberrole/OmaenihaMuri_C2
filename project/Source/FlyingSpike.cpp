@@ -43,7 +43,8 @@ void FlyingSpike::Update()
 
         if (hit)
         {
-            player->DestroyMe();  // ‘¦€
+            player->ForceDie();
+            player->SetDead();
         }
     }
 
