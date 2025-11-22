@@ -14,7 +14,7 @@ public:
 
 	bool IsBlock(int tx, int ty);
 	void SpawnFlyingSpike(float x, float y, float direction);
-    bool IsGoal(int px, int py);
+	bool IsGoal(int px, int py);
 
 	std::vector<POINT> pipesIn;   // 土管入り口(7)
 	std::vector<POINT> pipesOut;  // 土管出口(8)

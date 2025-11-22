@@ -254,7 +254,7 @@ void Player::Update()
 
 					// ワープ
 					x = out.x;
-					y = out.y - 64;  // 土管の上に出す位置
+					y = out.y + 64;  // 土管の上に出す位置
 				}
 
 				return; // これ以上判定しない
