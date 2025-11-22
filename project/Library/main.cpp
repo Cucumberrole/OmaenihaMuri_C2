@@ -46,11 +46,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	SetWriteZBuffer3D(TRUE);
 
 	SetHookWinProc([](HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT /*CALLBACK*/
-	{
-		// DxLibとImGuiのウィンドウプロシージャを両立させる
-		SetUseHookWinProcReturnValue(FALSE);
-		return ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
-	});
+		{
+			// DxLibとImGuiのウィンドウプロシージャを両立させる
+			SetUseHookWinProcReturnValue(FALSE);
+			return ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+		});
 #if IMGUI
 	// ImGUI初期化
 	IMGUI_CHECKVERSION();
@@ -71,7 +71,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		float refreshRate = (float)GetDeviceCaps(hdc, VREFRESH);	// リフレッシュレートの取得
 		refreshTime = 1.0f / refreshRate;
 		ReleaseDC(GetMainWindowHandle(), hdc);	// デバイスコンテキストの解放
-	} else {
+	}
+	else {
 		int d = Screen::FRAME_RATE;
 		refreshTime = 1.0f / d;
 	}
@@ -86,7 +87,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #endif
 	while (true) {
 #ifdef FIX_FRAME_RATE
-		while(true) {
+		while (true) {
 			LARGE_INTEGER current;
 			QueryPerformanceCounter(&current);
 			float dt = static_cast<float>(current.QuadPart - lastTime) / freq;
