@@ -6,12 +6,12 @@
 TitleScene::TitleScene()
 {
 	TitleImage = LoadGraph("data/image/title.png");//‰æ‘œ•Ï‚¦‚é‚Æ‚«‚Í‚±‚±
-	
+
 }
 
 TitleScene::~TitleScene()
 {
-	
+
 }
 
 void TitleScene::Update()

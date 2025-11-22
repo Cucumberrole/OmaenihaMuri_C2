@@ -4,12 +4,12 @@
 class Background : public GameObject
 {
 public:
-    Background();
-    ~Background();
+	Background();
+	~Background();
 
-    void Update() override;
-    void Draw() override;
+	void Update() override;
+	void Draw() override;
 
 private:
-    int bgImage;
+	int bgImage;
 };

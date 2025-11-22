@@ -3,13 +3,13 @@
 
 Background::Background()
 {
-    bgImage = LoadGraph("data/image/kabe.png");
-    SetDrawOrder(200);
+	bgImage = LoadGraph("data/image/kabe.png");
+	SetDrawOrder(200);
 }
 
 Background::~Background()
 {
-    DeleteGraph(bgImage);
+	DeleteGraph(bgImage);
 }
 
 void Background::Update()

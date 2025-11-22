@@ -72,7 +72,7 @@ void ObjectManager::Release()
 		auto itr = objects->begin();
 		if (*itr != nullptr)
 		{
-			delete *itr;
+			delete* itr;
 		}
 		objects->erase(itr);
 	}
