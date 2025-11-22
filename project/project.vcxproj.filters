@@ -81,6 +81,36 @@
     <ClCompile Include="Source\CsvReader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\あおいちゃん\project\Source\CsvReader.h" />
+    <ClInclude Include="ImGui\imconfig.h" />
+    <ClInclude Include="ImGui\imgui.h" />
+    <ClInclude Include="ImGui\imgui_impl_dx11.h" />
+    <ClInclude Include="ImGui\imgui_impl_dx9.h" />
+    <ClInclude Include="ImGui\imgui_impl_dxlib.hpp" />
+    <ClInclude Include="ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="ImGui\imgui_internal.h" />
+    <ClInclude Include="ImGui\imstb_rectpack.h" />
+    <ClInclude Include="ImGui\imstb_textedit.h" />
+    <ClInclude Include="ImGui\imstb_truetype.h" />
+    <ClInclude Include="Library\App.h" />
+    <ClInclude Include="Library\GameObject.h" />
+    <ClInclude Include="Library\myDxLib.h" />
+    <ClInclude Include="Library\ObjectManager.h" />
+    <ClInclude Include="Library\SceneBase.h" />
+    <ClInclude Include="Library\SceneManager.h" />
+    <ClInclude Include="Library\Time.h" />
+    <ClInclude Include="Library\Trigger.h" />
+    <ClInclude Include="Source\Background.h" />
+    <ClInclude Include="Source\BootScene.h" />
+    <ClInclude Include="Source\ClearScene.h" />
+    <ClInclude Include="Source\Dokan.h" />
+    <ClInclude Include="Source\FakeFloor.h" />
+    <ClInclude Include="Source\FallingFloor.h" />
+    <ClInclude Include="Source\Field.h" />
+    <ClInclude Include="Source\FlyingSpike.h" />
+    <ClInclude Include="Source\GameOver.h" />
+    <ClInclude Include="Source\Player.h" />
+    <ClInclude Include="Source\PlayScene.h" />
     <ClInclude Include="Source\Screen.h" />
     <ClInclude Include="Source\SceneFactory.h" />
     <ClInclude Include="Library\App.h">
@@ -192,5 +222,8 @@
     <Filter Include="ClearScene">
       <UniqueIdentifier>{92a63fa5-8db1-48e8-8a26-c9ee49f8359a}</UniqueIdentifier>
     </Filter>
+    <ClInclude Include="Source\TitleScene.h" />
+    <ClInclude Include="Source\Trap.h" />
+    <ClInclude Include="Source\Dokan2.h" />
   </ItemGroup>
 </Project>
