@@ -9,7 +9,7 @@
 PlayScene::PlayScene()
 {
 	new Background();
-	new Field(8);
+	new Field(0);
 	sound = 0;
 	Ssound = LoadSoundMem("data/sound/bgm_ogg.ogg");
 }

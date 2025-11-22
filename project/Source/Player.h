@@ -11,11 +11,17 @@ public:
 
     void Update() override;   // 状態更新（入力処理・物理計算など）
     void Draw() override;     // 描画処理
+    
+    void ForceDie();    //画面外判定用
+    void SetDead() { isDead = true; }
+
 
     float GetX() const;
     float GetY() const;
 
-    float GetRadius() const { return CHARACTER_WIDTH * 0.35f; }
+    float GetRadius() const { return CHARACTER_WIDTH * 0.35f; }    
+
+    bool isDead;        //プレイヤーが死んでるか
 private:
     // --- 基本パラメータ ---
     int hImage;         // プレイヤー画像ハンドル
