@@ -135,7 +135,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\あおいちゃん\project\Source\CsvReader.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_impl_dx11.h" />
@@ -157,6 +156,7 @@
     <ClInclude Include="Source\Background.h" />
     <ClInclude Include="Source\BootScene.h" />
     <ClInclude Include="Source\ClearScene.h" />
+    <ClInclude Include="Source\CsvReader.h" />
     <ClInclude Include="Source\Dokan.h" />
     <ClInclude Include="Source\Dokan2.h" />
     <ClInclude Include="Source\FakeFloor.h" />
@@ -172,7 +172,6 @@
     <ClInclude Include="Source\Trap.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\あおいちゃん\project\Source\CsvReader.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
     <ClCompile Include="ImGui\imgui_impl_dx11.cpp" />
@@ -190,6 +189,7 @@
     <ClCompile Include="Source\Background.cpp" />
     <ClCompile Include="Source\BootScene.cpp" />
     <ClCompile Include="Source\ClearScene.cpp" />
+    <ClCompile Include="Source\CsvReader.cpp" />
     <ClCompile Include="Source\Dokan.cpp" />
     <ClCompile Include="Source\Dokan2.cpp" />
     <ClCompile Include="Source\FakeFloor.cpp" />

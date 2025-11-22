@@ -5,7 +5,7 @@
 
 TitleScene::TitleScene()
 {
-	TitleImage = LoadGraph("data/image/title.png");//�摜�ς���Ƃ��͂���
+	TitleImage = LoadGraph("data/image/title.png");//‰æ‘œ•Ï‚¦‚é‚Æ‚«‚Í‚±‚±
 	
 }
 
@@ -41,7 +41,7 @@ void TitleScene::Draw()
 
 
 	int DrawWidth = GetDrawStringWidth("Push [SHIFT]Key To Play", -1);
-	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2, "Push [SHIFT]Key To Play", color);
+	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2, "SHIFTƒL[‚ð‰Ÿ‚µ‚ÄƒXƒ^[ƒg", GetColor(0, 255, 255));
 
 	
 
