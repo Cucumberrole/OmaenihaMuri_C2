@@ -1,205 +1,72 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <ClCompile Include="..\..\あおいちゃん\project\Source\CsvReader.cpp" />
+    <ClCompile Include="ImGui\imgui.cpp" />
+    <ClCompile Include="ImGui\imgui_draw.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_dx9.cpp" />
+    <ClCompile Include="ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="ImGui\imgui_ja_gryph_ranges.cpp" />
+    <ClCompile Include="ImGui\imgui_tables.cpp" />
+    <ClCompile Include="ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="Library\App.cpp" />
+    <ClCompile Include="Library\main.cpp" />
+    <ClCompile Include="Library\ObjectManager.cpp" />
+    <ClCompile Include="Library\SceneManager.cpp" />
+    <ClCompile Include="Library\Time.cpp" />
+    <ClCompile Include="Library\Trigger.cpp" />
+    <ClCompile Include="Source\Background.cpp" />
+    <ClCompile Include="Source\BootScene.cpp" />
+    <ClCompile Include="Source\ClearScene.cpp" />
+    <ClCompile Include="Source\Dokan.cpp" />
+    <ClCompile Include="Source\FakeFloor.cpp" />
+    <ClCompile Include="Source\FallingFloor.cpp" />
+    <ClCompile Include="Source\Field.cpp" />
+    <ClCompile Include="Source\FlyingSpike.cpp" />
+    <ClCompile Include="Source\GameOver.cpp" />
+    <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\PlayScene.cpp" />
     <ClCompile Include="Source\SceneFactory.cpp" />
-    <ClCompile Include="Library\App.cpp">
-      <Filter>Library</Filter>
-    </ClCompile>
-    <ClCompile Include="Library\main.cpp">
-      <Filter>Library</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\BootScene.cpp">
-      <Filter>BootScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\TitleScene.cpp">
-      <Filter>TitleScene</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_draw.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_dx9.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_dx11.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_impl_win32.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_ja_gryph_ranges.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_tables.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGui\imgui_widgets.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="Library\ObjectManager.cpp">
-      <Filter>Library</Filter>
-    </ClCompile>
-    <ClCompile Include="Library\SceneManager.cpp">
-      <Filter>Library</Filter>
-    </ClCompile>
-    <ClCompile Include="Library\Time.cpp">
-      <Filter>Library</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Field.cpp">
-      <Filter>PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Player.cpp">
-      <Filter>PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\PlayScene.cpp">
-      <Filter>PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Library\Trigger.cpp">
-      <Filter>Library</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\あおいちゃん\project\Source\CsvReader.cpp">
-      <Filter>PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Trap.cpp">
-      <Filter>PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Background.cpp">
-      <Filter>PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\FallingFloor.cpp">
-      <Filter>PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\FakeFloor.cpp">
-      <Filter>PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\FlyingSpike.cpp">
-      <Filter>PlayScene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\ClearScene.cpp">
-      <Filter>ClearScene</Filter>
-    </ClCompile>
-
-    </ClCompile>
+    <ClCompile Include="Source\TitleScene.cpp" />
+    <ClCompile Include="Source\Trap.cpp" />
+    <ClCompile Include="Source\Dokan2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\あおいちゃん\project\Source\CsvReader.h" />
+    <ClInclude Include="ImGui\imconfig.h" />
+    <ClInclude Include="ImGui\imgui.h" />
+    <ClInclude Include="ImGui\imgui_impl_dx11.h" />
+    <ClInclude Include="ImGui\imgui_impl_dx9.h" />
+    <ClInclude Include="ImGui\imgui_impl_dxlib.hpp" />
+    <ClInclude Include="ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="ImGui\imgui_internal.h" />
+    <ClInclude Include="ImGui\imstb_rectpack.h" />
+    <ClInclude Include="ImGui\imstb_textedit.h" />
+    <ClInclude Include="ImGui\imstb_truetype.h" />
+    <ClInclude Include="Library\App.h" />
+    <ClInclude Include="Library\GameObject.h" />
+    <ClInclude Include="Library\myDxLib.h" />
+    <ClInclude Include="Library\ObjectManager.h" />
+    <ClInclude Include="Library\SceneBase.h" />
+    <ClInclude Include="Library\SceneManager.h" />
+    <ClInclude Include="Library\Time.h" />
+    <ClInclude Include="Library\Trigger.h" />
+    <ClInclude Include="Source\Background.h" />
+    <ClInclude Include="Source\BootScene.h" />
+    <ClInclude Include="Source\ClearScene.h" />
+    <ClInclude Include="Source\Dokan.h" />
+    <ClInclude Include="Source\FakeFloor.h" />
+    <ClInclude Include="Source\FallingFloor.h" />
+    <ClInclude Include="Source\Field.h" />
+    <ClInclude Include="Source\FlyingSpike.h" />
+    <ClInclude Include="Source\GameOver.h" />
+    <ClInclude Include="Source\Player.h" />
+    <ClInclude Include="Source\PlayScene.h" />
     <ClInclude Include="Source\Screen.h" />
     <ClInclude Include="Source\SceneFactory.h" />
-    <ClInclude Include="Library\App.h">
-      <Filter>Library</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\SceneBase.h">
-      <Filter>Library</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\GameObject.h">
-      <Filter>Library</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\BootScene.h">
-      <Filter>BootScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\TitleScene.h">
-      <Filter>TitleScene</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imconfig.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_dx9.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_dx11.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_dxlib.hpp">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_impl_win32.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imgui_internal.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imstb_rectpack.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imstb_textedit.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGui\imstb_truetype.h">
-      <Filter>ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\ObjectManager.h">
-      <Filter>Library</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\SceneManager.h">
-      <Filter>Library</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Time.h">
-      <Filter>Library</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\myDxLib.h">
-      <Filter>Library</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Field.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Player.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\PlayScene.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Library\Trigger.h">
-      <Filter>Library</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\あおいちゃん\project\Source\CsvReader.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Trap.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Background.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\FallingFloor.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\FakeFloor.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\FlyingSpike.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\ClearScene.h">
-      <Filter>ClearScene</Filter>
-    </ClInclude>
-
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="Library">
-      <UniqueIdentifier>{208c2106-181f-415c-a2e8-fa160c7f8651}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="BootScene">
-      <UniqueIdentifier>{4e7a122b-01b5-4a1f-bdd8-381c4cb2403d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="TitleScene">
-      <UniqueIdentifier>{a52f9c67-9c6c-4376-8f4c-07a10ecbc3db}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PlayScene">
-      <UniqueIdentifier>{8123ada4-16d1-40da-a8f3-3f9e93aafb30}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ImGui">
-      <UniqueIdentifier>{a717257b-67b3-4bfa-834c-1e34032b33b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ClearScene">
-      <UniqueIdentifier>{92a63fa5-8db1-48e8-8a26-c9ee49f8359a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameOver">
-      <UniqueIdentifier>{d03e244c-9c70-416c-a28e-c8f051369f1c}</UniqueIdentifier>
-    </Filter>
+    <ClInclude Include="Source\TitleScene.h" />
+    <ClInclude Include="Source\Trap.h" />
+    <ClInclude Include="Source\Dokan2.h" />
   </ItemGroup>
 </Project>
