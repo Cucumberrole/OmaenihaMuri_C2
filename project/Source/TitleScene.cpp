@@ -41,8 +41,5 @@ void TitleScene::Draw()
 
 
 	int DrawWidth = GetDrawStringWidth("Push [SHIFT]Key To Play", -1);
-	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2, "SHIFTƒL[‚ð‰Ÿ‚µ‚ÄƒXƒ^[ƒg", GetColor(0, 255, 255));
-
-	
-
+	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2, "Push [SHIFT]Key To Play", color);
 }
