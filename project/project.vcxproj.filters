@@ -85,14 +85,13 @@
       <Filter>PlayScene</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameOver.cpp">
-      <Filter>Library</Filter>
+      <Filter>GameOver</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
     <ClInclude Include="Library\SceneBase.h" />
     <ClInclude Include="Source\BootScene.h" />
-    <ClInclude Include="Source\GameOver.h" />
     <ClInclude Include="Source\Screen.h" />
     <ClInclude Include="Source\SceneFactory.h" />
     <ClInclude Include="Library\App.h">
@@ -262,6 +261,9 @@
     <ClInclude Include="Source\Player.h">
       <Filter>PlayScene</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GameOver.h">
+      <Filter>GameOver</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">
@@ -284,5 +286,8 @@
     </Filter>
     <ClInclude Include="Source\TitleScene.h" />
     <ClInclude Include="Source\Trap.h" />
+    <Filter Include="GameOver">
+      <UniqueIdentifier>{13de5265-ab42-4124-8cf4-1005956d3358}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
