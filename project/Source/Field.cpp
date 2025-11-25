@@ -7,6 +7,7 @@
 #include "FlyingSpike.h"
 #include "Dokan.h"
 #include "Dokan2.h"
+#include "VanishingFloor.h"
 #include <vector>
 using namespace std;
 
@@ -117,6 +118,11 @@ Field::Field(int stage)
 				new Dokan2(x * 64, y * 64);
 				POINT p = { x * 64, y * 64 };
 				pipesOut.push_back(p);
+			}
+			if (maps[y][x] == 10)
+			{
+				// 消える床のトラップ
+				new VanishingFloor(x * 64, y * 64);
 			}
 
 		}
