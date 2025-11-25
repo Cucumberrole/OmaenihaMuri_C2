@@ -87,6 +87,9 @@
     <ClCompile Include="Source\Dokan.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
+    <ClCompile Include="Source\VanishingFloor.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -267,6 +270,9 @@
     </ClInclude>
     <ClInclude Include="Source\BootScene.h">
       <Filter>BootScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\VanishingFloor.h">
+      <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

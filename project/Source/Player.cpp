@@ -2,6 +2,7 @@
 #include "Field.h"
 #include "FallingFloor.h"
 #include "GameOver.h"
+#include "VanishingFloor.h"
 #include "../Library/Trigger.h"
 #include <assert.h>
 
@@ -114,6 +115,8 @@ void Player::Update()
 		int push2 = field->HitCheckRight(x + 60, y + 63);
 		int push = max(push1, push2);
 
+
+
 		// --- 落下床 判定（複数床対応） ---
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
@@ -136,6 +139,8 @@ void Player::Update()
 		int push1 = field->HitCheckLeft(x + 4, y + 5);
 		int push2 = field->HitCheckLeft(x + 4, y + 63);
 		int push = max(push1, push2);
+
+
 
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
