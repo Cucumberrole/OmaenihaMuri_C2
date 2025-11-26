@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "CsvReader.h"
 #include "Trap.h"
+#include "SmallTrap.h"
 #include "FallingFloor.h"
 #include "FakeFloor.h"
 #include "FlyingSpike.h"
@@ -123,6 +124,11 @@ Field::Field(int stage)
 			{
 				// 消える床のトラップ
 				new VanishingFloor(x * 64, y * 64);
+			}
+			if (maps[y][x] == 11)
+			{
+				// トラップ設置
+				new SmallTrap(x * 16, y * 16 + 64);
 			}
 
 		}

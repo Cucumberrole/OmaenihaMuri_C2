@@ -90,7 +90,9 @@
     <ClCompile Include="Source\VanishingFloor.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SmallTrap.cpp" />
+    <ClCompile Include="Source\SmallTrap.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
