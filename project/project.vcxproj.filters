@@ -93,6 +93,9 @@
     <ClCompile Include="Source\SmallTrap.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
+    <ClCompile Include="Source\RollongBall.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -278,6 +281,9 @@
       <Filter>Trap</Filter>
     </ClInclude>
     <ClInclude Include="Source\SmallTrap.h">
+      <Filter>Trap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\RollingBall.h">
       <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>
