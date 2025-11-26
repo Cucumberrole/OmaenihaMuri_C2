@@ -9,6 +9,7 @@
 #include "Dokan.h"
 #include "Dokan2.h"
 #include "VanishingFloor.h"
+#include "RollingBall.h"
 #include <vector>
 using namespace std;
 
@@ -120,15 +121,23 @@ Field::Field(int stage)
 				POINT p = { x * 64, y * 64 };
 				pipesOut.push_back(p);
 			}
+
 			if (maps[y][x] == 10)
 			{
 				// 消える床のトラップ
 				new VanishingFloor(x * 64, y * 64);
 			}
+
 			if (maps[y][x] == 11)
 			{
 				// トラップ設置
 				new SmallTrap(x * 16, y * 16 + 64);
+			}
+
+			if (maps[y][x] == 12)
+			{
+				// 鉄球のトラップ
+				// トリガーとして扱うので何もしないでね
 			}
 
 		}
@@ -158,11 +167,29 @@ void Field::Update()
 	if (ty < 0 || ty >= maps.size()) return;
 	if (tx < 0 || tx >= maps[ty].size()) return;
 
-	// --- 安全にアクセスできる ---
-	if (maps[ty][tx] == 5)
+	int cell = maps[ty][tx];   // 1度取り出す（安全）
+
+	//=====================================================
+	// ① 針が飛んでくるトラップ
+	//=====================================================
+	if (cell == 5)
 	{
 		SpawnFlyingSpike(tx * 64, ty * 64, -1.0f);
 		maps[ty][tx] = 0;
+		return;   // 他トリガーと同時発動しないように
+	}
+
+	//=====================================================
+	// ② 鉄球トリガー
+	//=====================================================
+	if (cell == 12)
+	{
+		// 転がる鉄球（+1で右　-1で左）
+		new RollingBall(tx * 64, ty * 64 - 64, +1);
+
+		// 一度だけ起動
+		maps[ty][tx] = 0;
+		return;
 	}
 }
 

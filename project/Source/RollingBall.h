@@ -12,12 +12,12 @@ public:
 
 private:
 	int hImage;
-	float x, y;
-	float vx;        // 横方向の速度（正：右 / 負：左）
-	float vy;        // 落下速度
-	float gravity;   // 重力
+	float x, y;        // 左上座標
+	float vx;          // 横方向速度
+	float vy;          // 落下速度
+	float gravity;     // 重力
 
-	int size;        // 鉄球の直径
+	int size;          // ボールの直径（画像サイズ）
 
-	void Bounce();   // 壁に当たった時の反転
+	void Bounce();     // 壁反転
 };
