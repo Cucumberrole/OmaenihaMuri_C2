@@ -7,15 +7,16 @@ RollingBall::RollingBall(float sx, float sy, float dir)
 {
 	hImage = LoadGraph("data/image/ball.png");
 
-	x = sx;
-	y = sy;
+	size = 64;  // ← 表示と当たり判定を64に固定！
 
-	vx = 5.0f * dir;   // dir = +1 で右、-1 で左
+	x = sx;
+	y = sy - size;
+
+	vx = 5.0f * dir;
 	vy = 0.0f;
 	gravity = 0.4f;
-
-	size = 48; // 鉄球サイズ
 }
+
 
 RollingBall::~RollingBall()
 {
@@ -33,18 +34,14 @@ void RollingBall::Update()
 	y += vy;
 
 	//----------------------------------------
-	// 穴なら落下し続ける
+	// 足元のタイル調査（穴判定）
 	//----------------------------------------
-	int tx = int((x + size / 2) / 64);
-	int ty = int((y + size) / 64);
+	int tx = int((x + size / 2) / 64);   // 中心 X
+	int ty = int((y + size) / 64);       // 足元 Y
 
-	if (!field->IsBlock(tx, ty))
+	if (field && field->IsBlock(tx, ty))
 	{
-		// 穴なので落下継続
-	}
-	else
-	{
-		// 床に着地
+		// 床に乗った
 		y = ty * 64 - size;
 		vy = 0;
 	}
@@ -55,18 +52,18 @@ void RollingBall::Update()
 	x += vx;
 
 	//----------------------------------------
-	// 壁にぶつかったら反転
+	// 壁に当たったら反転
 	//----------------------------------------
 	int cx = int((x + (vx > 0 ? size : 0)) / 64);
 	int cy = int((y + size / 2) / 64);
 
-	if (field->IsBlock(cx, cy))
+	if (field && field->IsBlock(cx, cy))
 	{
 		Bounce();
 	}
 
 	//----------------------------------------
-	// プレイヤーとの衝突判定
+	// プレイヤーと衝突
 	//----------------------------------------
 	Player* player = FindGameObject<Player>();
 	if (player)
@@ -83,17 +80,25 @@ void RollingBall::Update()
 
 		if (hit)
 		{
-			player->DestroyMe();
+			player->ForceDie();
+			player->SetDead();
 		}
 	}
 }
 
 void RollingBall::Bounce()
 {
-	vx = -vx;  // 反転
+	vx = -vx;
 }
 
 void RollingBall::Draw()
 {
-	DrawGraph((int)x, (int)y, hImage, TRUE);
+	// 500px → 64px に縮小
+	DrawExtendGraph(
+		(int)x,          // 左上X
+		(int)y,          // 左上Y
+		(int)(x + size), // 右下X
+		(int)(y + size), // 右下Y
+		hImage, TRUE
+	);
 }
