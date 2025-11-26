@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include "../Library/GameObject.h"
 
-class Trap : public GameObject {
+class Trap : public GameObject
+{
 public:
 	Trap(int x, int y);
 	~Trap();

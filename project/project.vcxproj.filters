@@ -90,6 +90,7 @@
     <ClCompile Include="Source\VanishingFloor.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
+    <ClCompile Include="Source\SmallTrap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -272,6 +273,9 @@
       <Filter>BootScene</Filter>
     </ClInclude>
     <ClInclude Include="Source\VanishingFloor.h">
+      <Filter>Trap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SmallTrap.h">
       <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>
