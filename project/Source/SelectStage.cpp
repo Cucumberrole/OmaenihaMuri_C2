@@ -8,7 +8,7 @@
 
 SelectStage::SelectStage()
 {
-	backgroundImage = LoadGraph("data/image/stageselect.png");
+	backgroundImage = LoadGraph("data/image/title.png");
 
 	// 表示するステージ名
 	stageNames = { "STAGE 1", "STAGE 2", "STAGE 3", "DEBUG STAGE" };
@@ -64,8 +64,8 @@ void SelectStage::Draw()
 {
 	DrawGraph(0, 0, backgroundImage, FALSE);
 
-	int colorNormal = GetColor(255, 255, 255);
-	int colorSelect = GetColor(255, 255, 0);
+	int colorNormal = GetColor(0, 0, 0);
+	int colorSelect = GetColor(255, 69, 0);
 
 	SetFontSize(36);
 
@@ -88,9 +88,8 @@ void SelectStage::Draw()
 		DrawString(x, y, stageNames[i].c_str(), color);
 	}
 
-	// 説明文も中央に
+	// 説明文も中央
 	const char* msg = "↑↓で選択 / ENTERで決定";
 	int w = GetDrawStringWidth(msg, -1);
-	DrawString((Screen::WIDTH - w) / 2, Screen::HEIGHT - 80,
-		msg, GetColor(200, 200, 200));
+	DrawString((Screen::WIDTH - w) / 2, Screen::HEIGHT - 80, msg, GetColor(0, 0, 0));
 }
