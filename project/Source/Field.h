@@ -19,6 +19,7 @@ public:
 	std::vector<POINT> pipesIn;   // 土管入り口(7)
 	std::vector<POINT> pipesOut;  // 土管出口(8)
 
+	void RemoveFloorsAround(int tx, int ty); // 床を消します
 
 	//--------------------------------------------------------
 	// 当たり判定（衝突チェック）
