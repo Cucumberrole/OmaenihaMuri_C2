@@ -4,9 +4,8 @@
 #include "BootScene.h"
 #include "TitleScene.h"
 #include "PlayScene.h"
-
+#include "SelectStage.h"
 #include "GameOver.h"
-
 #include "ClearScene.h"
 
 SceneBase* SceneFactory::CreateFirst()
@@ -23,6 +22,11 @@ SceneBase * SceneFactory::Create(const std::string & name)
 	if (name == "PLAY")
 	{
 		return new PlayScene();
+	}
+
+	if (name == "STAGE")
+	{
+		return new SelectStage();
 	}
 
 	if (name == "GAMEOVER")

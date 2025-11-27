@@ -99,6 +99,9 @@
     <ClCompile Include="Source\FallingTrap.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
+    <ClCompile Include="Source\SelectStage.cpp">
+      <Filter>StageSelect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -292,6 +295,9 @@
     <ClInclude Include="Source\FallingTrap.h">
       <Filter>Trap</Filter>
     </ClInclude>
+    <ClInclude Include="Source\SelectStage.h">
+      <Filter>StageSelect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">
@@ -319,6 +325,9 @@
     </Filter>
     <Filter Include="Trap">
       <UniqueIdentifier>{ec7d9f9a-df5c-4b7d-b43e-f784b3489e21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="StageSelect">
+      <UniqueIdentifier>{f78fe6bc-8697-4244-b3d9-a5a2daecdf45}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
