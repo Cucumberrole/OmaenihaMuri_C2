@@ -9,7 +9,13 @@
 PlayScene::PlayScene()
 {
 	new Background();
-	new Field(0);
+	if (CheckHitKey(KEY_INPUT_1)) {
+		new Field(1);
+	}
+	else
+	{
+		new Field(0);
+	}
 	sound = 0;
 	Ssound = LoadSoundMem("data/sound/bgm_ogg.ogg");
 }

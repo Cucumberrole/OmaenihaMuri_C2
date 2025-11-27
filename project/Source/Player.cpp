@@ -32,7 +32,7 @@ Player::Player()
 	// アニメーション初期化
 	animIndex = 0;
 	animFrame = 0;
-	direction = true;
+	frip = true;
 
 	hp = 0;
 }
@@ -58,7 +58,7 @@ Player::Player(int sx, int sy)
 	// アニメーション初期化
 	animIndex = 0;
 	animFrame = 0;
-	direction = false;
+	frip = false;
 
 	hp = 0;
 
@@ -107,7 +107,7 @@ void Player::Update()
 	//--------------------------------------
 	if (CheckHitKey(KEY_INPUT_D)) {
 		moveX = WALK_SPEED;
-		direction = false;
+		frip = false;
 
 		// --- Field 判定 ---
 		Field* field = FindGameObject<Field>();
@@ -133,7 +133,7 @@ void Player::Update()
 	//--------------------------------------
 	if (CheckHitKey(KEY_INPUT_A)) {
 		moveX = -WALK_SPEED;
-		direction = true;
+		frip = true;
 
 		Field* field = FindGameObject<Field>();
 		int push1 = field->HitCheckLeft(x + 4, y + 5);
@@ -323,7 +323,7 @@ void Player::Draw()
 		CHARACTER_HEIGHT,
 		hImage,
 		TRUE,
-		direction
+		frip
 	);
 
 	//--------------------------------------

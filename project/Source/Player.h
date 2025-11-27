@@ -44,5 +44,5 @@ private:
 	// --- アニメーション関連変数 ---
 	int animIndex;      // 現在のアニメーションフレーム番号
 	int animFrame;      // フレームカウンタ（アニメ速度制御）
-	bool direction;     // 向き（true=左向き / false=右向き）
+	bool frip;     // 向き（true=左向き / false=右向き）
 };
