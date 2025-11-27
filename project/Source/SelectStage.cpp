@@ -11,8 +11,8 @@ SelectStage::SelectStage()
 	backgroundImage = LoadGraph("data/image/title.png");
 
 	// 表示するステージ名
-	stageNames = { "STAGE 1", "STAGE 2", "STAGE 3", "DEBUG STAGE" };
-	stageEnabled = { true,     true,     true,     false };
+	stageNames = { "STAGE 1", "STAGE 2", "DEBUG STAGE" };
+	stageEnabled = { true,true,false };
 
 	cursor = 0;
 }
@@ -41,13 +41,13 @@ void SelectStage::Update()
 	}
 
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_D)) {
-		stageEnabled[3] = true;  // OK
+		stageEnabled[2] = true;  // OK
 	}
 
 	// --- 決定でステージへ ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_RETURN)) {
 
-		if (stageEnabled[cursor])    // ← 有効なときだけ
+		if (stageEnabled[cursor])    // 有効なときだけ
 		{
 			PlayScene::SelectedStage = cursor + 1;
 			SceneManager::ChangeScene("PLAY");
@@ -72,12 +72,12 @@ void SelectStage::Draw()
 	int lineHeight = 50;                 // 1行ごとの間隔
 	int totalHeight = lineHeight * stageNames.size();
 
-	// ★ 画面中央に全体を配置するための開始位置
+	// 画面中央に全体を配置するための開始位置
 	int startY = (Screen::HEIGHT - totalHeight) / 2;
 
 	for (int i = 0; i < stageNames.size(); i++)
 	{
-		int color = stageEnabled[i] ? (i == cursor ? colorSelect : colorNormal) : GetColor(120, 120, 120);  // ← 無効なステージは灰色
+		int color = stageEnabled[i] ? (i == cursor ? colorSelect : colorNormal) : GetColor(255, 255, 255);  // 無効なステージは背景色と同化させてます
 
 		// 各行の幅を取得して横中央に配置
 		int textWidth = GetDrawStringWidth(stageNames[i].c_str(), -1);
