@@ -41,7 +41,7 @@ void SelectStage::Update()
 	}
 
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_D)) {
-		stageEnabled[2] = true;  // OK
+		stageEnabled[2] = true;
 	}
 
 	// --- 決定でステージへ ---
@@ -49,7 +49,17 @@ void SelectStage::Update()
 
 		if (stageEnabled[cursor])    // 有効なときだけ
 		{
-			PlayScene::SelectedStage = cursor + 1;
+			// デバッグステージ（cursor == 2）の時だけ、ステージナンバーを 0 に設定する
+			if (cursor == 2)
+			{
+				PlayScene::SelectedStage = 0;
+			}
+			else
+			{
+				// STAGE 1, STAGE 2 の場合は、これまで通り cursor + 1
+				PlayScene::SelectedStage = cursor + 1;
+			}
+
 			SceneManager::ChangeScene("PLAY");
 		}
 	}
@@ -64,6 +74,7 @@ void SelectStage::Draw()
 {
 	DrawGraph(0, 0, backgroundImage, FALSE);
 
+	DrawFormatString(0, 0, GetColor(0, 0, 0), "選択番号＝%d", cursor);
 	int colorNormal = GetColor(0, 0, 0);
 	int colorSelect = GetColor(255, 69, 0);
 

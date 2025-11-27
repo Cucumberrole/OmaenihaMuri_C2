@@ -58,9 +58,3 @@ void SmallTrap::Draw()
 	);
 	DrawCircle(x + 8, y + 8, 8, GetColor(0, 0, 255), FALSE);
 }
-
-
-
-
-
-

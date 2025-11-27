@@ -4,7 +4,7 @@
 #include "../Library/SceneManager.h"
 #include "../Library/Trigger.h"
 
-int PlayScene::SelectedStage = 1;
+int PlayScene::SelectedStage = 0;
 
 PlayScene::PlayScene()
 {
