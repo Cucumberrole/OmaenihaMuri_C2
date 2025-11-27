@@ -93,7 +93,7 @@
     <ClCompile Include="Source\SmallTrap.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
-    <ClCompile Include="Source\RollongBall.cpp">
+    <ClCompile Include="Source\RollingBall.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
     <ClCompile Include="Source\FallingTrap.cpp">
@@ -196,16 +196,7 @@
     <ClInclude Include="Source\Background.h">
       <Filter>PlayScene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\FakeFloor.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\FallingFloor.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Field.h">
-      <Filter>PlayScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\FlyingSpike.h">
       <Filter>PlayScene</Filter>
     </ClInclude>
     <ClInclude Include="Source\PlayScene.h">
@@ -308,6 +299,15 @@
       <Filter>Trap</Filter>
     </ClInclude>
     <ClInclude Include="Source\FallingSpike.h">
+      <Filter>Trap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\FakeFloor.h">
+      <Filter>Trap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\FallingFloor.h">
+      <Filter>Trap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\FlyingSpike.h">
       <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>

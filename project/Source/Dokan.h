@@ -4,7 +4,7 @@
 class Dokan : public GameObject
 {
 public:
-	Dokan(int sx,int sy);
+	Dokan(int sx, int sy);
 	~Dokan();
 	void Update() override;
 	void Draw() override;

@@ -2,7 +2,7 @@
 #include "SmallTrap.h"
 #include "Player.h"
 
-SmallTrap::SmallTrap(int sx,int sy)
+SmallTrap::SmallTrap(int sx, int sy)
 {
 	SImage = LoadGraph("data/image/Smallhari.png"); // è¨Ç≥Ç¢êjâÊëú
 	x = sx;
@@ -56,7 +56,7 @@ void SmallTrap::Draw()
 		SImage,
 		TRUE
 	);
-	DrawCircle(x +  8, y + 8, 8, GetColor(0, 0, 255), FALSE);
+	DrawCircle(x + 8, y + 8, 8, GetColor(0, 0, 255), FALSE);
 }
 
 

@@ -4,16 +4,15 @@
 class PlayScene : public SceneBase
 {
 public:
-    PlayScene();        // ← 引数なし
-    PlayScene(int stage); // ← オプション版（使わなくてもOK）
-    ~PlayScene();
+	PlayScene();        // ← 引数なし
+	~PlayScene();
 
-    static int SelectedStage;  // ← ステージ番号を保持
+	static int SelectedStage;  // ← ステージ番号を保持
 
-    void Update() override;
-    void Draw() override;
+	void Update() override;
+	void Draw() override;
 
 private:
-    int Ssound;
-    bool sound;
+	int Ssound;
+	bool sound;
 };

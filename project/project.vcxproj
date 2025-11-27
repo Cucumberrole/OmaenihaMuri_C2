@@ -197,7 +197,7 @@
     <ClCompile Include="Source\CeilingSpike.cpp" />
     <ClCompile Include="Source\FallingSpike.cpp" />
     <ClCompile Include="Source\FallingTrap.cpp" />
-    <ClCompile Include="Source\RollongBall.cpp" />
+    <ClCompile Include="Source\RollingBall.cpp" />
     <ClCompile Include="Source\BootScene.cpp" />
     <ClCompile Include="Source\ClearScene.cpp" />
     <ClCompile Include="Source\CsvReader.cpp" />

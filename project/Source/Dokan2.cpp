@@ -1,4 +1,5 @@
 #include "Dokan2.h"
+#include "Dokan2.h"
 #include "Screen.h"
 
 Dokan2::Dokan2(int sx, int sy)

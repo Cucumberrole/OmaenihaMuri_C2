@@ -1,7 +1,7 @@
 #pragma once
 #include "../Library/GameObject.h"
 
-class SmallTrap : public GameObject 
+class SmallTrap : public GameObject
 {
 public:
 	SmallTrap(int x, int y);
@@ -17,6 +17,6 @@ private:
 	int width;     // 幅（画像サイズ）
 	int height;    // 高さ
 
-	
+
 
 };
