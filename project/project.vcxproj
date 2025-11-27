@@ -154,6 +154,8 @@
     <ClInclude Include="Library\Time.h" />
     <ClInclude Include="Library\Trigger.h" />
     <ClInclude Include="Source\Background.h" />
+    <ClInclude Include="Source\CeilingSpike.h" />
+    <ClInclude Include="Source\FallingSpike.h" />
     <ClInclude Include="Source\FallingTrap.h" />
     <ClInclude Include="Source\RollingBall.h" />
     <ClInclude Include="Source\BootScene.h" />
@@ -192,6 +194,8 @@
     <ClCompile Include="Library\Time.cpp" />
     <ClCompile Include="Library\Trigger.cpp" />
     <ClCompile Include="Source\Background.cpp" />
+    <ClCompile Include="Source\CeilingSpike.cpp" />
+    <ClCompile Include="Source\FallingSpike.cpp" />
     <ClCompile Include="Source\FallingTrap.cpp" />
     <ClCompile Include="Source\RollongBall.cpp" />
     <ClCompile Include="Source\BootScene.cpp" />

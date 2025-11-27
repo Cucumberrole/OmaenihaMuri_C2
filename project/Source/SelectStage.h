@@ -14,7 +14,7 @@ public:
 
 private:
 	int backgroundImage;
-
+	std::vector<bool> stageEnabled;
 	std::vector<std::string> stageNames;  // ステージ名一覧
 	int cursor;                          // 選択中の番号
 };

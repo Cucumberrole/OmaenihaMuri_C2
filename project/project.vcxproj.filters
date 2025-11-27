@@ -102,6 +102,12 @@
     <ClCompile Include="Source\SelectStage.cpp">
       <Filter>StageSelect</Filter>
     </ClCompile>
+    <ClCompile Include="Source\CeilingSpike.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\FallingSpike.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -297,6 +303,12 @@
     </ClInclude>
     <ClInclude Include="Source\SelectStage.h">
       <Filter>StageSelect</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CeilingSpike.h">
+      <Filter>Trap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\FallingSpike.h">
+      <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,17 +1,14 @@
 #include "TitleScene.h"
 #include "Screen.h"
 
-
-
 TitleScene::TitleScene()
 {
-	TitleImage = LoadGraph("data/image/title.png");//‰æ‘œ•Ï‚¦‚é‚Æ‚«‚Í‚±‚±
-
+	TitleImage = LoadGraph("data/image/title.png");
 }
 
 TitleScene::~TitleScene()
 {
-
+	DeleteGraph(TitleImage);
 }
 
 void TitleScene::Update()
