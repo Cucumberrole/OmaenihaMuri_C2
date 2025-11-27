@@ -28,8 +28,8 @@ void VanishingFloor::Update()
 	float py = player->GetY();
 
 	// --- ƒvƒŒƒCƒ„[‚Æ‚Ì‹——£ ---
-	float dx = (px + 32) - (x + 32);
-	float dy = (py + 32) - (y + 32);
+	float dx = px - (x + 32);
+	float dy = py - (y + 32);
 	float dist = dx * dx + dy * dy;
 
 	if (dist < vanishRange * vanishRange)

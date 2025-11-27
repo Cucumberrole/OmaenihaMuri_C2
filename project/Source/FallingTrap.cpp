@@ -1,10 +1,10 @@
-#include "FallingFloor.h"
+#include "FallingTrap.h"
 #include "Player.h"
 #include "Field.h"
 #include <vector>
 #include <DxLib.h>
 
-FallingFloor::FallingFloor(int sx, int sy)
+FallingTrap::FallingTrap(int sx, int sy)
 {
 	hImage = LoadGraph("data/image/New Blo.png");
 	x = static_cast<float>(sx);
@@ -17,12 +17,12 @@ FallingFloor::FallingFloor(int sx, int sy)
 	SetDrawOrder(-1); // 描画順位
 }
 
-FallingFloor::~FallingFloor()
+FallingTrap::~FallingTrap()
 {
 	DeleteGraph(hImage);
 }
 
-void FallingFloor::Update()
+void FallingTrap::Update()
 {
 	if (isLanded) return; // もう止まっているなら何もしない
 
@@ -91,18 +91,18 @@ void FallingFloor::Update()
 
 }
 
-void FallingFloor::StartFalling()
+void FallingTrap::StartFalling()
 {
 	isFalling = true;
 	velocityY = 0.0f;
 }
 
-void FallingFloor::Draw()
+void FallingTrap::Draw()
 {
 	DrawRectGraph(static_cast<int>(x), static_cast<int>(y), 0, 0, 64, 64, hImage, TRUE);
 }
 
-int FallingFloor::HitCheckRight(int px, int py)
+int FallingTrap::HitCheckRight(int px, int py)
 {
 	// px,py → プレイヤーの判定点
 	if (py < y || py >= y + 64) return 0; // 縦方向が重なっていない
@@ -115,7 +115,7 @@ int FallingFloor::HitCheckRight(int px, int py)
 	return 0;
 }
 
-int FallingFloor::HitCheckLeft(int px, int py)
+int FallingTrap::HitCheckLeft(int px, int py)
 {
 	if (py < y || py >= y + 64) return 0;
 
@@ -127,7 +127,7 @@ int FallingFloor::HitCheckLeft(int px, int py)
 	return 0;
 }
 
-int FallingFloor::HitCheckDown(int px, int py)
+int FallingTrap::HitCheckDown(int px, int py)
 {
 	// px が床の横範囲にない
 	if (px < x || px >= x + 64) return 0;
@@ -140,7 +140,7 @@ int FallingFloor::HitCheckDown(int px, int py)
 	return 0;
 }
 
-int FallingFloor::HitCheckUp(int px, int py)
+int FallingTrap::HitCheckUp(int px, int py)
 {
 	if (px < x || px >= x + 64) return 0;
 

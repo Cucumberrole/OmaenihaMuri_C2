@@ -111,8 +111,8 @@ void Player::Update()
 
 		// --- Field 判定 ---
 		Field* field = FindGameObject<Field>();
-		int push1 = field->HitCheckRight(x + 60, y + 5);
-		int push2 = field->HitCheckRight(x + 60, y + 63);
+		int push1 = field->HitCheckRight(x + 64, y + 5);
+		int push2 = field->HitCheckRight(x + 64, y + 58);
 		int push = max(push1, push2);
 
 
@@ -120,8 +120,8 @@ void Player::Update()
 		// --- 落下床 判定（複数床対応） ---
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
-			int p1 = f->HitCheckRight(x + 60, y + 5);
-			int p2 = f->HitCheckRight(x + 60, y + 63);
+			int p1 = f->HitCheckRight(x + 64, y + 1);
+			int p2 = f->HitCheckRight(x + 64, y + 62);
 			push = max(push, max(p1, p2));
 		}
 
@@ -136,16 +136,16 @@ void Player::Update()
 		frip = true;
 
 		Field* field = FindGameObject<Field>();
-		int push1 = field->HitCheckLeft(x + 4, y + 5);
-		int push2 = field->HitCheckLeft(x + 4, y + 63);
+		int push1 = field->HitCheckLeft(x, y + 5);
+		int push2 = field->HitCheckLeft(x, y + 58);
 		int push = max(push1, push2);
 
 
 
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
-			int p1 = f->HitCheckLeft(x + 4, y + 5);
-			int p2 = f->HitCheckLeft(x + 4, y + 63);
+			int p1 = f->HitCheckLeft(x, y + 1);
+			int p2 = f->HitCheckLeft(x, y + 62);
 			push = max(push, max(p1, p2));
 		}
 
@@ -200,15 +200,15 @@ void Player::Update()
 	//--------------------------------------
 
 	if (velocity >= 0) { // 落下中
-		int push1 = field->HitCheckDown(x + 14, y + 64);
-		int push2 = field->HitCheckDown(x + 50, y + 64);
+		int push1 = field->HitCheckDown(x + 5, y + 64);
+		int push2 = field->HitCheckDown(x + 58, y + 64);
 		int push = max(push1, push2);
 
 		// --- 落下床との当たり判定 ---
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
-			int p1 = f->HitCheckDown(x + 14, y + 64);
-			int p2 = f->HitCheckDown(x + 50, y + 64);
+			int p1 = f->HitCheckDown(x + 1, y + 64);
+			int p2 = f->HitCheckDown(x + 62, y + 64);
 			push = max(push, max(p1, p2));
 		}
 
@@ -222,15 +222,15 @@ void Player::Update()
 		}
 	}
 	else { // 上昇中
-		int push1 = field->HitCheckUp(x + 14, y + 5);
-		int push2 = field->HitCheckUp(x + 50, y + 5);
+		int push1 = field->HitCheckUp(x + 5, y + 1);
+		int push2 = field->HitCheckUp(x + 58, y + 1);
 		int push = max(push1, push2);
 
 		// --- 落下床との当たり判定 ---
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
-			int p1 = f->HitCheckUp(x + 14, y + 5);
-			int p2 = f->HitCheckUp(x + 50, y + 5);
+			int p1 = f->HitCheckUp(x + 1, y);
+			int p2 = f->HitCheckUp(x + 62, y);
 			push = max(push, max(p1, p2));
 		}
 

@@ -12,6 +12,9 @@ PlayScene::PlayScene()
 	if (CheckHitKey(KEY_INPUT_1)) {
 		new Field(1);
 	}
+	else if (CheckHitKey(KEY_INPUT_2)) {
+		new Field(2);
+	}
 	else
 	{
 		new Field(0);
