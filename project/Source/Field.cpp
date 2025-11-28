@@ -134,10 +134,18 @@ Field::Field(int stage)
 				new SmallTrap(x * 64 + 32 - 8, y * 64 + 48);
 			}
 
-			if (maps[y][x] == 12)
-			{
-				// 鉄球のトラップ
-				// トリガーとして扱うので何もしないでね
+			if (maps[y][x] == 20) {
+				// ボール踏む場所
+				ballTimer.push_back(0);   // タイマー初期化
+				POINT p = { x * 64, y * 64 };
+				ballTriggers.push_back(p);
+				ballTriggered.push_back(false);
+			}
+
+			if (maps[y][x] == 21) {
+				// ボールが出る場所
+				POINT p = { x * 64, y * 64 };
+				ballSpawns.push_back(p);
 			}
 
 		}
@@ -163,31 +171,58 @@ void Field::Update()
 	int tx = int(px + 32) / 64; // 中心X
 	int ty = int(py + 63) / 64; // 足元Y
 
-	// --- 範囲チェック（超重要！） ---
 	if (ty < 0 || ty >= maps.size()) return;
 	if (tx < 0 || tx >= maps[ty].size()) return;
 
-	int cell = maps[ty][tx];   // 1度取り出す（安全）
 
-	//=====================================================
-	// 針が飛んでくるトラップ
-	//=====================================================
+	//------------------------------------------
+	// RollingBallの判定
+	//------------------------------------------
+	// プレイヤーがトリガー上に来たら起動	
+	for (int i = 0; i < ballTriggers.size(); i++)
+	{
+		int trigX = ballTriggers[i].x / 64;
+		int trigY = ballTriggers[i].y / 64;
+
+		if (!ballTriggered[i] && tx == trigX && ty == trigY)
+		{
+			ballTriggered[i] = true;  // 起動
+			// 最初のボールはすぐ発射したいなら 0 にする
+			// 少し遅らせたいなら 30〜60 くらい
+			ballTimer[i] = 0; // タイマー初期化
+		}
+	}
+
+	// 一定時間ごとにボール発射
+	for (int i = 0; i < ballTriggers.size(); i++)
+	{
+		if (!ballTriggered[i]) continue;  // 起動していないトリガーは無視
+
+		if (ballTimer[i] > 0)
+		{
+			ballTimer[i]--;
+			continue;
+		}
+
+		// タイマーが 0 になったら発射
+		if (i < ballSpawns.size())
+		{
+			POINT spawn = ballSpawns[i];
+			new RollingBall(spawn.x, spawn.y, -1.0f);
+		}
+
+		// 次の発射までの時間
+		ballTimer[i] = 60;
+	}
+
+	//------------------------------------------
+	// その他の判定
+	//------------------------------------------
+	int cell = maps[ty][tx];
+
 	if (cell == 5)
 	{
 		SpawnFlyingSpike(tx * 64, ty * 64, -1.0f);
-		maps[ty][tx] = 0;
-		return;   // 他トリガーと同時発動しないように
-	}
-
-	//=====================================================
-	// 鉄球トリガー
-	//=====================================================
-	if (cell == 12)
-	{
-		// 転がる鉄球（+1で右　-1で左）
-		new RollingBall(tx * 64, ty * 64 - 64, +1);
-
-		// 一度だけ起動
 		maps[ty][tx] = 0;
 		return;
 	}

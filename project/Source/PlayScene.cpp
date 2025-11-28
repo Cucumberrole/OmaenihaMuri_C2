@@ -4,11 +4,16 @@
 #include "../Library/SceneManager.h"
 #include "../Library/Trigger.h"
 
-int PlayScene::SelectedStage = 0;
+int PlayScene::SelectedStage = -1;
 
 PlayScene::PlayScene()
 {
 	new Background();
+
+	// ステージ未選択なら強制的に1へ
+	if (SelectedStage < 0)
+		SelectedStage = 1;
+
 	new Field(SelectedStage);
 
 	sound = 0;
