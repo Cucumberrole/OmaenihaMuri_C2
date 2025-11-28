@@ -10,6 +10,7 @@
 #include "Dokan2.h"
 #include "VanishingFloor.h"
 #include "RollingBall.h"
+#include "EnemyChaser.h"
 #include <vector>
 using namespace std;
 
@@ -146,6 +147,11 @@ Field::Field(int stage)
 				// ボールが出る場所
 				POINT p = { x * 64, y * 64 };
 				ballSpawns.push_back(p);
+			}
+
+			if (maps[y][x] == 30)
+			{
+				new EnemyChaser(x * 64, y * 64);
 			}
 
 		}
