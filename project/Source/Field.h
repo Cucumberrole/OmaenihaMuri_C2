@@ -19,7 +19,13 @@ public:
 	std::vector<POINT> pipesIn;   // 土管入り口(7)
 	std::vector<POINT> pipesOut;  // 土管出口(8)
 
-	void RemoveFloorsAround(int tx, int ty); // 床を消します
+	// RollingBall 用
+	std::vector<POINT> ballTriggers;   // トリガー地点
+	std::vector<POINT> ballSpawns;     // 出現地点
+	std::vector<bool> ballTriggered;  // トリガーが既に発動したか
+	std::vector<int> ballTimer;
+
+	void RemoveFloorsAround(int tx, int ty); // 床を消しますよ
 
 	//--------------------------------------------------------
 	// 当たり判定（衝突チェック）
