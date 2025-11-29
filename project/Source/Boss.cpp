@@ -124,23 +124,59 @@ void Boss::CollisionWithMap()
 	Field* field = FindGameObject<Field>();
 	if (!field) return;
 
-	// 重力
+	// --- 重力 ---
 	vy += gravity;
 	y += vy;
 
-	// --- 下方向 ---
-	int tx1 = (int)(x + 20) / 64;
-	int tx2 = (int)(x + 236) / 64;
-	int ty = (int)(y + 256) / 64;
+	// ======== ▼ 下方向判定（地面に乗る） ========
 
-	if (field->IsBlock(tx1, ty) || field->IsBlock(tx2, ty))
+	int footY = (int)(y + 256); // ボスの足元
+	int txL = (int)(x + 32) / 64; // 左足（少し内側）
+	int txR = (int)(x + 224) / 64; // 右足（少し内側）
+	int ty = footY / 64;
+
+	if (field->IsBlock(txL, ty) || field->IsBlock(txR, ty))
 	{
-		y = ty * 64 - 256;
+		y = ty * 64 - 256;  // 足元を合わせる
 		vy = 0;
 	}
 
-	// 横移動
+	// ======== ▼ 横移動 ========
 	x += vx;
+
+	// ======== ▼ 左側面判定 ========
+	int leftX = (int)x;
+	int cy1 = (int)(y + 32) / 64;  // 上側
+	int cy2 = (int)(y + 224) / 64;  // 下側
+	int lx = leftX / 64;
+
+	if (field->IsBlock(lx, cy1) || field->IsBlock(lx, cy2))
+	{
+		x = lx * 64 + 64; // 壁の右側へ押し戻す
+		vx = 0;
+	}
+
+	// ======== ▼ 右側面判定 ========
+	int rightX = (int)(x + 256);
+	int rx = rightX / 64;
+
+	if (field->IsBlock(rx, cy1) || field->IsBlock(rx, cy2))
+	{
+		x = rx * 64 - 256; // 壁の左側へ押し戻す
+		vx = 0;
+	}
+
+	// ======== ▼ 天井判定 ========
+	int headY = (int)y;
+	int hxY = headY / 64;
+	int hxL = (int)(x + 64) / 64;
+	int hxR = (int)(x + 192) / 64;
+
+	if (field->IsBlock(hxL, hxY) || field->IsBlock(hxR, hxY))
+	{
+		y = hxY * 64 + 64; // 天井の下に押し下げる
+		vy = 0;
+	}
 }
 
 void Boss::AttackCheck()
