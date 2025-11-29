@@ -65,7 +65,6 @@
     <ClCompile Include="Source\ClearScene.cpp">
       <Filter>ClearScene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\CsvReader.cpp" />
     <ClCompile Include="Source\GameOver.cpp">
       <Filter>GameOver</Filter>
     </ClCompile>
@@ -113,6 +112,9 @@
     </ClCompile>
     <ClCompile Include="Source\Boss.cpp">
       <Filter>Trap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\CsvReader.cpp">
+      <Filter>Library</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -195,7 +197,6 @@
     <ClInclude Include="Source\ClearScene.h">
       <Filter>ClearScene</Filter>
     </ClInclude>
-    <ClInclude Include="Source\CsvReader.h" />
     <ClInclude Include="Source\ClearScene.h">
       <Filter>ClearScene</Filter>
     </ClInclude>
@@ -321,6 +322,9 @@
     </ClInclude>
     <ClInclude Include="Source\Boss.h">
       <Filter>Trap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\CsvReader.h">
+      <Filter>Library</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
