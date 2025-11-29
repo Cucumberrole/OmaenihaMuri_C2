@@ -27,10 +27,24 @@ public:
 
 	void RemoveFloorsAround(int tx, int ty); // 床を消しますよ
 
-	// 落ちてくる針のトラップ
-	std::vector<POINT> dropTriggers;
-	std::vector<POINT> dropSpawns;
-	std::vector<bool> dropTriggered; // 発動済みか管理
+	//--------------------------------------------------------
+	// 落下する針の処理
+	//--------------------------------------------------------
+	// 落下針の元位置（天井）
+	std::vector<POINT> fallingSpikes;
+	std::vector<bool> fallingSpikeAlive;  // 天井針の生存フラグ（待機表示用）
+
+	// トリガー位置（1つなら POINT でOK）
+	POINT fallingTrigger;
+
+	// トリガーが踏まれたか
+	bool fallingActivated = false;
+
+	// 次に落とす針のインデックス
+	int fallingIndex = 0;
+
+	// 針落下の間隔タイマー
+	int fallingTimer = 0;
 
 	//--------------------------------------------------------
 	// 当たり判定（衝突チェック）
@@ -41,7 +55,8 @@ public:
 	int HitCheckUp(int px, int py);     // 上方向の当たり判定（天井）
 
 private:
-	int hImage;     // 地形（ブロック）画像ハンドル
-	float x, y;     // ステージの座標（主にスクロール時に使用）
-	int scrollX;    // 横スクロール量（カメラ位置）
+	int hImage; // 地形画像ハンドル
+	int fallingSpikeImage; // 針画像ハンドル
+	float x, y; // ステージの座標（主にスクロール時に使用）
+	int scrollX; // 横スクロール量（カメラ位置）
 };

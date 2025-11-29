@@ -75,6 +75,7 @@ Field::Field(int stage)
 	//--------------------------------------------------------
 	SetDrawOrder(50);  // 描画順序を設定
 	hImage = LoadGraph("data/image/New Blo.png");        // ブロック
+	fallingSpikeImage = LoadGraph("data/image/hariBottom.png"); // 天井にある針の画像
 	x = 0;
 	y = 0;
 	scrollX = 0;
@@ -137,15 +138,16 @@ Field::Field(int stage)
 				new SmallTrap(x * 64 + 32 - 8, y * 64 + 48);
 			}
 
-			if (maps[y][x] == 12) {
-				POINT p = { x * 64, y * 64 };
-				dropTriggers.push_back(p);
-				dropTriggered.push_back(false);
+			if (maps[y][x] == 12)
+			{
+				fallingTrigger = { x * 64, y * 64 };
 			}
 
-			if (maps[y][x] == 13) {
+			if (maps[y][x] == 13)
+			{
 				POINT p = { x * 64, y * 64 };
-				dropSpawns.push_back(p);
+				fallingSpikes.push_back(p);
+				fallingSpikeAlive.push_back(true);
 			}
 
 			if (maps[y][x] == 20) {
@@ -234,25 +236,40 @@ void Field::Update()
 		ballTimer[i] = 60;
 	}
 
-	// 落下針トリガー判定
-	for (int i = 0; i < dropTriggers.size(); i++)
+	//------------------------------------------------------
+	// トリガーを踏んだら針落下開始
+	//------------------------------------------------------
+	int tX = fallingTrigger.x / 64;
+	int tY = fallingTrigger.y / 64;
+
+	if (!fallingActivated && tx == tX && ty == tY)
 	{
-		POINT trig = dropTriggers[i];
+		fallingActivated = true;
+		fallingIndex = 0;
+		fallingTimer = 0;
+	}
 
-		int trigX = trig.x / 64;
-		int trigY = trig.y / 64;
-
-		// トリガー（12）に乗った
-		if (tx == trigX && ty == trigY)
+	// 順番に針を落とす処理
+	if (fallingActivated)
+	{
+		if (fallingTimer > 0)
 		{
-			if (!dropTriggered[i]) {
-				dropTriggered[i] = true;
+			fallingTimer--;
+		}
+		else
+		{
+			if (fallingIndex < fallingSpikes.size())
+			{
+				POINT p = fallingSpikes[fallingIndex];
 
-				// 対応する 13 の位置に針を生成
-				if (i < dropSpawns.size()) {
-					POINT sp = dropSpawns[i];
-					new FallingSpike(sp.x, sp.y);
-				}
+				// 落下針を生成
+				new FallingSpike(p.x, p.y);
+
+				// --- 天井の待機針を消す ---
+				fallingSpikeAlive[fallingIndex] = false;
+
+				fallingIndex++;
+				fallingTimer = 30; // 次の針を落とすまでの間隔
 			}
 		}
 	}
@@ -275,7 +292,6 @@ void Field::Update()
 //------------------------------------------------------------
 void Field::Draw()
 {
-
 	// --- マップ走査してブロック描画 ---
 	for (int y = 0; y < maps.size(); y++)
 	{
@@ -294,6 +310,19 @@ void Field::Draw()
 				);
 			}
 		}
+	}
+
+	// --- 待機状態の針の描画 ---
+	for (int i = 0; i < fallingSpikes.size(); i++)
+	{
+		if (!fallingSpikeAlive[i]) continue;  // 落下済みなら描画しない
+
+		DrawGraph(
+			fallingSpikes[i].x,
+			fallingSpikes[i].y,
+			fallingSpikeImage,
+			TRUE
+		);
 	}
 }
 
