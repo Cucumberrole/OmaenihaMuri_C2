@@ -1,84 +1,91 @@
 #include "EnemyChaser.h"
 #include "Player.h"
 #include <DxLib.h>
-#include <cmath>
 
 EnemyChaser::EnemyChaser(float sx, float sy)
 {
-	animImage = LoadGraph("data/image/すい .png");
+	hImage = LoadGraph("data/image/すい.png"); // 1280×640
+
 	x = sx;
 	y = sy;
 
-	speed = 2.0f;  // 敵の移動速度
-	size = 48.0f;  // 当たり判定サイズ
+	speed = 1.5f;
 
-	// アニメーション初期化
 	animIndex = 0;
 	animFrame = 0;
+
+	SetDrawOrder(10);
 }
 
 EnemyChaser::~EnemyChaser()
 {
-	DeleteGraph(animImage);
+	DeleteGraph(hImage);
 }
 
 void EnemyChaser::Update()
 {
+	// アニメーション（常時）
+	animFrame++;
+	if (animFrame >= ANIM_FRAME_INTERVAL)
+	{
+		animFrame = 0;
+		animIndex = (animIndex + 1) % 2;
+	}
+
+	// プレイヤー追尾処理
 	Player* player = FindGameObject<Player>();
-	if (!player) return;
-
-	float px = player->GetX();
-	float py = player->GetY();
-
-	// --- 追尾処理（シンプル） ---
-	float dx = px - x;
-	float dy = py - y;
-	float dist = sqrtf(dx * dx + dy * dy);
-
-	if (dist > 1.0f)
+	if (player)
 	{
-		x += (dx / dist) * speed;
-		y += (dy / dist) * speed;
+		float px = player->GetX();
+		float py = player->GetY();
+
+		if (px < x) x -= speed;
+		if (px > x) x += speed;
+		if (py < y) y -= speed;
+		if (py > y) y += speed;
 	}
 
-	// --- プレイヤーと接触したら倒す ---
-	float pw = 64, ph = 64;
-	bool hit =
-		(x < px + pw) &&
-		(x + size > px) &&
-		(y < py + ph) &&
-		(y + size > py);
-
-	if (hit)
+	// プレイヤー接触で死亡
+	if (player)
 	{
-		player->ForceDie();
-		player->SetDead();
+		float px = player->GetX();
+		float py = player->GetY();
+		float pw = 64;   // プレイヤーの幅
+		float ph = 64;   // プレイヤーの高さ
+
+		// 敵のサイズ（64×64想定）必要なら変更OK
+		float ew = 64;
+		float eh = 64;
+
+		// --- AABB（四角形同士）当たり判定 ---
+		bool hit =
+			x < px + pw &&
+			x + ew > px &&
+			y < py + ph &&
+			y + eh > py;
+
+		if (hit)
+		{
+			player->ForceDie();  // プレイヤーを即死扱いにする関数
+			player->SetDead();   // 動きを止める
+
+		}
 	}
 
-	//  アニメーションの更新
-	animFrame = (animFrame + 1) % ANIM_FRAME_INTERVAL;
-	if (animFrame == 0)
-	{
-		animIndex = (animIndex + 1) % ANIM_FRAME_COUNT;     //  アニメーションのコマを更新
-	}
 }
 
 void EnemyChaser::Draw()
 {
-	//DrawExtendGraph(
-	//	(int)x,
-	//	(int)y,
-	//	(int)x + 64,
-	//	(int)y + 64,
-	//	animImage,
-	//	TRUE
-	//);
+	int srcX = animIndex * CHARACTER_WIDTH;
+	int srcY = 0;
 
-
-	//  アニメーションのコマがTextureAtlasのどこにあるか計算する
-	int xRect = (animIndex % ATLAS_WIDTH) * CHARACTER_WIDTH;
-	int yRect = (animIndex / ATLAS_WIDTH) * CHARACTER_HEIGHT;
-
-	//  キャラクターをTextureAtlasを使って表示する
-	DrawRectGraph(x, y, xRect, yRect, CHARACTER_WIDTH, CHARACTER_HEIGHT, animImage, TRUE, direction);
+	DrawRectExtendGraph(
+		(int)x, (int)y,               // 描画左上
+		(int)x + 256, (int)y + 256,     // 描画右下（64×64に縮小）
+		srcX, srcY,                   // 切り出し位置
+		CHARACTER_WIDTH,              // 元コマ幅 640
+		CHARACTER_HEIGHT,             // 元コマ高さ 640
+		hImage,
+		TRUE
+	);
 }
