@@ -38,7 +38,7 @@ void PlayScene::Update()
 	// --- Rキーでリトライ ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
 	{
-		SceneManager::ChangeScene("PLAY");
+		SceneManager::ChangeScene("STAGE");
 		return;
 	}
 }
