@@ -81,7 +81,7 @@ void EnemyChaser::Draw()
 
 	DrawRectExtendGraph(
 		(int)x, (int)y,               // 描画左上
-		(int)x + 256, (int)y + 256,     // 描画右下（64×64に縮小）
+		(int)x + 64, (int)y + 64,     // 描画右下（64×64に縮小）
 		srcX, srcY,                   // 切り出し位置
 		CHARACTER_WIDTH,              // 元コマ幅 640
 		CHARACTER_HEIGHT,             // 元コマ高さ 640

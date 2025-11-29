@@ -10,6 +10,8 @@
 #include "Dokan2.h"
 #include "VanishingFloor.h"
 #include "RollingBall.h"
+#include "CeilingSpike.h"
+#include "FallingSpike.h"
 #include "EnemyChaser.h"
 #include <vector>
 using namespace std;
@@ -26,7 +28,7 @@ using namespace std;
 // 6 : フェイクの床トラップ
 // 7 : 土管入口
 // 8 : 土管出口
-// 9 : ゴール
+// 99 : ゴール
 //------------------------------------------------------------
 vector<vector<int>> maps;
 /*					{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},　マップ元データ。とりま残しておきます
@@ -78,7 +80,7 @@ Field::Field(int stage)
 	scrollX = 0;
 
 	//--------------------------------------------------------
-	// --- マップ走査してプレイヤー配置 ---
+	// --- マップ走査して配置 ---
 	//--------------------------------------------------------
 	for (int y = 0; y < maps.size(); y++)
 	{
@@ -133,6 +135,17 @@ Field::Field(int stage)
 			{
 				// トラップ設置
 				new SmallTrap(x * 64 + 32 - 8, y * 64 + 48);
+			}
+
+			if (maps[y][x] == 12) {
+				POINT p = { x * 64, y * 64 };
+				dropTriggers.push_back(p);
+				dropTriggered.push_back(false);
+			}
+
+			if (maps[y][x] == 13) {
+				POINT p = { x * 64, y * 64 };
+				dropSpawns.push_back(p);
 			}
 
 			if (maps[y][x] == 20) {
@@ -219,6 +232,29 @@ void Field::Update()
 
 		// 次の発射までの時間
 		ballTimer[i] = 60;
+	}
+
+	// 落下針トリガー判定
+	for (int i = 0; i < dropTriggers.size(); i++)
+	{
+		POINT trig = dropTriggers[i];
+
+		int trigX = trig.x / 64;
+		int trigY = trig.y / 64;
+
+		// トリガー（12）に乗った
+		if (tx == trigX && ty == trigY)
+		{
+			if (!dropTriggered[i]) {
+				dropTriggered[i] = true;
+
+				// 対応する 13 の位置に針を生成
+				if (i < dropSpawns.size()) {
+					POINT sp = dropSpawns[i];
+					new FallingSpike(sp.x, sp.y);
+				}
+			}
+		}
 	}
 
 	//------------------------------------------

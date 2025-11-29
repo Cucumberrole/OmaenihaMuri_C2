@@ -5,7 +5,7 @@
 
 CeilingSpike::CeilingSpike(int sx, int sy)
 {
-	hImage = LoadGraph("data/image/ceiling_spike.png");
+	hImage = LoadGraph("data/image/hariBottom.png");
 	x = sx;
 	y = sy;
 	triggered = false;

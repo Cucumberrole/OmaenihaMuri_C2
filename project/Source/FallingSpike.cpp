@@ -5,7 +5,7 @@
 
 FallingSpike::FallingSpike(int sx, int sy)
 {
-	hImage = LoadGraph("data/image/falling_spike.png");
+	hImage = LoadGraph("data/image/hariBottom.png");
 
 	x = sx;
 	y = sy;

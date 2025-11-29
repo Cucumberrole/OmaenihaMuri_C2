@@ -27,6 +27,11 @@ public:
 
 	void RemoveFloorsAround(int tx, int ty); // 床を消しますよ
 
+	// 落ちてくる針のトラップ
+	std::vector<POINT> dropTriggers;
+	std::vector<POINT> dropSpawns;
+	std::vector<bool> dropTriggered; // 発動済みか管理
+
 	//--------------------------------------------------------
 	// 当たり判定（衝突チェック）
 	//--------------------------------------------------------
