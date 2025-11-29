@@ -11,8 +11,8 @@ SelectStage::SelectStage()
 	backgroundImage = LoadGraph("data/image/title.png");
 
 	// 表示するステージ名
-	stageNames = { "STAGE 1", "STAGE 2", "DEBUG STAGE" };
-	stageEnabled = { true,true,false };
+	stageNames = { "STAGE 1", "STAGE 2", "STAGE 3", "DEBUG STAGE" };
+	stageEnabled = { true,true,false,false };
 
 	cursor = 0;
 }
@@ -40,8 +40,14 @@ void SelectStage::Update()
 		} while (!stageEnabled[cursor]);  // 無効なら飛ばす
 	}
 
-	if (KeyTrigger::CheckTrigger(KEY_INPUT_D)) {
+	if (KeyTrigger::CheckTrigger(KEY_INPUT_B)) {
+		// ボスステージの開放
 		stageEnabled[2] = true;
+	}
+
+	if (KeyTrigger::CheckTrigger(KEY_INPUT_D)) {
+		// デバッグステージの開放
+		stageEnabled[3] = true;
 	}
 
 	// --- 決定でステージへ ---
@@ -50,7 +56,7 @@ void SelectStage::Update()
 		if (stageEnabled[cursor])    // 有効なときだけ
 		{
 			// デバッグステージ（cursor == 2）の時だけ、ステージナンバーを 0 に設定する
-			if (cursor == 2)
+			if (cursor == 3)
 			{
 				PlayScene::SelectedStage = 0;
 			}

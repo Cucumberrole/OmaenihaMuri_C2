@@ -111,6 +111,9 @@
     <ClCompile Include="Source\EnemyChaser.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Boss.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -314,6 +317,9 @@
       <Filter>Trap</Filter>
     </ClInclude>
     <ClInclude Include="Source\EnemyChaser.h">
+      <Filter>Trap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Boss.h">
       <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>

@@ -154,6 +154,7 @@
     <ClInclude Include="Library\Time.h" />
     <ClInclude Include="Library\Trigger.h" />
     <ClInclude Include="Source\Background.h" />
+    <ClInclude Include="Source\Boss.h" />
     <ClInclude Include="Source\CeilingSpike.h" />
     <ClInclude Include="Source\EnemyChaser.h" />
     <ClInclude Include="Source\FallingSpike.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="Library\Time.cpp" />
     <ClCompile Include="Library\Trigger.cpp" />
     <ClCompile Include="Source\Background.cpp" />
+    <ClCompile Include="Source\Boss.cpp" />
     <ClCompile Include="Source\CeilingSpike.cpp" />
     <ClCompile Include="Source\EnemyChaser.cpp" />
     <ClCompile Include="Source\FallingSpike.cpp" />

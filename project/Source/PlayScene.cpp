@@ -34,6 +34,13 @@ void PlayScene::Update()
 	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
 		SceneManager::Exit();
 	}
+
+	// --- Rキーでリトライ ---
+	if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
+	{
+		SceneManager::ChangeScene("PLAY");
+		return;
+	}
 }
 
 void PlayScene::Draw()
