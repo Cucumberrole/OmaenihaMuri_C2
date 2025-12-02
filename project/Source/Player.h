@@ -5,44 +5,52 @@
 class Player : public GameObject
 {
 public:
-	Player();                 // デフォルトコンストラクタ
-	Player(int sx, int sy);   // 座標指定付きコンストラクタ
-	~Player();                // デストラクタ
+	Player();
+	Player(int sx, int sy);
+	~Player();
 
-	void Update() override;   // 状態更新（入力処理・物理計算など）
-	void Draw() override;     // 描画処理
-
-	void ForceDie();    //画面外判定用
-	void SetDead() { isDead = true; }
-
+	void Update() override;
+	void Draw() override;
 
 	float GetX() const;
 	float GetY() const;
 
-	float GetRadius() const { return CHARACTER_WIDTH * 0.35f; }
+	void SetDead() { isDead = true; }
+	void ForceDie();
 
-	bool isDead;        //プレイヤーが死んでるか
+	// 円形当たり判定の取得
+	float GetRadius() const { return CHARACTER_WIDTH * 0.35f; }
+	void GetHitCircle(float& outX, float& outY, float& outRadius) const;
+
+	// （もしデバッグ用に描画したければ）
+	// void DrawHitCircleDebug() const;
+
 private:
 	// --- 基本パラメータ ---
-	int hImage;         // プレイヤー画像ハンドル
-	float x, y;         // プレイヤー座標（左上基準）
-	float velocity;     // 垂直方向の速度（重力・ジャンプに使用）
-	bool onGround;      // 地面に接地しているかどうかのフラグ
-	int jumpcount;      // 残りジャンプ回数（二段ジャンプ制御用）
-	int Maxjumpcount;   // 最大ジャンプ回数
-	int hp;             // 残機
+	int hImage;
+	float x, y;         // 左上座標
+	float velocity;
+	bool onGround;
+	int jumpcount;
+	int Maxjumpcount;
+	int hp;
+
+	bool isDead;  // ← プレイヤーが死んで固定状態か？
+
+	// 円当たり判定用 (中心からの半径だけ持っておく)
+	float hitRadius;
 
 	// --- アニメーション設定 ---
-	static const int CHARACTER_WIDTH = 64;     // 1コマの横幅（ピクセル）
-	static const int CHARACTER_HEIGHT = 64;    // 1コマの縦幅（ピクセル）
-	static const int ATLAS_WIDTH = 12;         // スプライトシートの横方向のコマ数
-	static const int ATLAS_HEIGHT = 1;         // スプライトシートの縦方向のコマ数
-	static const int ANIM_FRAME_COUNT = 12;    // 使用するアニメーションコマ数
-	static const int ANIM_FRAME_INTERVAL = 3;  // コマを切り替えるフレーム間隔
-	static const int WALK_SPEED = 3;           // プレイヤーの横移動速度
+	static const int CHARACTER_WIDTH = 64;
+	static const int CHARACTER_HEIGHT = 64;
+	static const int ATLAS_WIDTH = 12;
+	static const int ATLAS_HEIGHT = 1;
+	static const int ANIM_FRAME_COUNT = 12;
+	static const int ANIM_FRAME_INTERVAL = 5;
+	static const int WALK_SPEED = 3;
 
-	// --- アニメーション関連変数 ---
-	int animIndex;      // 現在のアニメーションフレーム番号
-	int animFrame;      // フレームカウンタ（アニメ速度制御）
-	bool frip;     // 向き（true=左向き / false=右向き）
+	// --- アニメ関連 ---
+	int  animIndex;
+	int  animFrame;
+	bool frip;
 };

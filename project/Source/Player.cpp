@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "Field.h"
 #include "FallingFloor.h"
+#include "Trap.h"
 #include "GameOver.h"
 #include "VanishingFloor.h"
 #include "../Library/Trigger.h"
@@ -29,12 +30,14 @@ Player::Player()
 
 	isDead = false;
 
-	// アニメーション初期化
 	animIndex = 0;
 	animFrame = 0;
 	frip = true;
 
 	hp = 0;
+
+	// ★ 円当たり判定の半径（お好みで調整）
+	hitRadius = 22.0f;
 }
 
 //--------------------------------------
@@ -55,14 +58,16 @@ Player::Player(int sx, int sy)
 
 	isDead = false;
 
-	// アニメーション初期化
 	animIndex = 0;
 	animFrame = 0;
 	frip = false;
 
 	hp = 0;
 
-	SetDrawOrder(0); // 描画順を変更
+	// ★ 同じく半径設定
+	hitRadius = 22.0f;
+
+	SetDrawOrder(0);
 }
 
 //--------------------------------------
@@ -84,6 +89,15 @@ float Player::GetX() const
 float Player::GetY() const
 {
 	return y;
+}
+
+// ★ 追加：円形当たり判定を取得
+void Player::GetHitCircle(float& outX, float& outY, float& outRadius) const
+{
+	// プレイヤーのスプライトは左上が (x, y)、サイズは 64x64 前提
+	outX = x + CHARACTER_WIDTH / 2.0f;  // 中心 X
+	outY = y + CHARACTER_HEIGHT / 2.0f;  // 中心 Y
+	outRadius = hitRadius;
 }
 
 //--------------------------------------
@@ -325,6 +339,14 @@ void Player::Draw()
 		TRUE,
 		frip
 	);
+
+	// デバッグ用：当たり判定円を描く（必要なときだけ）
+	
+	float cx, cy, r;
+	GetHitCircle(cx, cy, r);
+	int c = GetColor(0, 255, 0);
+	DrawCircle((int)cx, (int)cy, (int)r, c, FALSE);
+	
 
 	//--------------------------------------
 	// デバッグ用座標表示
