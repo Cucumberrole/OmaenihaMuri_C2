@@ -369,5 +369,5 @@ void Player::ForceDie()
 	onGround = false;
 
 	// ゲームオーバーに飛ぶならここで～
-	//SceneManager::ChangeScene("GAMEOVER");
+	SceneManager::ChangeScene("GAMEOVER");
 }
