@@ -1,6 +1,8 @@
 #include <DxLib.h>
 #include "SmallTrap.h"
 #include "Player.h"
+#include "Telop.h"
+
 
 SmallTrap::SmallTrap(int sx, int sy)
 {
@@ -21,6 +23,7 @@ SmallTrap::~SmallTrap()
 
 void SmallTrap::Update()
 {
+	Telop GameOverTelop;
 	//----------------------------------------
 	// プレイヤーと衝突
 	//----------------------------------------
@@ -43,7 +46,7 @@ void SmallTrap::Update()
 			player->SetDead();
 
 			
-			DrawString(100, 100, "あほoooooooooooooooo", GetColor(255, 255, 255));
+			GameOverTelop.Activate("あほ");
 			
 		}
 	}
@@ -68,5 +71,5 @@ void SmallTrap::Draw()
 		GetColor(255, 0, 0), // 赤色
 		FALSE                // 塗りつぶしなし
 	);
-	
+	//DrawString(620, 140, "こんな小さいのにw", GetColor(255, 255, 255));
 }
