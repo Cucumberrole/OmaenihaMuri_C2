@@ -56,5 +56,13 @@ void SmallTrap::Draw()
 		SImage,
 		TRUE
 	);
-	DrawCircle(x + 8, y + 8, 8, GetColor(0, 0, 255), FALSE);
+	DrawBox(
+		static_cast<int>(x),
+		static_cast<int>(y),
+		static_cast<int>(x + width),
+		static_cast<int>(y + height),
+		GetColor(255, 0, 0), // ê‘êF
+		FALSE                // ìhÇËÇ¬Ç‘ÇµÇ»Çµ
+	);
+	
 }
