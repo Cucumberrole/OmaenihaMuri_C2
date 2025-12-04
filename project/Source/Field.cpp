@@ -129,11 +129,13 @@ Field::Field(int stage)
 
 			if (maps[y][x] == 12)
 			{
+				// 針が落ちるトリガー
 				fallingTrigger = { x * 64, y * 64 };
 			}
 
 			if (maps[y][x] == 13)
 			{
+				// 針が落ちるトラップ
 				POINT p = { x * 64, y * 64 };
 				fallingSpikes.push_back(p);
 				fallingSpikeAlive.push_back(true);
@@ -262,7 +264,7 @@ void Field::Update()
 				fallingSpikeAlive[fallingIndex] = false;
 
 				fallingIndex++;
-				fallingTimer = 30; // 次の針を落とすまでの間隔
+				fallingTimer = 15; // 次の針を落とすまでの間隔
 			}
 		}
 	}
