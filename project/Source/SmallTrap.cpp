@@ -41,6 +41,10 @@ void SmallTrap::Update()
 		{
 			player->ForceDie();
 			player->SetDead();
+
+			
+			DrawString(100, 100, "‚ ‚Ùoooooooooooooooo", GetColor(255, 255, 255));
+			
 		}
 	}
 }

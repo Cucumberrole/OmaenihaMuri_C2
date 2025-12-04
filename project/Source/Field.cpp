@@ -124,7 +124,7 @@ Field::Field(int stage)
 			if (maps[y][x] == 11)
 			{
 				// トラップ設置
-				new SmallTrap(x * 64 + 32 - 8, y * 64 + 48);
+				new SmallTrap(x * 64 + 24, y * 64 + 48);
 			}
 
 			if (maps[y][x] == 12)

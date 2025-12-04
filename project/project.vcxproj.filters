@@ -116,6 +116,7 @@
     <ClCompile Include="Source\CsvReader.cpp">
       <Filter>Library</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Telop.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -326,6 +327,7 @@
     <ClInclude Include="Source\CsvReader.h">
       <Filter>Library</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Telop.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">

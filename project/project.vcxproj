@@ -176,6 +176,7 @@
     <ClInclude Include="Source\SceneFactory.h" />
     <ClInclude Include="Source\SmallTrap.h" />
     <ClInclude Include="Source\SelectStage.h" />
+    <ClInclude Include="Source\Telop.h" />
     <ClInclude Include="Source\TitleScene.h" />
     <ClInclude Include="Source\Trap.h" />
     <ClInclude Include="Source\VanishingFloor.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="Source\SceneFactory.cpp" />
     <ClCompile Include="Source\SmallTrap.cpp" />
     <ClCompile Include="Source\SelectStage.cpp" />
+    <ClCompile Include="Source\Telop.cpp" />
     <ClCompile Include="Source\TitleScene.cpp" />
     <ClCompile Include="Source\Trap.cpp" />
     <ClCompile Include="Source\VanishingFloor.cpp" />
