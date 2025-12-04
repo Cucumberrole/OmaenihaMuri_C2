@@ -31,8 +31,8 @@ void FallingSpike::Update()
 		Field* field = FindGameObject<Field>();
 		if (field)
 		{
-			int tx = (x + 32) / 64;
-			int ty = (y + 64) / 64;
+			int tx = int((x + 32) / 64);
+			int ty = int((y + 64) / 64);
 
 			if (field->IsBlock(tx, ty))
 			{
