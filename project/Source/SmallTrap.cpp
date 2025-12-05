@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Telop.h"
 
+bool g_isPlayerTouchedTrap = false;
 
 SmallTrap::SmallTrap(int sx, int sy)
 {
@@ -18,8 +19,6 @@ SmallTrap::~SmallTrap()
 {
 	DeleteGraph(SImage);
 }
-
-
 
 void SmallTrap::Update()
 {
@@ -42,17 +41,13 @@ void SmallTrap::Update()
 
 		if (hit)
 		{
+			g_isPlayerTouchedTrap = true;
+
 			player->ForceDie();
 			player->SetDead();
-
-			
-			GameOverTelop.Activate("‚ ‚Ù");
-			
 		}
 	}
 }
-
-
 
 void SmallTrap::Draw()
 {
