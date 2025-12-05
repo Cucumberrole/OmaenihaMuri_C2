@@ -14,13 +14,12 @@ RollingBall::RollingBall(float sx, float sy, float dir)
 	vy = 0.0f;
 	gravity = 0.4f;
 
-	// 表示上のサイズ（当たり判定もこれを基準にしている想定）
+	// 表示上のサイズ
 	size = 64;
 
-	// 元画像サイズを取得してスケールを計算（500×500 → 64×64）
 	int w, h;
 	GetGraphSize(hImage, &w, &h);
-	// 正方形前提。w が 0 にならないよう一応チェック
+	// 正方形前提　w が 0 にならないよう一応チェック
 	if (w > 0)
 	{
 		scale = static_cast<float>(size) / static_cast<float>(w);
@@ -58,7 +57,7 @@ void RollingBall::Update()
 
 	if (!field->IsBlock(tx, ty))
 	{
-		// 穴なので何もしない（落下継続）
+		// 落下継続
 	}
 	else
 	{
@@ -89,7 +88,7 @@ void RollingBall::Update()
 	Player* player = FindGameObject<Player>();
 	if (player)
 	{
-		// プレイヤーの情報（左上が px,py で 64x64 想定）
+		// プレイヤーの情報
 		float px = player->GetX();
 		float py = player->GetY();
 		float pw = 64.0f;
@@ -98,12 +97,12 @@ void RollingBall::Update()
 		// プレイヤーの円
 		float playerCx = px + pw / 2.0f;
 		float playerCy = py + ph / 2.0f;
-		float playerR = pw * 0.4f;   // ちょっと小さめ（0.35〜0.45 お好みで調整）
+		float playerR = pw * 0.4f;
 
 		// ボールの円（size は表示上の直径 64 を想定）
 		float ballCx = x + size / 2.0f;
 		float ballCy = y + size / 2.0f;
-		float ballR = size * 0.5f;   // ボールは見た目どおりの半径
+		float ballR = size * 0.5f;
 
 		// 中心距離の2乗と半径の和の2乗で判定
 		float dx = ballCx - playerCx;
@@ -125,7 +124,7 @@ void RollingBall::Update()
 	// 係数 0.05f は「転がる速さに対してどれくらい回転するか」の調整用
 	angle += vx * 0.05f;
 
-	// 角度が大きくなりすぎないように 0～2π の範囲にしておくと安心
+	// 角度が大きくなりすぎないように 0～2π の範囲にしておく
 	const float PI2 = 3.1415926535f * 2.0f;
 	if (angle > PI2) angle -= PI2;
 	if (angle < -PI2) angle += PI2;
@@ -151,7 +150,6 @@ void RollingBall::Draw()
 	float cy = y + size / 2.0f;
 
 	// 回転＆縮小して描画
-	// DrawRotaGraph(中心X, 中心Y, 拡大率, 角度, 画像ハンドル, 透過フラグ);
 	DrawRotaGraph(
 		static_cast<int>(cx),
 		static_cast<int>(cy),
