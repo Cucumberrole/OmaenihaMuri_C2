@@ -192,7 +192,7 @@ void Field::Update()
 
 
 	//------------------------------------------
-	// RollingBallの判定
+	// 転がってくる球の処理
 	//------------------------------------------
 	// プレイヤーがトリガー上に来たら起動	
 	for (int i = 0; i < ballTriggers.size(); i++)
@@ -228,11 +228,11 @@ void Field::Update()
 		}
 
 		// 次の発射までの時間
-		ballTimer[i] = 60;
+		ballTimer[i] = 95;
 	}
 
 	//------------------------------------------------------
-	// トリガーを踏んだら針落下開始
+	// 上から落下してくる針の処理
 	//------------------------------------------------------
 	int tX = fallingTrigger.x / 64;
 	int tY = fallingTrigger.y / 64;
@@ -264,7 +264,7 @@ void Field::Update()
 				fallingSpikeAlive[fallingIndex] = false;
 
 				fallingIndex++;
-				fallingTimer = 15; // 次の針を落とすまでの間隔
+				fallingTimer = 20; // 次の針を落とすまでの間隔
 			}
 		}
 	}

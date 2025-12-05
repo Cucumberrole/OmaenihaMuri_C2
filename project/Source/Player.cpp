@@ -36,7 +36,7 @@ Player::Player()
 
 	hp = 0;
 
-	// ★ 円当たり判定の半径（お好みで調整）
+	// 円当たり判定の半径
 	hitRadius = 22.0f;
 }
 
@@ -164,6 +164,9 @@ void Player::Update()
 		}
 
 		x += push;
+	}
+
+	if (CheckHitKey(KEY_INPUT_0)) {
 	}
 
 	//--------------------------------------

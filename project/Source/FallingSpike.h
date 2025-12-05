@@ -19,5 +19,5 @@ private:
 	int   width;     // 幅（画像サイズ）
 	int   height;    // 高さ
 
-	bool landed;
+	bool  landed;
 };
