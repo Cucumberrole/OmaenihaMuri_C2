@@ -8,8 +8,8 @@
 Trap::Trap(int sx, int sy)
 {
 	hImage = LoadGraph("data/image/hari.png"); // j‰æ‘œ
-	x = static_cast<float>(sx);
-	y = static_cast<float>(sy);
+	x = sx;
+	y = sy;
 	width = 64;
 	height = 64;
 

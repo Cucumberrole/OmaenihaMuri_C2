@@ -4,8 +4,8 @@
 FakeFloor::FakeFloor(int sx, int sy)
 {
 	hImage = LoadGraph("data/image/New Blo.png");
-	x = static_cast<float>(sx);
-	y = static_cast<float>(sy);
+	x = sx;
+	y = sy;
 }
 
 FakeFloor::~FakeFloor()

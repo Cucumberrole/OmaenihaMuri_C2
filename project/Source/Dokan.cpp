@@ -4,8 +4,8 @@
 Dokan::Dokan(int sx, int sy)
 {
 	dImage = LoadGraph("data/image/dokan.png");
-	x = static_cast<float>(sx);
-	y = static_cast<float>(sy);
+	x = sx;
+	y = sy;
 }
 
 Dokan::~Dokan()

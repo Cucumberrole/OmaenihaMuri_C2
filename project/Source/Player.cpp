@@ -48,8 +48,8 @@ Player::Player(int sx, int sy)
 	hImage = LoadGraph("data/image/OMAEwalk.png");
 	assert(hImage != -1);
 
-	x = static_cast<float>(sx);
-	y = static_cast<float>(sy);
+	x = sx;
+	y = sy;
 	velocity = 0;
 	onGround = false;
 
