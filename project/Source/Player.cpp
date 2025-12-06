@@ -64,7 +64,7 @@ Player::Player(int sx, int sy)
 
 	hp = 0;
 
-	// ★ 同じく半径設定
+	// 半径設定
 	hitRadius = 22.0f;
 
 	SetDrawOrder(0);
@@ -91,10 +91,9 @@ float Player::GetY() const
 	return y;
 }
 
-// ★ 追加：円形当たり判定を取得
+// 円形当たり判定を取得
 void Player::GetHitCircle(float& outX, float& outY, float& outRadius) const
 {
-	// プレイヤーのスプライトは左上が (x, y)、サイズは 64x64 前提
 	outX = x + CHARACTER_WIDTH / 2.0f;  // 中心 X
 	outY = y + CHARACTER_HEIGHT / 2.0f;  // 中心 Y
 	outRadius = hitRadius;
@@ -258,37 +257,50 @@ void Player::Update()
 	}
 
 	//--------------------------------------
-	// 土管の判定
+	// 土管の判定（上に乗った時だけワープ）
 	//--------------------------------------
 	if (field)
 	{
 		float px = x;
 		float py = y;
+		float pw = 64.0f;
+		float ph = 64.0f;
 
-		// --- 土管に入ったか判定 ---
-		for (int i = 0; i < field->pipesIn.size(); i++)
+		float centerX = px + pw / 2.0f;
+		float footY = py + ph; // 足元のY
+
+		// 足元のタイル座標
+		int tx = int(centerX) / 64;
+		int ty = int(py + 63) / 64;
+
+		int cell = field->GetCell(tx, ty);
+
+		// タイルが「土管入口(7)」かどうか
+		if (cell == 7)
 		{
-			POINT in = field->pipesIn[i];
-
-			bool hitPipe =
-				px + 64 > in.x &&
-				px < in.x + 64 &&
-				py + 64 > in.y &&
-				py < in.y + 64;
-
-			if (hitPipe)
+			// pipesIn / pipesOut は Field が持っている前提
+			// 「この土管入口に一番近い pipesIn の index」を探す
+			int index = -1;
+			for (int i = 0; i < (int)field->pipesIn.size(); i++)
 			{
-				// 出口があるか
-				if (!field->pipesOut.empty())
+				POINT in = field->pipesIn[i];
+				int inTx = in.x / 64;
+				int inTy = in.y / 64;
+
+				if (inTx == tx && inTy == ty)
 				{
-					POINT out = field->pipesOut[i % field->pipesOut.size()];
-
-					// ワープ
-					x = out.x;
-					y = out.y + 64;  // 土管の上に出す位置
+					index = i;
+					break;
 				}
+			}
 
-				return; // これ以上判定しない
+			if (index >= 0 && !field->pipesOut.empty())
+			{
+				// 対応する出口を決める（1:1対応なら同じ index を使う）
+				POINT out = field->pipesOut[index % field->pipesOut.size()];
+
+				x = (float)out.x;
+				y = (float)out.y + ph;   // 出口タイルの上にプレイヤーを乗せる
 			}
 		}
 	}
@@ -344,12 +356,12 @@ void Player::Draw()
 	);
 
 	// デバッグ用：当たり判定円を描く（必要なときだけ）
-	
+
 	float cx, cy, r;
 	GetHitCircle(cx, cy, r);
 	int c = GetColor(0, 255, 0);
 	DrawCircle((int)cx, (int)cy, (int)r, c, FALSE);
-	
+
 
 	//--------------------------------------
 	// デバッグ用座標表示

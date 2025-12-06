@@ -1,47 +1,160 @@
 #include "VanishingFloor.h"
 #include "Player.h"
 #include <DxLib.h>
+#include <algorithm>    // std::max, std::min を使う場合
+
+// 静的メンバの定義
+bool VanishingFloor::s_triggered = false;
 
 VanishingFloor::VanishingFloor(int sx, int sy)
 {
-	hImage = LoadGraph("data/image/New Blo.png");  // 床画像
-	x = (float)sx;
-	y = (float)sy;
+	floorImage = LoadGraph("data/image/New Blo.png"); // 床画像
+	spikeImage = LoadGraph("data/image/hari.png"); // 針画像
 
-	isActive = true;        // 最初は存在している
-	vanishRange = 100.0f;   // プレイヤーが100px以内で消える
+	x = static_cast<float>(sx);
+	y = static_cast<float>(sy);
+
+	isActive = true; // 最初は床の画像
+	vanishRange = 64.0f; //床が消える範囲
 }
 
 VanishingFloor::~VanishingFloor()
 {
-	DeleteGraph(hImage);
+	DeleteGraph(floorImage);
+	DeleteGraph(spikeImage);
 }
 
 void VanishingFloor::Update()
 {
-	if (!isActive) return;
-
 	Player* player = FindGameObject<Player>();
 	if (!player) return;
 
 	float px = player->GetX();
 	float py = player->GetY();
 
-	// --- プレイヤーとの距離 ---
-	float dx = px - (x + 32);
-	float dy = py - (y + 32);
-	float dist = dx * dx + dy * dy;
-
-	if (dist < vanishRange * vanishRange)
+	// ------------------------------
+	// まだ一度もトリガーされていないとき：
+	// どれか1つでも近づいたら「全床消滅」状態に移行
+	// ------------------------------
+	if (!s_triggered)
 	{
-		isActive = false;   // 床が消える
+		float dx = px - (x + 32.0f);
+		float dy = py - (y + 32.0f);
+		float dist2 = dx * dx + dy * dy;
+
+		if (dist2 < vanishRange * vanishRange)
+		{
+			// トリガーが発動したら全ての床を消す
+			s_triggered = true;
+		}
+	}
+
+	// グローバルフラグに合わせて床の有効/無効を更新する
+	isActive = !s_triggered;
+
+	// ------------------------------
+	// 床が消えたあとは「針」としてダメージ判定だけ持つ
+	// ------------------------------
+	if (s_triggered)
+	{
+		float cx, cy, cr;
+		player->GetHitCircle(cx, cy, cr);
+
+		// この床タイル（針）の矩形範囲
+		float left = x;
+		float right = x + 64.0f;
+		float top = y;
+		float bottom = y + 64.0f;
+
+		// 円と矩形の当たり判定（最近接点との距離で判定）
+		float nearestX = max(left, min(cx, right));
+		float nearestY = max(top, min(cy, bottom));
+
+		float dx = cx - nearestX;
+		float dy = cy - nearestY;
+
+		if (dx * dx + dy * dy <= cr * cr)
+		{
+			// 針に当たったら即死系処理
+			player->ForceDie();
+			player->SetDead();
+		}
 	}
 }
 
 void VanishingFloor::Draw()
 {
+	// 「床が生きている」ときはブロック画像、
+	// 一度トリガーされた後は針画像を描画
 	if (isActive)
 	{
-		DrawRectGraph((int)x, (int)y, 0, 0, 64, 64, hImage, TRUE);
+		DrawRectGraph(static_cast<int>(x), static_cast<int>(y), 0, 0, 64, 64, floorImage, TRUE);
 	}
+	else
+	{
+		DrawGraph(static_cast<int>(x), static_cast<int>(y), spikeImage, TRUE);
+	}
+}
+
+/* ここから足場としての当たり判定（床が生きているときだけ有効） */
+
+// 下方向（プレイヤーの足と床の上面）
+int VanishingFloor::HitCheckDown(int px, int py)
+{
+	if (!isActive) return 0;          // 床が消えていたら足場にならない
+
+	// px,py がこの床タイルの範囲内かどうか
+	if (px < x || px >= x + 64) return 0;
+
+	int localY = static_cast<int>(py - y);
+	if (localY >= 0 && localY < 64)
+	{
+		return localY + 1;            // めり込んだ分だけ押し戻す
+	}
+	return 0;
+}
+
+// 上方向（プレイヤーの頭と床の下面）
+int VanishingFloor::HitCheckUp(int px, int py)
+{
+	if (!isActive) return 0;
+
+	if (px < x || px >= x + 64) return 0;
+
+	int localY = static_cast<int>(py - y);
+	if (localY >= 0 && localY < 64)
+	{
+		return 64 - localY;
+	}
+	return 0;
+}
+
+// 左方向
+int VanishingFloor::HitCheckLeft(int px, int py)
+{
+	if (!isActive) return 0;
+
+	if (py < y || py >= y + 64) return 0;
+
+	int localX = static_cast<int>(px - x);
+	if (localX >= 0 && localX < 64)
+	{
+		return 64 - localX;
+	}
+	return 0;
+}
+
+// 右方向
+int VanishingFloor::HitCheckRight(int px, int py)
+{
+	if (!isActive) return 0;
+
+	if (py < y || py >= y + 64) return 0;
+
+	int localX = static_cast<int>(px - x);
+	if (localX >= 0 && localX < 64)
+	{
+		return localX + 1;
+	}
+	return 0;
 }

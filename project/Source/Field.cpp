@@ -30,8 +30,20 @@ vector<vector<int>> maps;
 // 6 : フェイクの床トラップ
 // 7 : 土管入口
 // 8 : 土管出口
+// 10 : 床が消えて針になるトラップ
+// 11 : 小さい針
+// 12 : １３番のトリガー
+// 13 : 天井から落ちてくる針本体
+// 20 : ２１番のトリガー
+// 21 : ボールが転がってくるトラップ
 // 99 : ゴール
 //------------------------------------------------------------
+
+// ブロックかどうかを判定するヘルパー関数
+static bool IsSolidCell(int cell)
+{
+	return (cell == 1 || cell == 7 || cell == 8);
+}
 
 //------------------------------------------------------------
 // コンストラクタ
@@ -339,13 +351,13 @@ int Field::HitCheckRight(int px, int py)
 	if (y < 0 || y >= maps.size()) return 0;
 	if (x < 0 || x >= maps[y].size()) return 0;
 
-	if (maps[y][x] == 1) {
+	if (IsSolidCell(maps[y][x])) {
 		return px % 64 + 1;
 	}
 	return 0;
 }
 
-// 左方向の当たり判定
+// 左方向
 int Field::HitCheckLeft(int px, int py)
 {
 	if (py < 0) return 0;
@@ -356,14 +368,13 @@ int Field::HitCheckLeft(int px, int py)
 	if (y < 0 || y >= maps.size()) return 0;
 	if (x < 0 || x >= maps[y].size()) return 0;
 
-	if (maps[y][x] == 1)
-	{
+	if (IsSolidCell(maps[y][x])) {
 		return 64 - (px % 64);
 	}
 	return 0;
 }
 
-// 上方向の当たり判定
+// 上方向
 int Field::HitCheckUp(int px, int py)
 {
 	if (py < 0) return 0;
@@ -374,14 +385,13 @@ int Field::HitCheckUp(int px, int py)
 	if (y < 0 || y >= maps.size()) return 0;
 	if (x < 0 || x >= maps[y].size()) return 0;
 
-	if (maps[y][x] == 1)
-	{
+	if (IsSolidCell(maps[y][x])) {
 		return 64 - (py % 64);
 	}
 	return 0;
 }
 
-// 下方向の当たり判定
+// 下方向
 int Field::HitCheckDown(int px, int py)
 {
 	if (py < 0) return 0;
@@ -392,8 +402,7 @@ int Field::HitCheckDown(int px, int py)
 	if (y < 0 || y >= maps.size()) return 0;
 	if (x < 0 || x >= maps[y].size()) return 0;
 
-	if (maps[y][x] == 1)
-	{
+	if (IsSolidCell(maps[y][x])) {
 		return (py % 64) + 1;
 	}
 	return 0;
@@ -428,4 +437,11 @@ bool Field::IsGoal(int px, int py)
 		return true;
 	}
 	return false;
+}
+
+int Field::GetCell(int tx, int ty)
+{
+	if (ty < 0 || ty >= maps.size()) return -1;
+	if (tx < 0 || tx >= maps[ty].size()) return -1;
+	return maps[ty][tx];
 }

@@ -10,7 +10,7 @@ public:
 	void Update() override;
 	void Draw() override;
 
-	// 床が消えていない時だけ当たり判定を返す
+	// 床として有効なときだけ当たり判定を返す
 	bool IsActive() const { return isActive; }
 
 	int HitCheckDown(int px, int py);
@@ -19,8 +19,15 @@ public:
 	int HitCheckRight(int px, int py);
 
 private:
-	int hImage;
-	float x, y;
-	bool isActive;      // true = 床が存在する, false = 消えた
-	float vanishRange;  // プレイヤーが近づく距離
+	int floorImage;      // ブロック画像
+	int spikeImage;      // 針画像
+	float x, y;          // 左上座標
+
+	bool isActive;       // true = 床として存在（ブロック画像＆足場あり）　false = 床は消えて針だけ（足場なし・ダメージあり）
+
+	float vanishRange;   // プレイヤーが近づく距離
+
+	// 全インスタンス共通のフラグ
+	// どれか1つがトリガーされると、全て「床が消滅状態」になる
+	static bool s_triggered;
 };
