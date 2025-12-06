@@ -18,7 +18,7 @@ Trap::Trap(int sx, int sy)
 	isExtended = false;
 	moveSpeed = 10.0f; // 上にせり出すスピード
 
-	SetDrawOrder(100); // 描画順序
+	SetDrawOrder(100);  // 描画順序
 }
 
 //--------------------------------------
@@ -105,31 +105,41 @@ void Trap::Update()
 		return;
 	}
 
-	float px = player->GetX();
-	float py = player->GetY();
-	float pw = 64.0f;
-	float ph = 64.0f;
+	// プレイヤーの「円当たり判定」を取得
+	float cx, cy, cr;
+	player->GetHitCircle(cx, cy, cr);
 
 	//----------------------------------
 	// プレイヤーが「上のブロック」を踏んだら発動
-	// （針の真上 1マス分を判定エリアとする）
+	// 円＆矩形で判定中
 	//----------------------------------
 	if (!isActive && !isExtended)
 	{
-		float triggerTop = y - height; // 針の真上の1マス上
-		float triggerBottom = y;          // 針の床高さ
-		float playerFootY = py + ph;    // プレイヤーの足元
+		// 針の真上 1マス分
+		float triggerLeft = x;
+		float triggerRight = x + width;
+		float triggerTop = y - height;
+		float triggerBottom = y;
 
-		bool inX =
-			(px + pw > x) &&
-			(px < x + width);
+		float marginX = 0.0f; // 少し左右にマージンを足したいならここを調整
+		triggerLeft -= marginX;
+		triggerRight += marginX;
 
-		bool inY =
-			(playerFootY > triggerTop) &&
-			(playerFootY <= triggerBottom);
+		// 円 vs AABB 最近接点をとる
+		float nearestX = cx;
+		if (nearestX < triggerLeft)  nearestX = triggerLeft;
+		else if (nearestX > triggerRight) nearestX = triggerRight;
 
-		if (inX && inY)
+		float nearestY = cy;
+		if (nearestY < triggerTop)   nearestY = triggerTop;
+		else if (nearestY > triggerBottom) nearestY = triggerBottom;
+
+		float dx = cx - nearestX;
+		float dy = cy - nearestY;
+
+		if (dx * dx + dy * dy <= cr * cr)
 		{
+			// 左右・斜め・落下中どこから来ても円が範囲に入れば発動
 			Activate();
 		}
 	}
@@ -148,21 +158,17 @@ void Trap::Update()
 		}
 	}
 
-	// ----------------------------------
+	//----------------------------------
 	// 当たり判定（出ている間だけ）
-	// ----------------------------------
+	//----------------------------------
 	if (isExtended)
 	{
 		float baseY = y - offsetY;
 
-		// 三角形の頂点
+		// 三角形の頂点（画面上の座標）
 		VECTOR tri1 = VGet(x, baseY + height, 0); // 左下
 		VECTOR tri2 = VGet(x + width, baseY + height, 0); // 右下
 		VECTOR tri3 = VGet(x + width / 2, baseY, 0); // 上の先端
-
-		// プレイヤーの円当たり判定を取得
-		float cx, cy, cr;
-		player->GetHitCircle(cx, cy, cr);
 
 		VECTOR center = VGet(cx, cy, 0);
 		float  radius = cr;
@@ -193,16 +199,5 @@ void Trap::Draw()
 		static_cast<int>(x),
 		static_cast<int>(y - offsetY),
 		0, 0, width, height,
-		hImage,
-		TRUE
-	);
-}
-
-//--------------------------------------
-// 旧AABB判定（今は使っていなければ不要）
-//--------------------------------------
-bool Trap::CheckHit(int px, int py, int pw, int ph)
-{
-	return (px + pw > x && px < x + width &&
-		py + ph > y - offsetY && py < y + height);
+		hImage, TRUE);
 }

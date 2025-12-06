@@ -6,7 +6,7 @@
 
 FallingFloor::FallingFloor(int sx, int sy)
 {
-	hImage = LoadGraph("data/image/New Blo.png");
+	hImage = LoadGraph("data/image/NewBlock.png");
 	x = sx;
 	y = sy;
 

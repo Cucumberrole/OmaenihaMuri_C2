@@ -75,7 +75,7 @@ Field::Field(int stage)
 	// --- 背景画像とブロック画像を読み込み ---
 	//--------------------------------------------------------
 	SetDrawOrder(50);  // 描画順序を設定
-	hImage = LoadGraph("data/image/New Blo.png");        // ブロック
+	hImage = LoadGraph("data/image/NewBlock.png");        // ブロック
 	fallingSpikeImage = LoadGraph("data/image/hariBottom.png"); // 天井にある針の画像
 	x = 0;
 	y = 0;

@@ -261,46 +261,45 @@ void Player::Update()
 	//--------------------------------------
 	if (field)
 	{
+		// プレイヤーの大きさ（64x64前提）
+		const float pw = 64.0f;
+		const float ph = 64.0f;
+
 		float px = x;
 		float py = y;
-		float pw = 64.0f;
-		float ph = 64.0f;
 
-		float centerX = px + pw / 2.0f;
-		float footY = py + ph; // 足元のY
+		float footY = py + ph;
 
-		// 足元のタイル座標
-		int tx = int(centerX) / 64;
-		int ty = int(py + 63) / 64;
-
-		int cell = field->GetCell(tx, ty);
-
-		// タイルが「土管入口(7)」かどうか
-		if (cell == 7)
+		for (int i = 0; i < (int)field->pipesIn.size(); i++)
 		{
-			// pipesIn / pipesOut は Field が持っている前提
-			// 「この土管入口に一番近い pipesIn の index」を探す
-			int index = -1;
-			for (int i = 0; i < (int)field->pipesIn.size(); i++)
-			{
-				POINT in = field->pipesIn[i];
-				int inTx = in.x / 64;
-				int inTy = in.y / 64;
+			POINT in = field->pipesIn[i];
 
-				if (inTx == tx && inTy == ty)
+			float pipeLeft = (float)in.x;
+			float pipeRight = (float)in.x + 64.0f;
+			float pipeTop = (float)in.y;
+			float pipeBottom = (float)in.y + 64.0f;
+
+			// 横方向は土管と重なっているか
+			bool overlapX =
+				(px + pw > pipeLeft) &&
+				(px < pipeRight);
+
+			// 足が「土管の天面付近」にあるかどうか
+			bool onPipeTop = (footY >= pipeTop - 2.0f) && (footY <= pipeTop + 16.0f);
+
+			if (overlapX && onPipeTop)
+			{
+				// 出口があるかチェック
+				if (!field->pipesOut.empty())
 				{
-					index = i;
-					break;
+					POINT out = field->pipesOut[i % field->pipesOut.size()];
+
+					// 土管出口に出す
+					x = (float)out.x;
+					y = (float)out.y + ph;
 				}
-			}
 
-			if (index >= 0 && !field->pipesOut.empty())
-			{
-				// 対応する出口を決める（1:1対応なら同じ index を使う）
-				POINT out = field->pipesOut[index % field->pipesOut.size()];
-
-				x = (float)out.x;
-				y = (float)out.y + ph;   // 出口タイルの上にプレイヤーを乗せる
+				return;
 			}
 		}
 	}
@@ -343,17 +342,7 @@ void Player::Draw()
 	// キャラクター描画
 	// DrawRectGraph(x, y, 切り出しX, 切り出しY, 幅, 高さ, 画像, 透過, 左右反転)
 	//--------------------------------------
-	DrawRectGraph(
-		static_cast<int>(x),
-		static_cast<int>(y),
-		xRect,
-		yRect,
-		CHARACTER_WIDTH,
-		CHARACTER_HEIGHT,
-		hImage,
-		TRUE,
-		frip
-	);
+	DrawRectGraph(static_cast<int>(x), static_cast<int>(y), xRect, yRect, CHARACTER_WIDTH, CHARACTER_HEIGHT, hImage, TRUE, frip);
 
 	// デバッグ用：当たり判定円を描く（必要なときだけ）
 
@@ -372,6 +361,7 @@ void Player::Draw()
 	DrawFormatString(0, 100 + h * 0, GetColor(255, 255, 255), "PlayerX: %.2f", x);
 	DrawFormatString(0, 100 + h * 1, GetColor(255, 255, 255), "PlayerY: %.2f", y);
 	DrawFormatString(0, 100 + h * 2, GetColor(255, 255, 255), "PlayerHP: %d", hp);
+
 }
 
 void Player::ForceDie()

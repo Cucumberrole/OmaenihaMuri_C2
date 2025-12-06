@@ -8,14 +8,14 @@ bool VanishingFloor::s_triggered = false;
 
 VanishingFloor::VanishingFloor(int sx, int sy)
 {
-	floorImage = LoadGraph("data/image/New Blo.png"); // °‰æ‘œ
+	floorImage = LoadGraph("data/image/NewBlock.png"); // °‰æ‘œ
 	spikeImage = LoadGraph("data/image/hari.png"); // j‰æ‘œ
 
 	x = static_cast<float>(sx);
 	y = static_cast<float>(sy);
 
 	isActive = true; // Å‰‚Í°‚Ì‰æ‘œ
-	vanishRange = 64.0f; //°‚ªÁ‚¦‚é”ÍˆÍ
+	vanishRange = 64.0f + 32.0f; //°‚ªÁ‚¦‚é”ÍˆÍ
 }
 
 VanishingFloor::~VanishingFloor()
