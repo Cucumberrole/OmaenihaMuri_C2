@@ -25,7 +25,7 @@ public:
 	std::vector<bool> ballTriggered;  // トリガーが既に発動したか
 	std::vector<int> ballTimer;
 
-	void RemoveFloorsAround(int tx, int ty); // 床を消しますよ
+	int GetCell(int tx, int ty);
 
 	//--------------------------------------------------------
 	// 落下する針の処理

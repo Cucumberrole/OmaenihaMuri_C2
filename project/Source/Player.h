@@ -19,8 +19,9 @@ public:
 	void ForceDie();
 
 	// 円形当たり判定の取得
-	float GetRadius() const { return CHARACTER_WIDTH * 0.35f; }
+	float GetRadius() const { return hitRadius; }
 	void GetHitCircle(float& outX, float& outY, float& outRadius) const;
+
 
 	// （もしデバッグ用に描画したければ）
 	// void DrawHitCircleDebug() const;

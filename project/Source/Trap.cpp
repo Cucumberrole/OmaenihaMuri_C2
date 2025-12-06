@@ -148,22 +148,24 @@ void Trap::Update()
 		}
 	}
 
-	//----------------------------------
+	// ----------------------------------
 	// 当たり判定（出ている間だけ）
-	//----------------------------------
+	// ----------------------------------
 	if (isExtended)
 	{
 		float baseY = y - offsetY;
 
-		// 三角形の頂点（画面上の座標）
+		// 三角形の頂点
 		VECTOR tri1 = VGet(x, baseY + height, 0); // 左下
 		VECTOR tri2 = VGet(x + width, baseY + height, 0); // 右下
 		VECTOR tri3 = VGet(x + width / 2, baseY, 0); // 上の先端
 
-		// プレイヤーの「円形当たり判定」
-		// ※プレイヤー側で GetRadius() を定義しておくこと
-		VECTOR center = VGet(px + pw / 2, py + ph / 2, 0);
-		float radius = player->GetRadius();
+		// プレイヤーの円当たり判定を取得
+		float cx, cy, cr;
+		player->GetHitCircle(cx, cy, cr);
+
+		VECTOR center = VGet(cx, cy, 0);
+		float  radius = cr;
 
 		if (HitCheck_Circle_Triangle(center, radius, tri1, tri2, tri3))
 		{
