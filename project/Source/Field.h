@@ -59,4 +59,8 @@ private:
 	int fallingSpikeImage; // 針画像ハンドル
 	float x, y; // ステージの座標（主にスクロール時に使用）
 	int scrollX; // 横スクロール量（カメラ位置）
+
+	std::vector<POINT> wallTriggers;
+	std::vector<POINT> wallSpawns;
+	std::vector<bool>  wallTriggered;
 };

@@ -4,6 +4,7 @@
 #include "Trap.h"
 #include "GameOver.h"
 #include "VanishingFloor.h"
+#include "MovingWall.h"
 #include "../Library/Trigger.h"
 #include <assert.h>
 
@@ -137,6 +138,7 @@ void Player::Update()
 			int p2 = f->HitCheckRight(x + 64, y + 62);
 			push = max(push, max(p1, p2));
 		}
+
 
 		x -= push;
 	}

@@ -71,7 +71,6 @@ void EnemyChaser::Update()
 
 		}
 	}
-
 }
 
 void EnemyChaser::Draw()

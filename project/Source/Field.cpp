@@ -10,10 +10,10 @@
 #include "Dokan2.h"
 #include "VanishingFloor.h"
 #include "RollingBall.h"
-#include "CeilingSpike.h"
 #include "FallingSpike.h"
 #include "EnemyChaser.h"
 #include "Boss.h"
+#include "MovingWall.h"
 #include <vector>
 using namespace std;
 vector<vector<int>> maps;
@@ -167,12 +167,26 @@ Field::Field(int stage)
 				ballSpawns.push_back(p);
 			}
 
-			if (maps[y][x] == 30)
+			if (maps[y][x] == 40)
+			{
+				// トリガータイル
+				POINT p = { x * 64, y * 64 };
+				wallTriggers.push_back(p);
+				wallTriggered.push_back(false);
+			}
+			if (maps[y][x] == 41)
+			{
+				// 壁が出現する位置（下のブロックの位置）
+				POINT p = { x * 64, y * 64 };
+				wallSpawns.push_back(p);
+			}
+
+			if (maps[y][x] == 90)
 			{
 				new EnemyChaser(x * 64, y * 64);
 			}
 
-			if (maps[y][x] == 40)
+			if (maps[y][x] == 91)
 			{
 				new Boss(x * 64, y * 64 - 192); // 足場の上に出す
 			}
@@ -277,6 +291,33 @@ void Field::Update()
 
 				fallingIndex++;
 				fallingTimer = 20; // 次の針を落とすまでの間隔
+			}
+		}
+	}
+
+	// --------------------------
+	//  壁トラップのトリガー処理
+	// --------------------------
+	for (int i = 0; i < (int)wallTriggers.size(); ++i)
+	{
+		if (wallTriggered[i]) continue; // もう起動済み
+
+		int trigX = wallTriggers[i].x / 64;
+		int trigY = wallTriggers[i].y / 64;
+
+		if (tx == trigX && ty == trigY)
+		{
+			wallTriggered[i] = true;
+
+			if (i < wallSpawns.size())
+			{
+				POINT sp = wallSpawns[i];
+
+				// プレイヤーのどっち側に出すかで向きを変える
+				int dir = (player->GetX() < sp.x) ? -1 : +1;
+
+				// sp は「一番下のブロック」の位置とする
+				new MovingWall((float)sp.x, (float)sp.y, dir);
 			}
 		}
 	}

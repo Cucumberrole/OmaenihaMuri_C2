@@ -155,10 +155,9 @@
     <ClInclude Include="Library\Trigger.h" />
     <ClInclude Include="Source\Background.h" />
     <ClInclude Include="Source\Boss.h" />
-    <ClInclude Include="Source\CeilingSpike.h" />
     <ClInclude Include="Source\EnemyChaser.h" />
     <ClInclude Include="Source\FallingSpike.h" />
-    <ClInclude Include="Source\FallingTrap.h" />
+    <ClInclude Include="Source\MovingWall.h" />
     <ClInclude Include="Source\RollingBall.h" />
     <ClInclude Include="Source\BootScene.h" />
     <ClInclude Include="Source\ClearScene.h" />
@@ -198,10 +197,9 @@
     <ClCompile Include="Library\Trigger.cpp" />
     <ClCompile Include="Source\Background.cpp" />
     <ClCompile Include="Source\Boss.cpp" />
-    <ClCompile Include="Source\CeilingSpike.cpp" />
     <ClCompile Include="Source\EnemyChaser.cpp" />
     <ClCompile Include="Source\FallingSpike.cpp" />
-    <ClCompile Include="Source\FallingTrap.cpp" />
+    <ClCompile Include="Source\MovingWall.cpp" />
     <ClCompile Include="Source\RollingBall.cpp" />
     <ClCompile Include="Source\BootScene.cpp" />
     <ClCompile Include="Source\ClearScene.cpp" />

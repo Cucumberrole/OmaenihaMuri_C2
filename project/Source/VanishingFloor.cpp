@@ -1,7 +1,7 @@
 #include "VanishingFloor.h"
 #include "Player.h"
 #include <DxLib.h>
-#include <algorithm>    // std::max, std::min を使う場合
+#include <algorithm>
 
 // 静的メンバの定義
 bool VanishingFloor::s_triggered = false;

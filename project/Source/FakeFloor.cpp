@@ -1,4 +1,5 @@
 #include "FakeFloor.h"
+#include "Player.h"
 #include <DxLib.h>
 
 FakeFloor::FakeFloor(int sx, int sy)
@@ -15,7 +16,6 @@ FakeFloor::~FakeFloor()
 
 void FakeFloor::Update()
 {
-
 }
 
 void FakeFloor::Draw()

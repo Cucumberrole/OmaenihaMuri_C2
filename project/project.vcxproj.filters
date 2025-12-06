@@ -95,14 +95,8 @@
     <ClCompile Include="Source\RollingBall.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
-    <ClCompile Include="Source\FallingTrap.cpp">
-      <Filter>Trap</Filter>
-    </ClCompile>
     <ClCompile Include="Source\SelectStage.cpp">
       <Filter>StageSelect</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\CeilingSpike.cpp">
-      <Filter>Trap</Filter>
     </ClCompile>
     <ClCompile Include="Source\FallingSpike.cpp">
       <Filter>Trap</Filter>
@@ -117,6 +111,9 @@
       <Filter>Library</Filter>
     </ClCompile>
     <ClCompile Include="Source\Telop.cpp" />
+    <ClCompile Include="Source\MovingWall.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -297,14 +294,8 @@
     <ClInclude Include="Source\RollingBall.h">
       <Filter>Trap</Filter>
     </ClInclude>
-    <ClInclude Include="Source\FallingTrap.h">
-      <Filter>Trap</Filter>
-    </ClInclude>
     <ClInclude Include="Source\SelectStage.h">
       <Filter>StageSelect</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\CeilingSpike.h">
-      <Filter>Trap</Filter>
     </ClInclude>
     <ClInclude Include="Source\FallingSpike.h">
       <Filter>Trap</Filter>
@@ -328,6 +319,9 @@
       <Filter>Library</Filter>
     </ClInclude>
     <ClInclude Include="Source\Telop.h" />
+    <ClInclude Include="Source\MovingWall.h">
+      <Filter>Trap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">
