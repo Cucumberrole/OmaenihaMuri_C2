@@ -8,8 +8,8 @@
 
 // ==== static 変数の定義 ====
 
-// ステージ番号（ステージセレクトから設定）
-int PlayScene::SelectedStage = 0;
+// ステージ番号
+int PlayScene::SelectedStage = -1;
 
 // 残機・スコア・タイム
 int   PlayScene::LifeCount = 0;
