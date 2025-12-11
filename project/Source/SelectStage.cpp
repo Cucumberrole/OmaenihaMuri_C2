@@ -65,7 +65,7 @@ void SelectStage::Update()
 				// STAGE 1, STAGE 2 ÇÃèÍçáÇÕÅAÇ±ÇÍÇ‹Ç≈í ÇË cursor + 1
 				PlayScene::SelectedStage = cursor + 1;
 			}
-
+			PlayScene::LifeCount = 5;
 			SceneManager::ChangeScene("PLAY");
 		}
 	}

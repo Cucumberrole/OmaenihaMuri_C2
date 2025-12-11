@@ -1,3 +1,4 @@
+#include "PlayScene.h"
 #include "Player.h"
 #include "Field.h"
 #include "FallingFloor.h"
@@ -322,6 +323,7 @@ void Player::Update()
 	//--------------------------------------
 
 	if (field->IsGoal(x + 32, y + 32)) {
+		PlayScene::OnStageClear();
 		SceneManager::ChangeScene("CLEAR");
 	}
 
@@ -375,6 +377,7 @@ void Player::ForceDie()
 	velocity = 0;
 	onGround = false;
 
+	isDead = true;
 	// ゲームオーバーに飛ぶならここで～
 	//SceneManager::ChangeScene("GAMEOVER");
 }
