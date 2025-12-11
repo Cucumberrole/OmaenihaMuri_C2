@@ -1,6 +1,7 @@
 #include "TitleScene.h"
 #include "Screen.h"
 
+
 TitleScene::TitleScene()
 {
 	TitleImage = LoadGraph("data/image/title.png");
@@ -13,6 +14,7 @@ TitleScene::~TitleScene()
 
 void TitleScene::Update()
 {
+	
 	if (CheckHitKey(KEY_INPUT_LSHIFT) || CheckHitKey(KEY_INPUT_RSHIFT)) {
 		SceneManager::ChangeScene("STAGE");
 	}

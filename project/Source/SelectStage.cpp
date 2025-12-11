@@ -24,6 +24,7 @@ SelectStage::~SelectStage()
 
 void SelectStage::Update()
 {
+	Fader* fader = FindGameObject<Fader>();
 	// --- 上下でカーソル移動 ---
 	// --- 上移動 ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_UP)) {
@@ -66,7 +67,7 @@ void SelectStage::Update()
 				// STAGE 1, STAGE 2 の場合は、これまで通り cursor + 1
 				PlayScene::SelectedStage = cursor + 1;
 			}
-	
+			fader->FadeIn(3.0f);
 			SceneManager::ChangeScene("PLAY");
 		}
 	}
@@ -79,7 +80,11 @@ void SelectStage::Update()
 
 void SelectStage::Draw()
 {
+	
 	DrawGraph(0, 0, backgroundImage, FALSE);
+
+	DrawBox(100, 100, 100, 100, GetColor(180, 190, 0), TRUE);
+	DrawBox(400, 100, 100, 100, GetColor(255, 0, 0), TRUE);
 
 	DrawFormatString(0, 0, GetColor(0, 0, 0), "選択番号＝%d", cursor);
 	int colorNormal = GetColor(0, 0, 0);
@@ -110,4 +115,5 @@ void SelectStage::Draw()
 	const char* msg = "↑↓で選択 / ENTERで決定";
 	int w = GetDrawStringWidth(msg, -1);
 	DrawString((Screen::WIDTH - w) / 2, Screen::HEIGHT - 80, msg, GetColor(0, 0, 0));
+
 }
