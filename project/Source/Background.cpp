@@ -4,7 +4,7 @@
 Background::Background()
 {
 	bgImage = LoadGraph("data/image/kabe.png");
-	SetDrawOrder(200);
+	SetDrawOrder(1000);
 }
 
 Background::~Background()
