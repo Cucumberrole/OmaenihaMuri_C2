@@ -114,9 +114,6 @@
     <ClCompile Include="Source\MovingWall.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameResult.cpp">
-      <Filter>ClearScene</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Fader.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -325,9 +322,6 @@
     <ClInclude Include="Source\Telop.h" />
     <ClInclude Include="Source\MovingWall.h">
       <Filter>Trap</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameResult.h">
-      <Filter>ClearScene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Fader.h" />
   </ItemGroup>

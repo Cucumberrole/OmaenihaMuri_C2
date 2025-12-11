@@ -11,7 +11,7 @@ SelectStage::SelectStage()
 {
 	backgroundImage = LoadGraph("data/image/title.png");
 
-	// è¡¨ç¤ºã™ã‚‹ã‚¹ãƒ†ãƒ¼ã‚¸å
+	// •\¦‚·‚éƒXƒe[ƒW–¼
 	stageNames = { "STAGE 1", "STAGE 2", "STAGE 3", "DEBUG STAGE" };
 	stageEnabled = { true,true,false,false };
 
@@ -24,65 +24,55 @@ SelectStage::~SelectStage()
 
 void SelectStage::Update()
 {
-<<<<<<< HEAD
 	Fader* fader = FindGameObject<Fader>();
 	// --- ã‰º‚ÅƒJ[ƒ\ƒ‹ˆÚ“® ---
 	// --- ãˆÚ“® ---
-=======
-	// --- ä¸Šä¸‹ã§ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹• ---
-	// --- ä¸Šç§»å‹• ---
->>>>>>> 94ba39019be8c19bf43fb01ed716a2f4671335fc
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_UP)) {
 		do {
 			cursor--;
 			if (cursor < 0) cursor = stageNames.size() - 1;
-		} while (!stageEnabled[cursor]);  // ç„¡åŠ¹ãªã‚‰é£›ã°ã™
+		} while (!stageEnabled[cursor]);  // –³Œø‚È‚ç”ò‚Î‚·
 	}
 
-	// --- ä¸‹ç§»å‹• ---
+	// --- ‰ºˆÚ“® ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_DOWN)) {
 		do {
 			cursor++;
 			if (cursor >= stageNames.size()) cursor = 0;
-		} while (!stageEnabled[cursor]);  // ç„¡åŠ¹ãªã‚‰é£›ã°ã™
+		} while (!stageEnabled[cursor]);  // –³Œø‚È‚ç”ò‚Î‚·
 	}
 
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_B)) {
-		// ãƒœã‚¹ã‚¹ãƒ†ãƒ¼ã‚¸ã®é–‹æ”¾
+		// ƒ{ƒXƒXƒe[ƒW‚ÌŠJ•ú
 		stageEnabled[2] = true;
 	}
 
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_D)) {
-		// ãƒ‡ãƒãƒƒã‚°ã‚¹ãƒ†ãƒ¼ã‚¸ã®é–‹æ”¾
+		// ƒfƒoƒbƒOƒXƒe[ƒW‚ÌŠJ•ú
 		stageEnabled[3] = true;
 	}
 
-	// --- æ±ºå®šã§ã‚¹ãƒ†ãƒ¼ã‚¸ã¸ ---
+	// --- Œˆ’è‚ÅƒXƒe[ƒW‚Ö ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_RETURN)) {
 
-		if (stageEnabled[cursor])    // æœ‰åŠ¹ãªã¨ãã ã‘
+		if (stageEnabled[cursor])    // —LŒø‚È‚Æ‚«‚¾‚¯
 		{
-			// ãƒ‡ãƒãƒƒã‚°ã‚¹ãƒ†ãƒ¼ã‚¸ï¼ˆcursor == 2ï¼‰ã®æ™‚ã ã‘ã€ã‚¹ãƒ†ãƒ¼ã‚¸ãƒŠãƒ³ãƒãƒ¼ã‚’ 0 ã«è¨­å®šã™ã‚‹
+			// ƒfƒoƒbƒOƒXƒe[ƒWicursor == 2j‚Ì‚¾‚¯AƒXƒe[ƒWƒiƒ“ƒo[‚ğ 0 ‚Éİ’è‚·‚é
 			if (cursor == 3)
 			{
 				PlayScene::SelectedStage = 0;
 			}
 			else
 			{
-				// STAGE 1, STAGE 2 ã®å ´åˆã¯ã€ã“ã‚Œã¾ã§é€šã‚Š cursor + 1
+				// STAGE 1, STAGE 2 ‚Ìê‡‚ÍA‚±‚ê‚Ü‚Å’Ê‚è cursor + 1
 				PlayScene::SelectedStage = cursor + 1;
 			}
-<<<<<<< HEAD
 			fader->FadeIn(3.0f);
-=======
-			PlayScene::LifeCount = 5;
-	
->>>>>>> 94ba39019be8c19bf43fb01ed716a2f4671335fc
 			SceneManager::ChangeScene("PLAY");
 		}
 	}
 
-	// ESCã§çµ‚äº†
+	// ESC‚ÅI—¹
 	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
 		SceneManager::Exit();
 	}
@@ -93,30 +83,26 @@ void SelectStage::Draw()
 	
 	DrawGraph(0, 0, backgroundImage, FALSE);
 
-<<<<<<< HEAD
 	DrawBox(100, 100, 100, 100, GetColor(180, 190, 0), TRUE);
 	DrawBox(400, 100, 100, 100, GetColor(255, 0, 0), TRUE);
 
 	DrawFormatString(0, 0, GetColor(0, 0, 0), "‘I‘ğ”Ô†%d", cursor);
-=======
-	DrawFormatString(0, 0, GetColor(0, 0, 0), "é¸æŠç•ªå·ï¼%d", cursor);
->>>>>>> 94ba39019be8c19bf43fb01ed716a2f4671335fc
 	int colorNormal = GetColor(0, 0, 0);
 	int colorSelect = GetColor(255, 69, 0);
 
 	SetFontSize(36);
 
-	int lineHeight = 50;                 // 1è¡Œã”ã¨ã®é–“éš”
+	int lineHeight = 50;                 // 1s‚²‚Æ‚ÌŠÔŠu
 	int totalHeight = lineHeight * stageNames.size();
 
-	// ç”»é¢ä¸­å¤®ã«å…¨ä½“ã‚’é…ç½®ã™ã‚‹ãŸã‚ã®é–‹å§‹ä½ç½®
+	// ‰æ–Ê’†‰›‚É‘S‘Ì‚ğ”z’u‚·‚é‚½‚ß‚ÌŠJnˆÊ’u
 	int startY = (Screen::HEIGHT - totalHeight) / 2;
 
 	for (int i = 0; i < stageNames.size(); i++)
 	{
-		int color = stageEnabled[i] ? (i == cursor ? colorSelect : colorNormal) : GetColor(255, 255, 255);  // ç„¡åŠ¹ãªã‚¹ãƒ†ãƒ¼ã‚¸ã¯èƒŒæ™¯è‰²ã¨åŒåŒ–ã•ã›ã¦ã¾ã™
+		int color = stageEnabled[i] ? (i == cursor ? colorSelect : colorNormal) : GetColor(255, 255, 255);  // –³Œø‚ÈƒXƒe[ƒW‚Í”wŒiF‚Æ“¯‰»‚³‚¹‚Ä‚Ü‚·
 
-		// å„è¡Œã®å¹…ã‚’å–å¾—ã—ã¦æ¨ªä¸­å¤®ã«é…ç½®
+		// Šes‚Ì•‚ğæ“¾‚µ‚Ä‰¡’†‰›‚É”z’u
 		int textWidth = GetDrawStringWidth(stageNames[i].c_str(), -1);
 		int x = (Screen::WIDTH - textWidth) / 2;
 
@@ -125,8 +111,8 @@ void SelectStage::Draw()
 		DrawString(x, y, stageNames[i].c_str(), color);
 	}
 
-	// èª¬æ˜æ–‡ã‚‚ä¸­å¤®
-	const char* msg = "â†‘â†“ã§é¸æŠ / ENTERã§æ±ºå®š";
+	// à–¾•¶‚à’†‰›
+	const char* msg = "ª«‚Å‘I‘ğ / ENTER‚ÅŒˆ’è";
 	int w = GetDrawStringWidth(msg, -1);
 	DrawString((Screen::WIDTH - w) / 2, Screen::HEIGHT - 80, msg, GetColor(0, 0, 0));
 
