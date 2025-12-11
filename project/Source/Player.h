@@ -17,6 +17,7 @@ public:
 
 	void SetDead() { isDead = true; }
 	void ForceDie();
+	bool IsDead() const { return isDead; }
 
 	// ‰~Œ`“–‚½‚è”»’è‚ÌŽæ“¾
 	float GetRadius() const { return hitRadius; }

@@ -1,3 +1,5 @@
+#include "PlayScene.h"
+#include "GameResult.h"
 #include "Player.h"
 #include "Field.h"
 #include "FallingFloor.h"
@@ -322,6 +324,10 @@ void Player::Update()
 	//--------------------------------------
 
 	if (field->IsGoal(x + 32, y + 32)) {
+		PlayScene::OnStageClear();
+		//g_GameResult.score = finalScore;   // 計算済みのスコア
+		//g_GameResult.clearTime = timeSec;      // 経過秒
+		//g_GameResult.retryCount = retry;        // 死んだ回数
 		SceneManager::ChangeScene("CLEAR");
 	}
 
@@ -375,6 +381,7 @@ void Player::ForceDie()
 	velocity = 0;
 	onGround = false;
 
+	isDead = true;
 	// ゲームオーバーに飛ぶならここで～
 	//SceneManager::ChangeScene("GAMEOVER");
 }
