@@ -16,6 +16,7 @@ public:
 	float GetY() const;
 
 	void SetDead() { isDead = true; }
+	bool IsDead() const { return isDead; }
 	void ForceDie();
 
 	// ‰~Œ`“–‚½‚è”»’è‚ÌŽæ“¾
