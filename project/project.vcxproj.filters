@@ -114,6 +114,7 @@
     <ClCompile Include="Source\MovingWall.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Fader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -322,6 +323,7 @@
     <ClInclude Include="Source\MovingWall.h">
       <Filter>Trap</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Fader.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">

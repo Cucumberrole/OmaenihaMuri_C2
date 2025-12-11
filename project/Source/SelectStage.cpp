@@ -1,6 +1,7 @@
 #include "SelectStage.h"
 #include "PlayScene.h"
 #include "Screen.h"
+#include "Fader.h"
 #include "../Library/SceneManager.h"
 #include "../Library/Trigger.h"
 #include <DxLib.h>
@@ -65,7 +66,7 @@ void SelectStage::Update()
 				// STAGE 1, STAGE 2 ÇÃèÍçáÇÕÅAÇ±ÇÍÇ‹Ç≈í ÇË cursor + 1
 				PlayScene::SelectedStage = cursor + 1;
 			}
-
+	
 			SceneManager::ChangeScene("PLAY");
 		}
 	}
