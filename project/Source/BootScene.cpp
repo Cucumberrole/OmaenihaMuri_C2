@@ -1,7 +1,9 @@
 #include "BootScene.h"
+#include "Fader.h"
 
 BootScene::BootScene()
 {
+	new Fader();
 }
 
 BootScene::~BootScene()
