@@ -360,9 +360,9 @@ void Player::Draw()
 	SetFontSize(30);
 	int h = GetFontSize();
 
-	DrawFormatString(0, 100 + h * 0, GetColor(255, 255, 255), "PlayerX: %.2f", x);
-	DrawFormatString(0, 100 + h * 1, GetColor(255, 255, 255), "PlayerY: %.2f", y);
-	DrawFormatString(0, 100 + h * 2, GetColor(255, 255, 255), "PlayerHP: %d", hp);
+	//DrawFormatString(0, 200 + h * 0, GetColor(255, 255, 255), "PlayerX: %.2f", x);
+	//DrawFormatString(0, 200 + h * 1, GetColor(255, 255, 255), "PlayerY: %.2f", y);
+	//DrawFormatString(0, 200 + h * 2, GetColor(255, 255, 255), "PlayerHP: %d", hp);
 
 }
 
