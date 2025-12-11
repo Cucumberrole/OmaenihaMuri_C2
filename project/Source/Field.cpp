@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "CsvReader.h"
 #include "Trap.h"
+#include "Telop.h"
 #include "SmallTrap.h"
 #include "FallingFloor.h"
 #include "FakeFloor.h"
@@ -50,6 +51,7 @@ static bool IsSolidCell(int cell)
 //------------------------------------------------------------
 Field::Field(int stage)
 {
+	new Telop();//とりあえず置いた
 	char filename[60];
 	sprintf_s<60>(filename, "data/stage%02d.csv", stage);
 
@@ -135,7 +137,7 @@ Field::Field(int stage)
 
 			if (maps[y][x] == 11)
 			{
-				// トラップ設置
+				// 小さいトラップ設置
 				new SmallTrap(x * 64 + 24, y * 64 + 48);
 			}
 
@@ -190,6 +192,7 @@ Field::Field(int stage)
 			{
 				new Boss(x * 64, y * 64 - 192); // 足場の上に出す
 			}
+			
 		}
 	}
 }

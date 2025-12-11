@@ -3,7 +3,8 @@
 #include "Player.h"
 #include "Telop.h"
 
-bool g_isPlayerTouchedTrap = false;
+
+
 
 SmallTrap::SmallTrap(int sx, int sy)
 {
@@ -22,10 +23,10 @@ SmallTrap::~SmallTrap()
 
 void SmallTrap::Update()
 {
-	Telop GameOverTelop;
 	//----------------------------------------
 	// プレイヤーと衝突
 	//----------------------------------------
+	Telop* telop = FindGameObject<Telop>();
 	Player* player = FindGameObject<Player>();
 	if (player)
 	{
@@ -41,7 +42,7 @@ void SmallTrap::Update()
 
 		if (hit)
 		{
-			g_isPlayerTouchedTrap = true;
+			telop->g_isPlayerTouchedTrap = true;
 
 			player->ForceDie();
 			player->SetDead();
@@ -66,5 +67,5 @@ void SmallTrap::Draw()
 		GetColor(255, 0, 0), // 赤色
 		FALSE                // 塗りつぶしなし
 	);
-	//DrawString(620, 140, "こんな小さいのにw", GetColor(255, 255, 255));
+	
 }
