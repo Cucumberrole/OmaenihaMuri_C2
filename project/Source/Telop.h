@@ -1,12 +1,13 @@
 #pragma once
 #include "../Library/GameObject.h"
 
-class Telop
+class Telop : public GameObject
 {
 public:
 	Telop();
 	~Telop();
-	void Update();
-	void Draw();
+	void Update() override;
+	void Draw() override;
+	bool g_isPlayerTouchedTrap = false;
 };
 

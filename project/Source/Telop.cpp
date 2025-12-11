@@ -4,8 +4,6 @@
 #include "Field.h"
 #include "SmallTrap.h"
 
-extern bool g_isPlayerTouchedTrap;
-
 Telop::Telop()
 {
 }
@@ -22,7 +20,7 @@ void Telop::Draw()
 {
     if (g_isPlayerTouchedTrap)
     {
-        DrawString(160, 500, "‚ ‚Ù", GetColor(255, 255, 255));
+        DrawString(550, 200, "‚ ‚Ù", GetColor(255, 255, 255));
     }
 }
 
