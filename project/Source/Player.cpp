@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "ClearScene.h"
 #include "Field.h"
 #include "FallingFloor.h"
 #include "Trap.h"
@@ -322,6 +323,12 @@ void Player::Update()
 	//--------------------------------------
 
 	if (field->IsGoal(x + 32, y + 32)) {
+		// プレイ中に計測している値を使う
+		extern float g_ClearTimeSeconds;   // クリアまでの累計時間
+		extern int   g_RetryCount;        // このステージで死んだ回数
+		bool noMiss = (g_RetryCount == 0);
+
+		ClearScene::SetResult(g_ClearTimeSeconds, g_RetryCount, noMiss);
 		SceneManager::ChangeScene("CLEAR");
 	}
 

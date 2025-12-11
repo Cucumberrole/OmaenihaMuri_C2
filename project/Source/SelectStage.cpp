@@ -80,11 +80,11 @@ void SelectStage::Update()
 
 void SelectStage::Draw()
 {
-	
+
 	DrawGraph(0, 0, backgroundImage, FALSE);
 
-	DrawRoundRect(320, 300, 800, 780,5,5, GetColor(180, 190, 0), TRUE);
-	DrawRoundRect(1120, 300, 1600, 780,5,5, GetColor(255, 0, 0), TRUE);
+	DrawRoundRect(320, 300, 800, 780, 5, 5, GetColor(180, 190, 0), TRUE);
+	DrawRoundRect(1120, 300, 1600, 780, 5, 5, GetColor(255, 0, 0), TRUE);
 
 	DrawFormatString(0, 0, GetColor(0, 0, 0), "ëIëî‘çÜÅÅ%d", cursor);
 	int colorNormal = GetColor(0, 0, 0);

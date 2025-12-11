@@ -6,7 +6,7 @@
 GameOver::GameOver()
 {
 	OwariImage = LoadGraph("data/image/you lose.png");//画像変えるときここ
-	
+
 }
 
 GameOver::~GameOver()
@@ -24,8 +24,8 @@ void GameOver::Update()
 	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
 		SceneManager::Exit();
 	}
-	
-	
+
+
 }
 
 void GameOver::Draw()
@@ -43,10 +43,10 @@ void GameOver::Draw()
 	DrawFormatString(0, 0 + h * 3, GetColor(0, 0, 0), "FontSize:%d", h);
 
 
-	
-	
+
+
 	int DrawWidth = GetDrawStringWidth("Push [SHIFT]Key To Play", -1);
 	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2, "Tキーでタイトルに戻る\nRキーでリトライする", GetColor(0, 0, 0));
 
-	
+
 }
