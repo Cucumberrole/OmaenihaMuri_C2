@@ -1,6 +1,7 @@
 #include "SelectStage.h"
 #include "PlayScene.h"
 #include "Screen.h"
+#include "Fader.h"
 #include "../Library/SceneManager.h"
 #include "../Library/Trigger.h"
 #include <DxLib.h>
@@ -10,7 +11,7 @@ SelectStage::SelectStage()
 {
 	backgroundImage = LoadGraph("data/image/title.png");
 
-	// •\¦‚·‚éƒXƒe[ƒW–¼
+	// è¡¨ç¤ºã™ã‚‹ã‚¹ãƒ†ãƒ¼ã‚¸å
 	stageNames = { "STAGE 1", "STAGE 2", "STAGE 3", "DEBUG STAGE" };
 	stageEnabled = { true,true,false,false };
 
@@ -23,54 +24,55 @@ SelectStage::~SelectStage()
 
 void SelectStage::Update()
 {
-	// --- ã‰º‚ÅƒJ[ƒ\ƒ‹ˆÚ“® ---
-	// --- ãˆÚ“® ---
+	// --- ä¸Šä¸‹ã§ã‚«ãƒ¼ã‚½ãƒ«ç§»å‹• ---
+	// --- ä¸Šç§»å‹• ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_UP)) {
 		do {
 			cursor--;
 			if (cursor < 0) cursor = stageNames.size() - 1;
-		} while (!stageEnabled[cursor]);  // –³Œø‚È‚ç”ò‚Î‚·
+		} while (!stageEnabled[cursor]);  // ç„¡åŠ¹ãªã‚‰é£›ã°ã™
 	}
 
-	// --- ‰ºˆÚ“® ---
+	// --- ä¸‹ç§»å‹• ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_DOWN)) {
 		do {
 			cursor++;
 			if (cursor >= stageNames.size()) cursor = 0;
-		} while (!stageEnabled[cursor]);  // –³Œø‚È‚ç”ò‚Î‚·
+		} while (!stageEnabled[cursor]);  // ç„¡åŠ¹ãªã‚‰é£›ã°ã™
 	}
 
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_B)) {
-		// ƒ{ƒXƒXƒe[ƒW‚ÌŠJ•ú
+		// ãƒœã‚¹ã‚¹ãƒ†ãƒ¼ã‚¸ã®é–‹æ”¾
 		stageEnabled[2] = true;
 	}
 
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_D)) {
-		// ƒfƒoƒbƒOƒXƒe[ƒW‚ÌŠJ•ú
+		// ãƒ‡ãƒãƒƒã‚°ã‚¹ãƒ†ãƒ¼ã‚¸ã®é–‹æ”¾
 		stageEnabled[3] = true;
 	}
 
-	// --- Œˆ’è‚ÅƒXƒe[ƒW‚Ö ---
+	// --- æ±ºå®šã§ã‚¹ãƒ†ãƒ¼ã‚¸ã¸ ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_RETURN)) {
 
-		if (stageEnabled[cursor])    // —LŒø‚È‚Æ‚«‚¾‚¯
+		if (stageEnabled[cursor])    // æœ‰åŠ¹ãªã¨ãã ã‘
 		{
-			// ƒfƒoƒbƒOƒXƒe[ƒWicursor == 2j‚Ì‚¾‚¯AƒXƒe[ƒWƒiƒ“ƒo[‚ğ 0 ‚Éİ’è‚·‚é
+			// ãƒ‡ãƒãƒƒã‚°ã‚¹ãƒ†ãƒ¼ã‚¸ï¼ˆcursor == 2ï¼‰ã®æ™‚ã ã‘ã€ã‚¹ãƒ†ãƒ¼ã‚¸ãƒŠãƒ³ãƒãƒ¼ã‚’ 0 ã«è¨­å®šã™ã‚‹
 			if (cursor == 3)
 			{
 				PlayScene::SelectedStage = 0;
 			}
 			else
 			{
-				// STAGE 1, STAGE 2 ‚Ìê‡‚ÍA‚±‚ê‚Ü‚Å’Ê‚è cursor + 1
+				// STAGE 1, STAGE 2 ã®å ´åˆã¯ã€ã“ã‚Œã¾ã§é€šã‚Š cursor + 1
 				PlayScene::SelectedStage = cursor + 1;
 			}
 			PlayScene::LifeCount = 5;
+	
 			SceneManager::ChangeScene("PLAY");
 		}
 	}
 
-	// ESC‚ÅI—¹
+	// ESCã§çµ‚äº†
 	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
 		SceneManager::Exit();
 	}
@@ -80,23 +82,23 @@ void SelectStage::Draw()
 {
 	DrawGraph(0, 0, backgroundImage, FALSE);
 
-	DrawFormatString(0, 0, GetColor(0, 0, 0), "‘I‘ğ”Ô†%d", cursor);
+	DrawFormatString(0, 0, GetColor(0, 0, 0), "é¸æŠç•ªå·ï¼%d", cursor);
 	int colorNormal = GetColor(0, 0, 0);
 	int colorSelect = GetColor(255, 69, 0);
 
 	SetFontSize(36);
 
-	int lineHeight = 50;                 // 1s‚²‚Æ‚ÌŠÔŠu
+	int lineHeight = 50;                 // 1è¡Œã”ã¨ã®é–“éš”
 	int totalHeight = lineHeight * stageNames.size();
 
-	// ‰æ–Ê’†‰›‚É‘S‘Ì‚ğ”z’u‚·‚é‚½‚ß‚ÌŠJnˆÊ’u
+	// ç”»é¢ä¸­å¤®ã«å…¨ä½“ã‚’é…ç½®ã™ã‚‹ãŸã‚ã®é–‹å§‹ä½ç½®
 	int startY = (Screen::HEIGHT - totalHeight) / 2;
 
 	for (int i = 0; i < stageNames.size(); i++)
 	{
-		int color = stageEnabled[i] ? (i == cursor ? colorSelect : colorNormal) : GetColor(255, 255, 255);  // –³Œø‚ÈƒXƒe[ƒW‚Í”wŒiF‚Æ“¯‰»‚³‚¹‚Ä‚Ü‚·
+		int color = stageEnabled[i] ? (i == cursor ? colorSelect : colorNormal) : GetColor(255, 255, 255);  // ç„¡åŠ¹ãªã‚¹ãƒ†ãƒ¼ã‚¸ã¯èƒŒæ™¯è‰²ã¨åŒåŒ–ã•ã›ã¦ã¾ã™
 
-		// Šes‚Ì•‚ğæ“¾‚µ‚Ä‰¡’†‰›‚É”z’u
+		// å„è¡Œã®å¹…ã‚’å–å¾—ã—ã¦æ¨ªä¸­å¤®ã«é…ç½®
 		int textWidth = GetDrawStringWidth(stageNames[i].c_str(), -1);
 		int x = (Screen::WIDTH - textWidth) / 2;
 
@@ -105,8 +107,8 @@ void SelectStage::Draw()
 		DrawString(x, y, stageNames[i].c_str(), color);
 	}
 
-	// à–¾•¶‚à’†‰›
-	const char* msg = "ª«‚Å‘I‘ğ / ENTER‚ÅŒˆ’è";
+	// èª¬æ˜æ–‡ã‚‚ä¸­å¤®
+	const char* msg = "â†‘â†“ã§é¸æŠ / ENTERã§æ±ºå®š";
 	int w = GetDrawStringWidth(msg, -1);
 	DrawString((Screen::WIDTH - w) / 2, Screen::HEIGHT - 80, msg, GetColor(0, 0, 0));
 }

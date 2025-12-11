@@ -117,6 +117,7 @@
     <ClCompile Include="Source\GameResult.cpp">
       <Filter>ClearScene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Fader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -328,6 +329,7 @@
     <ClInclude Include="Source\GameResult.h">
       <Filter>ClearScene</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Fader.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">

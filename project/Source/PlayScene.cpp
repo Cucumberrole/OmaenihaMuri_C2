@@ -1,5 +1,6 @@
 #include "PlayScene.h"
 #include "Field.h"
+#include "Fader.h"
 #include "Background.h"
 #include "Player.h"
 #include "../Library/SceneManager.h"
@@ -138,6 +139,16 @@ void PlayScene::Update()
 	if (CheckHitKey(KEY_INPUT_R)) {
 		SceneManager::ChangeScene("STAGE");
 	}
+
+	// --- フェードインアウト ---
+	Fader* fader = FindGameObject<Fader>();
+	if (CheckHitKey(KEY_INPUT_I)) {
+		fader->FadeIn(1.0f);
+	}
+	if (CheckHitKey(KEY_INPUT_O)) {
+		fader->FadeOut(1.0f);
+	}
+	
 }
 
 // Draw（HUD表示）
