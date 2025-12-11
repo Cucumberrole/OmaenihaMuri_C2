@@ -17,8 +17,8 @@ ClearScene::ClearScene()
 	CalcRank();
 
 	// キャラ画像（画像は好きなのに変えてね）
-	leftCharaImg = LoadGraph("data/image/clear_left.png");
-	rightCharaImg = LoadGraph("data/image/clear_right.png");
+	leftCharaImg = LoadGraph("data/image/すい1.png");
+	rightCharaImg = LoadGraph("data/image/すい2.png");
 }
 
 ClearScene::~ClearScene()
