@@ -1,1 +1,1 @@
-aiueo
+aiueoaiueo
