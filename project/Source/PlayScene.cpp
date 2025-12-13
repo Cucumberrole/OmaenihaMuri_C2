@@ -103,7 +103,7 @@ void PlayScene::Update()
 	// --- フェードインアウト ---
 	Fader* fader = FindGameObject<Fader>();
 	if (CheckHitKey(KEY_INPUT_I)) {
-		fader->FadeIn(1.0f);
+		fader->FadeIn(0.5f);
 	}
 	if (CheckHitKey(KEY_INPUT_O)) {
 		fader->FadeOut(1.0f);

@@ -67,7 +67,7 @@ void SelectStage::Update()
 				// STAGE 1, STAGE 2 ‚Ìê‡‚ÍA‚±‚ê‚Ü‚Å’Ê‚è cursor + 1
 				PlayScene::SelectedStage = cursor + 1;
 			}
-			fader->FadeIn(3.0f);
+			fader->FadeIn(1.0f);
 			SceneManager::ChangeScene("PLAY");
 		}
 	}
