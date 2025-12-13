@@ -51,7 +51,8 @@ static bool PointInTriangle(VECTOR p, VECTOR a, VECTOR b, VECTOR c)
 //--------------------------------------
 // 円と三角形の当たり判定
 //--------------------------------------
-static bool HitCheck_Circle_Triangle(VECTOR center, float radius,
+static bool HitCheck_Circle_Triangle(
+	VECTOR center, float radius,
 	VECTOR t1, VECTOR t2, VECTOR t3)
 {
 	if (HitCheck_Circle_Line(center, radius, t1, t2)) return true;
@@ -66,22 +67,27 @@ static bool HitCheck_Circle_Triangle(VECTOR center, float radius,
 //--------------------------------------
 // コンストラクタ
 //--------------------------------------
-FallingSpike::FallingSpike(int sx, int sy)
+FallingSpike::FallingSpike(int sx, int sy, bool chaseAfterLand)
 {
 	hImage = LoadGraph("data/image/hariBottom.png");
 
-	x = sx;
-	y = sy;
+	x = (float)sx;
+	y = (float)sy;
 
 	vy = 0.0f;
 	gravity = 0.8f;
 	landed = false;
 
-	// 画像サイズを取得して width / height に保存
 	int w, h;
 	GetGraphSize(hImage, &w, &h);
 	width = w;
 	height = h;
+
+	// 追尾関連
+	isChaser = chaseAfterLand;
+	startedChase = false;
+	vx = 0.0f;
+	chaseSpeed = 6.0f;  // 横に走る速さ（好みで調整）
 }
 
 //--------------------------------------
@@ -97,14 +103,16 @@ FallingSpike::~FallingSpike()
 //--------------------------------------
 void FallingSpike::Update()
 {
+	Field* field = FindGameObject<Field>();
+
+	//----------------------------------
 	// まだ落下中なら重力処理
+	//----------------------------------
 	if (!landed)
 	{
 		vy += gravity;
 		y += vy;
 
-		// 地面に衝突判定
-		Field* field = FindGameObject<Field>();
 		if (field)
 		{
 			int tx = static_cast<int>((x + width / 2) / 64); // 中心X
@@ -119,19 +127,70 @@ void FallingSpike::Update()
 			}
 		}
 	}
+	else
+	{
+		//----------------------------------
+		// 着地済み：追尾モードなら横移動
+		//----------------------------------
+		if (isChaser)
+		{
+			Player* player = FindGameObject<Player>();
 
-	// プレイヤー衝突判定（落下中・着地後どちらでも有効）
+			// まだ方向を決めていないなら、最初の1回だけ決定
+			if (!startedChase && player)
+			{
+				float pxCenter = player->GetX() + 32.0f;
+				float sxCenter = x + width / 2.0f;
+
+				if (pxCenter < sxCenter)
+					vx = -chaseSpeed;   // 左へ
+				else
+					vx = chaseSpeed;   // 右へ
+
+				startedChase = true;
+			}
+
+			// 横に平行移動
+			if (startedChase)
+			{
+				float oldX = x;
+				x += vx;
+
+				// 壁にぶつかったら止まる
+				if (field)
+				{
+					float checkX = (vx > 0.0f) ? (x + width) : x;
+					float checkY = y + height / 2.0f;
+
+					int tileX = static_cast<int>(checkX / 64);
+					int tileY = static_cast<int>(checkY / 64);
+
+					if (field->IsBlock(tileX, tileY))
+					{
+						x = oldX;
+						vx = 0.0f;
+						isChaser = false;  // もう動かない
+						DestroyMe();
+					}
+				}
+			}
+		}
+	}
+
+	//----------------------------------
+	// プレイヤーとの当たり判定（落下中・移動中どちらでも有効）
+	//----------------------------------
 	Player* player = FindGameObject<Player>();
 	if (player)
 	{
 		float px = player->GetX();
 		float py = player->GetY();
 
-		// プレイヤーの当たり判定「円」（中心 + 半径）
+		// プレイヤー円
 		VECTOR center = VGet(px + 32.0f, py + 32.0f, 0.0f);
-		float  radius = player->GetRadius();   // 64 * 0.35f 相当
+		float  radius = player->GetRadius();
 
-		//  左上, 右上, 下の先端
+		// 針の三角形（下向き）
 		VECTOR t1 = VGet(x, y, 0.0f); // 左上
 		VECTOR t2 = VGet(x + width, y, 0.0f); // 右上
 		VECTOR t3 = VGet(x + width / 2, y + height, 0.0f); // 下の先端
@@ -149,21 +208,20 @@ void FallingSpike::Update()
 //--------------------------------------
 void FallingSpike::Draw()
 {
-	// 普通の描画
 	DrawGraph(static_cast<int>(x), static_cast<int>(y), hImage, TRUE);
 
 #ifdef _DEBUG
+	// 当たり判定三角形の表示（デバッグ用）
 	int tx1 = static_cast<int>(x);
-	int ty1 = static_cast<int>(y); // 左上
+	int ty1 = static_cast<int>(y);
 
 	int tx2 = static_cast<int>(x + width);
-	int ty2 = static_cast<int>(y); // 右上
+	int ty2 = static_cast<int>(y);
 
 	int tx3 = static_cast<int>(x + width / 2);
-	int ty3 = static_cast<int>(y + height); // 下の先端
+	int ty3 = static_cast<int>(y + height);
 
 	int col = GetColor(0, 255, 0);
-
 	DrawTriangle(tx1, ty1, tx2, ty2, tx3, ty3, col, FALSE);
 #endif
 }

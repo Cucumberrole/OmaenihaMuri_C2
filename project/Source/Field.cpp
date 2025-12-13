@@ -35,6 +35,7 @@ vector<vector<int>> maps;
 // 11 : 小さい針
 // 12 : １３番のトリガー
 // 13 : 天井から落ちてくる針本体
+// 14 : 落ちたらプレイヤーに向かって飛んでくる針
 // 20 : ２１番のトリガー
 // 21 : ボールが転がってくるトラップ
 // 99 : ゴール
@@ -153,6 +154,16 @@ Field::Field(int stage)
 				POINT p = { x * 64, y * 64 };
 				fallingSpikes.push_back(p);
 				fallingSpikeAlive.push_back(true);
+				fallingSpikeChaser.push_back(false);
+			}
+
+			if (maps[y][x] == 14)
+			{
+				// 針が落ちるトラップ
+				POINT p = { x * 64, y * 64 };
+				fallingSpikes.push_back(p);
+				fallingSpikeAlive.push_back(true);
+				fallingSpikeChaser.push_back(true);
 			}
 
 			if (maps[y][x] == 20) {
@@ -192,7 +203,7 @@ Field::Field(int stage)
 			{
 				new Boss(x * 64, y * 64 - 192); // 足場の上に出す
 			}
-			
+
 		}
 	}
 }
@@ -286,8 +297,13 @@ void Field::Update()
 			{
 				POINT p = fallingSpikes[fallingIndex];
 
+				bool chase = false;
+				if (fallingIndex < (int)fallingSpikeChaser.size())
+				{
+					chase = fallingSpikeChaser[fallingIndex];
+				}
 				// 落下針を生成
-				new FallingSpike(p.x, p.y);
+				new FallingSpike(p.x, p.y, chase);
 
 				// --- 天井の待機針を消す ---
 				fallingSpikeAlive[fallingIndex] = false;
