@@ -95,6 +95,7 @@ void PlayScene::Update()
 	// --- Rキーでリトライ ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
 	{
+		g_RetryCount++;
 		SceneManager::ChangeScene("STAGE");
 		return;
 	}

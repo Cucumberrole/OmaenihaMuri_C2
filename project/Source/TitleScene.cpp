@@ -1,4 +1,6 @@
 #include "TitleScene.h"
+#include "PlayScene.h"
+#include "GameResult.h"
 #include "Screen.h"
 
 
@@ -17,6 +19,8 @@ void TitleScene::Update()
 	
 	if (CheckHitKey(KEY_INPUT_LSHIFT) || CheckHitKey(KEY_INPUT_RSHIFT)) {
 		SceneManager::ChangeScene("STAGE");
+		g_ClearTimeSeconds = 0.0f;
+		g_RetryCount = 0;
 	}
 	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
 		SceneManager::Exit();
