@@ -2,27 +2,36 @@
 #include "Field.h"
 #include "Player.h"
 #include <DxLib.h>
-#include <algorithm>
+
+// clamp を自前で（min/max マクロ問題を避ける）
+static float ClampFloat(float v, float a, float b)
+{
+	if (v < a) return a;
+	if (v > b) return b;
+	return v;
+}
 
 //--------------------------------------
 // コンストラクタ
 //--------------------------------------
 MovingWall::MovingWall(float baseX, float baseY, int dir)
 {
-	hImage = LoadGraph("data/image/NewBlock.png"); // ブロック画像
+	hImage = LoadGraph("data/image/NewBlock.png");
 	x = baseX;
-	y = baseY;        // 一番下のブロックの左上
+	y = baseY;
+
 	width = 64;
 	blockSize = 64;
 	buildLevel = 0;
 	maxLevel = 3;
 	buildTimer = 0;
-	buildInterval = 10;           // 10フレームごとに 1 段追加
+	buildInterval = 10;
 
-	moveSpeed = 6.0f;         // 横移動速度
+	moveSpeed = 6.0f;
 	this->dir = (dir >= 0) ? 1 : -1;
 
 	state = State::BUILDING;
+	lastMoveDx = 0.0f;
 
 	SetDrawOrder(60);
 }
@@ -45,7 +54,6 @@ void MovingWall::BuildStep()
 		buildLevel++;
 		if (buildLevel >= maxLevel)
 		{
-			// 3 段積み終わったら横移動を開始
 			state = State::MOVING;
 		}
 	}
@@ -57,7 +65,7 @@ void MovingWall::BuildStep()
 void MovingWall::MoveStep()
 {
 	Field* field = FindGameObject<Field>();
-	if (!field) return;
+	if (!field) { lastMoveDx = 0.0f; return; }
 
 	float oldX = x;
 	float dx = moveSpeed * dir;
@@ -65,20 +73,16 @@ void MovingWall::MoveStep()
 	// 横に進める
 	x += dx;
 
-	if (buildLevel <= 0) return;
+	if (buildLevel <= 0) { lastMoveDx = 0.0f; return; }
 
 	// 壁全体の矩形
 	float wallLeft = x;
 	float wallRight = x + width;
-	float wallBottom = y + blockSize;                      // 一番下ブロックの下端
-	float wallTop = y - blockSize * (buildLevel - 1);   // 一番上ブロックの上端
+	float wallBottom = y + blockSize;
+	float wallTop = y - blockSize * (buildLevel - 1);
 
 	// 進行方向側のタイルを調べる
-	int tileX;
-	if (dir > 0)
-		tileX = (int)(wallRight) / 64;   // 右側
-	else
-		tileX = (int)(wallLeft) / 64;    // 左側
+	int tileX = (dir > 0) ? (int)(wallRight) / 64 : (int)(wallLeft) / 64;
 
 	int tileYTop = (int)(wallTop) / 64;
 	int tileYBottom = (int)(wallBottom - 1) / 64;
@@ -99,21 +103,23 @@ void MovingWall::MoveStep()
 		x = oldX;
 		state = State::STOPPED;
 	}
+
+	// 実際に動いた量（止まったら 0 ）
+	lastMoveDx = x - oldX;
 }
 
 //--------------------------------------
-// プレイヤー押し潰し判定（毎フレーム呼ぶ）
+// プレイヤー押し出し + 挟まれ死亡（毎フレーム）
 //--------------------------------------
 void MovingWall::CheckCrushWithPlayer()
 {
-	// 壁がまだ無いなら何もしない
 	if (buildLevel <= 0) return;
 
 	Player* player = FindGameObject<Player>();
 	if (!player) return;
 
-	float cx, cy, cr;
-	player->GetHitCircle(cx, cy, cr); // プレイヤーの円当たり判定
+	Field* field = FindGameObject<Field>();
+	if (!field) return;
 
 	// 壁全体の矩形
 	float wallLeft = x;
@@ -121,48 +127,43 @@ void MovingWall::CheckCrushWithPlayer()
 	float wallBottom = y + blockSize;
 	float wallTop = y - blockSize * (buildLevel - 1);
 
-	// 円 vs 矩形の最近接点
-	float nearestX = max(wallLeft, min(cx, wallRight));
-	float nearestY = max(wallTop, min(cy, wallBottom));
+	// プレイヤー円
+	float cx, cy, cr;
+	player->GetHitCircle(cx, cy, cr);
+
+	// 円 vs 矩形（最近接点）
+	float nearestX = ClampFloat(cx, wallLeft, wallRight);
+	float nearestY = ClampFloat(cy, wallTop, wallBottom);
 
 	float ddx = cx - nearestX;
 	float ddy = cy - nearestY;
 
 	bool overlap = (ddx * ddx + ddy * ddy <= cr * cr);
-	if (!overlap) return; // そもそも当たっていない
+	if (!overlap) return;
 
-	// ここまで来たら「壁にめり込んでいる」
-
-	Field* field = FindGameObject<Field>();
-	if (!field) return;
-
-	bool crushed = false;
-
-	if (dir > 0)
+	// ===========================
+	// ここから「押す」処理が本体
+	// ===========================
+	// 壁がこのフレームで動いていないなら押せない（停止中など）
+	if (lastMoveDx != 0.0f)
 	{
-		// 右方向に動いている → プレイヤーの右側にブロックがあると挟まれ
-		int checkX = (int)(cx + cr) / 64;
-		int checkY = (int)(cy) / 64;
-		if (field->IsBlock(checkX, checkY))
-		{
-			crushed = true;
-		}
-	}
-	else
-	{
-		// 左方向に動いている → プレイヤーの左側にブロックがあると挟まれ
-		int checkX = (int)(cx - cr) / 64;
-		int checkY = (int)(cy) / 64;
-		if (field->IsBlock(checkX, checkY))
-		{
-			crushed = true;
-		}
+		// 壁の移動量ぶんプレイヤーを押す
+		// ※ Player に PushByWall(dx) を追加してください
+		player->PushByWall(lastMoveDx);
 	}
 
-	if (crushed)
+	// 押した後もまだ重なってるなら「押し切れない＝挟まれ」
+	player->GetHitCircle(cx, cy, cr);
+	nearestX = ClampFloat(cx, wallLeft, wallRight);
+	nearestY = ClampFloat(cy, wallTop, wallBottom);
+
+	ddx = cx - nearestX;
+	ddy = cy - nearestY;
+
+	bool stillOverlap = (ddx * ddx + ddy * ddy <= cr * cr);
+	if (stillOverlap)
 	{
-		player->ForceDie();
-		player->SetDead();
+
 	}
 }
 
@@ -174,7 +175,6 @@ void MovingWall::Update()
 	switch (state)
 	{
 	case State::BUILDING:
-		// 一定フレームごとに 1 段追加
 		if (buildTimer > 0)
 		{
 			buildTimer--;
@@ -184,6 +184,7 @@ void MovingWall::Update()
 			BuildStep();
 			buildTimer = buildInterval;
 		}
+		lastMoveDx = 0.0f;
 		break;
 
 	case State::MOVING:
@@ -191,15 +192,11 @@ void MovingWall::Update()
 		break;
 
 	case State::STOPPED:
-		// その場で止まっているだけ
+		lastMoveDx = 0.0f;
 		break;
 	}
 
-	// プレイヤーが動いていなくても、毎フレーム押し潰し判定する
-	if (state == State::MOVING)
-	{
-		CheckCrushWithPlayer();
-	}
+	CheckCrushWithPlayer();
 }
 
 //--------------------------------------
@@ -207,7 +204,6 @@ void MovingWall::Update()
 //--------------------------------------
 void MovingWall::Draw()
 {
-	// buildLevel 段分だけ上に積み上げて描画
 	for (int i = 0; i < buildLevel; ++i)
 	{
 		int drawX = (int)x;
@@ -226,17 +222,14 @@ int MovingWall::HitCheckRight(int px, int py)
 	if (buildLevel <= 0) return 0;
 
 	float wallLeft = x;
-	float wallRight = x + width;
 	float wallBottom = y + blockSize;
 	float wallTop = y - blockSize * (buildLevel - 1);
 
-	// Y方向がかすってなければ当たりなし
 	if (py < wallTop || py >= wallBottom) return 0;
 
-	int localX = px - (int)wallLeft;   // 壁左端からの距離
+	int localX = px - (int)wallLeft;
 	if (localX >= 0 && localX < width)
 	{
-		// Field::HitCheckRight と同じ思想：めり込んだ分＋1
 		return localX + 1;
 	}
 	return 0;
@@ -248,7 +241,6 @@ int MovingWall::HitCheckLeft(int px, int py)
 	if (buildLevel <= 0) return 0;
 
 	float wallLeft = x;
-	float wallRight = x + width;
 	float wallBottom = y + blockSize;
 	float wallTop = y - blockSize * (buildLevel - 1);
 
@@ -271,10 +263,8 @@ int MovingWall::HitCheckDown(int px, int py)
 	float wallRight = x + width;
 	float wallTop = y - blockSize * (buildLevel - 1); // 一番上ブロックの上端
 
-	// X方向にかすってなければ当たりなし
 	if (px < wallLeft || px >= wallRight) return 0;
 
-	// 「一番上の面」だけを床として扱う
 	int localY = py - (int)wallTop;
 	if (localY >= 0 && localY < blockSize)
 	{
@@ -290,12 +280,11 @@ int MovingWall::HitCheckUp(int px, int py)
 
 	float wallLeft = x;
 	float wallRight = x + width;
-	float wallBottom = y + blockSize;      // 一番下ブロックの下端
+	float wallBottom = y + blockSize; // 一番下ブロックの下端
 
 	if (px < wallLeft || px >= wallRight) return 0;
 
-	// 「一番下の面」を天井として扱う
-	int localY = (int)wallBottom - py;     // 下端からの距離
+	int localY = (int)wallBottom - py;
 	if (localY >= 0 && localY < blockSize)
 	{
 		return localY;

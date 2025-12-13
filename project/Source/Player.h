@@ -23,6 +23,7 @@ public:
 	float GetRadius() const { return hitRadius; }
 	void GetHitCircle(float& outX, float& outY, float& outRadius) const;
 
+	void PushByWall(float dx);
 
 	// （もしデバッグ用に描画したければ）
 	// void DrawHitCircleDebug() const;

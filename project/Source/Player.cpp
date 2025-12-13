@@ -8,7 +8,6 @@
 #include "../Library/Trigger.h"
 #include <assert.h>
 
-
 // --- 定数 ---
 static const float Gravity = 0.4f;  // 重力加速度
 static const float V0 = -10.0f;     // ジャンプ初速度（上方向）
@@ -49,8 +48,8 @@ Player::Player(int sx, int sy)
 	hImage = LoadGraph("data/image/OMAEwalk.png");
 	assert(hImage != -1);
 
-	x = sx;
-	y = sy;
+	x = (float)sx;
+	y = (float)sy;
 	velocity = 0;
 	onGround = false;
 
@@ -82,22 +81,46 @@ Player::~Player()
 //--------------------------------------
 // 座標取得用
 //--------------------------------------
-float Player::GetX() const
-{
-	return x;
-}
-
-float Player::GetY() const
-{
-	return y;
-}
+float Player::GetX() const { return x; }
+float Player::GetY() const { return y; }
 
 // 円形当たり判定を取得
 void Player::GetHitCircle(float& outX, float& outY, float& outRadius) const
 {
-	outX = x + CHARACTER_WIDTH / 2.0f;  // 中心 X
+	outX = x + CHARACTER_WIDTH / 2.0f;   // 中心 X
 	outY = y + CHARACTER_HEIGHT / 2.0f;  // 中心 Y
 	outRadius = hitRadius;
+}
+
+void Player::PushByWall(float dx)
+{
+	if (dx == 0.0f) return;
+
+	Field* field = FindGameObject<Field>();
+	if (!field) { x += dx; return; }
+
+	// おす
+	x += dx;
+
+	// 押された後にフィールドへめり込んだら押し戻す
+	int push = 0;
+
+	if (dx > 0)
+	{
+		int push1 = field->HitCheckRight((int)(x + 63), (int)(y + 5));
+		int push2 = field->HitCheckRight((int)(x + 63), (int)(y + 58));
+		push = max(push1, push2);
+
+		if (push > 0) x -= (float)push;
+	}
+	else
+	{
+		int push1 = field->HitCheckLeft((int)(x + 0), (int)(y + 5));
+		int push2 = field->HitCheckLeft((int)(x + 0), (int)(y + 58));
+		push = max(push1, push2);
+
+		if (push > 0) x += (float)push;
+	}
 }
 
 //--------------------------------------
@@ -107,99 +130,110 @@ void Player::Update()
 {
 	// --- 死亡していたら完全固定 ---
 	if (isDead) {
-		return;  // 動きを何も更新しない
+		return;
 	}
+
+	Field* field = FindGameObject<Field>();
+	if (!field) return;
 
 	// --- 地面にいるときはジャンプ回数をリセット ---
 	if (onGround && jumpcount < Maxjumpcount) {
 		jumpcount += 1;
 	}
 
+	//========================================================
+	// 横移動（移動 → 押し戻し）
+	//========================================================
 	int moveX = 0;
-	//--------------------------------------
-	// 右移動（Dキー）
-	//--------------------------------------
+
 	if (CheckHitKey(KEY_INPUT_D)) {
 		moveX = WALK_SPEED;
 		frip = false;
-
-		// --- Field 判定 ---
-		Field* field = FindGameObject<Field>();
-		int push1 = field->HitCheckRight(x + 64, y + 5);
-		int push2 = field->HitCheckRight(x + 64, y + 58);
-		int push = max(push1, push2);
-
-
-
-		// --- 落下床 判定（複数床対応） ---
-		auto floors = FindGameObjects<FallingFloor>();
-		for (auto f : floors) {
-			int p1 = f->HitCheckRight(x + 64, y + 1);
-			int p2 = f->HitCheckRight(x + 64, y + 62);
-			push = max(push, max(p1, p2));
-		}
-
-
-		x -= push;
 	}
-
-	//--------------------------------------
-	// 左移動（Aキー）
-	//--------------------------------------
-	if (CheckHitKey(KEY_INPUT_A)) {
+	else if (CheckHitKey(KEY_INPUT_A)) {
 		moveX = -WALK_SPEED;
 		frip = true;
-
-		Field* field = FindGameObject<Field>();
-		int push1 = field->HitCheckLeft(x, y + 5);
-		int push2 = field->HitCheckLeft(x, y + 58);
-		int push = max(push1, push2);
-
-
-
-		auto floors = FindGameObjects<FallingFloor>();
-		for (auto f : floors) {
-			int p1 = f->HitCheckLeft(x, y + 1);
-			int p2 = f->HitCheckLeft(x, y + 62);
-			push = max(push, max(p1, p2));
-		}
-
-		x += push;
 	}
 
-	if (CheckHitKey(KEY_INPUT_0)) {
-	}
-
-	//--------------------------------------
-	// 歩行アニメーション更新
-	//--------------------------------------
+	// 歩行アニメーション（常時アニメしたいなら moveX 判定を外す）
 	if (moveX != 0) {
-		// 一定間隔で次のコマに切り替える
 		animFrame = (animFrame + 1) % ANIM_FRAME_INTERVAL;
 		if (animFrame == 0) {
 			animIndex = (animIndex + 1) % ANIM_FRAME_COUNT;
 		}
-
-		// 実際の位置を更新
-		x += moveX;
 	}
 
-	//マップクラスの取得
-	Field* field = FindGameObject<Field>();
+	// まず移動
+	if (moveX != 0)
+	{
+		x += (float)moveX;
 
-	//--------------------------------------
-	// ジャンプ処理（接地中）
-	//--------------------------------------
-	if (onGround) {
-		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
-			velocity = V0;     // 上方向に加速
-			onGround = false;  // 空中へ
+		// 壁押し戻し量
+		int push = 0;
+
+		// --- Field 判定 ---
+		if (moveX > 0) {
+			// 右端は「63」にする
+			int push1 = field->HitCheckRight((int)(x + 63), (int)(y + 5));
+			int push2 = field->HitCheckRight((int)(x + 63), (int)(y + 58));
+			push = max(push1, push2);
+		}
+		else {
+			int push1 = field->HitCheckLeft((int)(x + 0), (int)(y + 5));
+			int push2 = field->HitCheckLeft((int)(x + 0), (int)(y + 58));
+			push = max(push1, push2);
+		}
+
+		// --- FallingFloor 判定 ---
+		auto floors = FindGameObjects<FallingFloor>();
+		for (auto f : floors) {
+			if (moveX > 0) {
+				int p1 = f->HitCheckRight((int)(x + 63), (int)(y + 1));
+				int p2 = f->HitCheckRight((int)(x + 63), (int)(y + 62));
+				push = max(push, max(p1, p2));
+			}
+			else {
+				int p1 = f->HitCheckLeft((int)(x + 0), (int)(y + 1));
+				int p2 = f->HitCheckLeft((int)(x + 0), (int)(y + 62));
+				push = max(push, max(p1, p2));
+			}
+		}
+
+		// --- VanishingFloor 判定（あるなら） ---
+		auto vFloors = FindGameObjects<VanishingFloor>();
+		for (auto vf : vFloors) {
+			if (!vf->IsActive()) continue;
+
+			if (moveX > 0) {
+				int p1 = vf->HitCheckRight((int)(x + 63), (int)(y + 1));
+				int p2 = vf->HitCheckRight((int)(x + 63), (int)(y + 62));
+				push = max(push, max(p1, p2));
+			}
+			else {
+				int p1 = vf->HitCheckLeft((int)(x + 0), (int)(y + 1));
+				int p2 = vf->HitCheckLeft((int)(x + 0), (int)(y + 62));
+				push = max(push, max(p1, p2));
+			}
+		}
+
+		// 押し戻し
+		if (push > 0) {
+			if (moveX > 0) x -= (float)push;
+			else           x += (float)push;
 		}
 	}
 
-	//--------------------------------------
-	// 二段ジャンプ処理
-	//--------------------------------------
+	//========================================================
+	// ジャンプ処理
+	//========================================================
+	if (onGround) {
+		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
+			velocity = V0;
+			onGround = false;
+		}
+	}
+
+	// 二段ジャンプ
 	if (!onGround && jumpcount == Maxjumpcount) {
 		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
 			jumpcount -= 1;
@@ -207,31 +241,37 @@ void Player::Update()
 		}
 	}
 
-	//--------------------------------------
-	// 重力適用
-	//--------------------------------------
+	//========================================================
+	// 重力
+	//========================================================
 	y += velocity;
 	velocity += Gravity;
 
-	//--------------------------------------
-	// 当たり判定（下方向：床）
-	//--------------------------------------
-
-	if (velocity >= 0) { // 落下中
-		int push1 = field->HitCheckDown(x + 5, y + 64);
-		int push2 = field->HitCheckDown(x + 58, y + 64);
+	//========================================================
+	// 縦方向当たり判定（床／天井）
+	//========================================================
+	if (velocity >= 0) {
+		int push1 = field->HitCheckDown((int)(x + 5), (int)(y + 64));
+		int push2 = field->HitCheckDown((int)(x + 58), (int)(y + 64));
 		int push = max(push1, push2);
 
-		// --- 落下床との当たり判定 ---
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
-			int p1 = f->HitCheckDown(x + 1, y + 64);
-			int p2 = f->HitCheckDown(x + 62, y + 64);
+			int p1 = f->HitCheckDown((int)(x + 1), (int)(y + 64));
+			int p2 = f->HitCheckDown((int)(x + 62), (int)(y + 64));
+			push = max(push, max(p1, p2));
+		}
+
+		auto vFloors = FindGameObjects<VanishingFloor>();
+		for (auto vf : vFloors) {
+			if (!vf->IsActive()) continue;
+			int p1 = vf->HitCheckDown((int)(x + 1), (int)(y + 64));
+			int p2 = vf->HitCheckDown((int)(x + 62), (int)(y + 64));
 			push = max(push, max(p1, p2));
 		}
 
 		if (push > 0) {
-			y -= push - 1;
+			y -= (float)(push - 1);
 			velocity = 0;
 			onGround = true;
 		}
@@ -239,31 +279,37 @@ void Player::Update()
 			onGround = false;
 		}
 	}
-	else { // 上昇中
-		int push1 = field->HitCheckUp(x + 5, y + 1);
-		int push2 = field->HitCheckUp(x + 58, y + 1);
+	else {
+		int push1 = field->HitCheckUp((int)(x + 5), (int)(y + 1));
+		int push2 = field->HitCheckUp((int)(x + 58), (int)(y + 1));
 		int push = max(push1, push2);
 
-		// --- 落下床との当たり判定 ---
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
-			int p1 = f->HitCheckUp(x + 1, y);
-			int p2 = f->HitCheckUp(x + 62, y);
+			int p1 = f->HitCheckUp((int)(x + 1), (int)(y + 0));
+			int p2 = f->HitCheckUp((int)(x + 62), (int)(y + 0));
+			push = max(push, max(p1, p2));
+		}
+
+		auto vFloors = FindGameObjects<VanishingFloor>();
+		for (auto vf : vFloors) {
+			if (!vf->IsActive()) continue;
+			int p1 = vf->HitCheckUp((int)(x + 1), (int)(y + 0));
+			int p2 = vf->HitCheckUp((int)(x + 62), (int)(y + 0));
 			push = max(push, max(p1, p2));
 		}
 
 		if (push > 0) {
-			y += push;
+			y += (float)push;
 			velocity = 0;
 		}
 	}
 
-	//--------------------------------------
+	//========================================================
 	// 土管の判定（上に乗った時だけワープ）
-	//--------------------------------------
+	//========================================================
 	if (field)
 	{
-		// プレイヤーの大きさ（64x64前提）
 		const float pw = 64.0f;
 		const float ph = 64.0f;
 
@@ -279,45 +325,25 @@ void Player::Update()
 			float pipeLeft = (float)in.x;
 			float pipeRight = (float)in.x + 64.0f;
 			float pipeTop = (float)in.y;
-			float pipeBottom = (float)in.y + 64.0f;
 
-			// 横方向は土管と重なっているか
 			bool overlapX =
 				(px + pw > pipeLeft) &&
 				(px < pipeRight);
 
-			// 足が「土管の天面付近」にあるかどうか
 			bool onPipeTop = (footY >= pipeTop - 2.0f) && (footY <= pipeTop + 16.0f);
 
 			if (overlapX && onPipeTop)
 			{
-				// 出口があるかチェック
 				if (!field->pipesOut.empty())
 				{
 					POINT out = field->pipesOut[i % field->pipesOut.size()];
-
-					// 土管出口に出す
 					x = (float)out.x;
 					y = (float)out.y + ph;
 				}
-
 				return;
 			}
 		}
 	}
-
-	//--------------------------------------
-	// クリア
-	//--------------------------------------
-
-/*	if (field->IsGoal(x + 32, y + 32)) {
-		// プレイ中に計測している値を使う
-		bool noMiss = (g_RetryCount == 0);
-
-		ClearScene::SetResult(g_ClearTimeSeconds, g_RetryCount, noMiss);
-		SceneManager::ChangeScene("CLEAR");
-	}
-*/
 }
 
 //--------------------------------------
@@ -325,49 +351,34 @@ void Player::Update()
 //--------------------------------------
 void Player::Draw()
 {
-	Field* field = FindGameObject<Field>();
-
-	//--------------------------------------
-	// 現在のスプライトシート上での位置を算出
-	//--------------------------------------
+	// 現在のスプライトシート上での位置
 	int xRect = (animIndex % ATLAS_WIDTH) * CHARACTER_WIDTH;
 	int yRect = (animIndex / ATLAS_WIDTH) * CHARACTER_HEIGHT;
 
-	//--------------------------------------
-	// キャラクター描画
-	// DrawRectGraph(x, y, 切り出しX, 切り出しY, 幅, 高さ, 画像, 透過, 左右反転)
-	//--------------------------------------
-	DrawRectGraph(static_cast<int>(x), static_cast<int>(y), xRect, yRect, CHARACTER_WIDTH, CHARACTER_HEIGHT, hImage, TRUE, frip);
+	DrawRectGraph(
+		(int)x, (int)y,
+		xRect, yRect,
+		CHARACTER_WIDTH, CHARACTER_HEIGHT,
+		hImage,
+		TRUE,
+		frip
+	);
 
-	// デバッグ用：当たり判定円を描く（必要なときだけ）
-
+	// デバッグ用：当たり判定円
 	float cx, cy, r;
 	GetHitCircle(cx, cy, r);
-	int c = GetColor(0, 255, 0);
-	DrawCircle((int)cx, (int)cy, (int)r, c, FALSE);
-
-
-	//--------------------------------------
-	// デバッグ用座標表示
-	//--------------------------------------
-	SetFontSize(30);
-	int h = GetFontSize();
-
-	//DrawFormatString(0, 200 + h * 0, GetColor(255, 255, 255), "PlayerX: %.2f", x);
-	//DrawFormatString(0, 200 + h * 1, GetColor(255, 255, 255), "PlayerY: %.2f", y);
-	//DrawFormatString(0, 200 + h * 2, GetColor(255, 255, 255), "PlayerHP: %d", hp);
-
+	DrawCircle((int)cx, (int)cy, (int)r, GetColor(0, 255, 0), FALSE);
 }
 
 void Player::ForceDie()
 {
+	// 画面外へ
 	x = -9999;
 	y = -9999;
 
-	// 動けなくする
 	velocity = 0;
 	onGround = false;
 
-	// ゲームオーバーに飛ぶならここで～
-	//SceneManager::ChangeScene("GAMEOVER");
+	// ここで確実に固定状態にする
+	isDead = true;
 }

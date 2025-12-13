@@ -15,33 +15,9 @@
 #include "EnemyChaser.h"
 #include "Boss.h"
 #include "MovingWall.h"
-#include <vector>
-using namespace std;
-vector<vector<int>> maps;
+#include <DxLib.h>
 
-//------------------------------------------------------------
-// マップデータ
-//------------------------------------------------------------
-// 1 : ブロック（当たり判定あり）
-// 0 : 空間（通過可）
-// 2 : プレイヤー初期位置
-// 3 : 針がにゅって出てくるトラップ
-// 4 : 床落ちるトラップ
-// 5 : 針が飛んでくるトラップ
-// 6 : フェイクの床トラップ
-// 7 : 土管入口
-// 8 : 土管出口
-// 10 : 床が消えて針になるトラップ
-// 11 : 小さい針
-// 12 : １３番のトリガー
-// 13 : 天井から落ちてくる針本体
-// 14 : 落ちたらプレイヤーに向かって飛んでくる針
-// 20 : ２１番のトリガー
-// 21 : ボールが転がってくるトラップ
-// 99 : ゴール
-//------------------------------------------------------------
-
-// ブロックかどうかを判定するヘルパー関数
+// ブロック扱い（押し戻し/床/壁として固いセル）
 static bool IsSolidCell(int cell)
 {
 	return (cell == 1 || cell == 7 || cell == 8);
@@ -52,166 +28,145 @@ static bool IsSolidCell(int cell)
 //------------------------------------------------------------
 Field::Field(int stage)
 {
-	new Telop();//とりあえず置いた
+	new Telop();
+
 	char filename[60];
 	sprintf_s<60>(filename, "data/stage%02d.csv", stage);
 
-	//--------------------------------------------------------
-	// --- CSVファイルからマップデータを読み込み ---
-	//--------------------------------------------------------
-	CsvReader* csv = new CsvReader(filename);
-	int lines = csv->GetLines();      // 行数（縦方向のマス数）
-	maps.resize(lines);               // 行数分のメモリを確保
+	// CSV 読み込み
+	{
+		CsvReader* csv = new CsvReader(filename);
+		int lines = csv->GetLines();
+		maps.resize(lines);
 
-	for (int y = 0; y < lines; y++) {
-		int cols = csv->GetColumns(y);  // 列数（横方向のマス数）
-		maps[y].resize(cols);           // 列数を設定
+		for (int y = 0; y < lines; y++) {
+			int cols = csv->GetColumns(y);
+			maps[y].resize(cols);
 
-		for (int x = 0; x < cols; x++) {
-			int num = csv->GetInt(y, x); // CSVの値を取得
-			maps[y][x] = num;            // マップデータに格納
+			for (int x = 0; x < cols; x++) {
+				maps[y][x] = csv->GetInt(y, x);
+			}
 		}
+		delete csv;
 	}
-	delete csv;  // メモリ解放
 
-	//--------------------------------------------------------
-	// --- 背景画像とブロック画像を読み込み ---
-	//--------------------------------------------------------
-	SetDrawOrder(50);  // 描画順序を設定
-	hImage = LoadGraph("data/image/NewBlock.png");        // ブロック
-	fallingSpikeImage = LoadGraph("data/image/hariBottom.png"); // 天井にある針の画像
+	// 画像
+	SetDrawOrder(50);
+	hImage = LoadGraph("data/image/NewBlock.png");
+	fallingSpikeImage = LoadGraph("data/image/hariBottom.png");
+
 	x = 0;
 	y = 0;
 	scrollX = 0;
 
-	//--------------------------------------------------------
-	// --- マップ走査して配置 ---
-	//--------------------------------------------------------
-	for (int y = 0; y < maps.size(); y++)
+	// 落下針のトリガー初期化（A対策）
+	hasFallingTrigger = false;
+	fallingTrigger = { -9999, -9999 };
+	fallingActivated = false;
+	fallingIndex = 0;
+	fallingTimer = 0;
+
+	// マップ走査して配置
+	for (int yy = 0; yy < (int)maps.size(); yy++)
 	{
-		for (int x = 0; x < maps[y].size(); x++)
+		for (int xx = 0; xx < (int)maps[yy].size(); xx++)
 		{
-			if (maps[y][x] == 2)
-			{
-				// CSVで「2」と指定された位置にプレイヤーを生成
-				new Player(x * 64, y * 64);
-			}
+			int cell = maps[yy][xx];
 
-			if (maps[y][x] == 3)
+			if (cell == 2)
 			{
-				// トラップ設置
-				new Trap(x * 64, y * 64 + 64);
+				new Player(xx * 64, yy * 64);
 			}
-
-			if (maps[y][x] == 4)
+			else if (cell == 3)
 			{
-				// 床落ちるトラップ
-				new FallingFloor(x * 64, y * 64);
+				new Trap(xx * 64, yy * 64 + 64);
 			}
-
-			if (maps[y][x] == 6)
+			else if (cell == 4)
 			{
-				// フェイク床トラップ
-				new FakeFloor(x * 64, y * 64);
+				new FallingFloor(xx * 64, yy * 64);
 			}
-
-			if (maps[y][x] == 7)
+			else if (cell == 6)
 			{
-				// 土管入口
-				new Dokan(x * 64, y * 64);
-				POINT p = { x * 64, y * 64 };
-				pipesIn.push_back(p);
+				new FakeFloor(xx * 64, yy * 64);
 			}
-			if (maps[y][x] == 8)
+			else if (cell == 7)
 			{
-				// 土管出口
-				new Dokan2(x * 64, y * 64);
-				POINT p = { x * 64, y * 64 };
-				pipesOut.push_back(p);
+				new Dokan(xx * 64, yy * 64);
+				pipesIn.push_back({ xx * 64, yy * 64 });
 			}
-
-			if (maps[y][x] == 10)
+			else if (cell == 8)
 			{
-				// 消える床のトラップ
-				new VanishingFloor(x * 64, y * 64);
+				new Dokan2(xx * 64, yy * 64);
+				pipesOut.push_back({ xx * 64, yy * 64 });
 			}
-
-			if (maps[y][x] == 11)
+			else if (cell == 10)
 			{
-				// 小さいトラップ設置
-				new SmallTrap(x * 64 + 24, y * 64 + 48);
+				new VanishingFloor(xx * 64, yy * 64);
 			}
-
-			if (maps[y][x] == 12)
+			else if (cell == 11)
 			{
-				// 針が落ちるトリガー
-				fallingTrigger = { x * 64, y * 64 };
+				new SmallTrap(xx * 64 + 24, yy * 64 + 48);
 			}
-
-			if (maps[y][x] == 13)
+			else if (cell == 12)
 			{
-				// 針が落ちるトラップ
-				POINT p = { x * 64, y * 64 };
-				fallingSpikes.push_back(p);
-				fallingSpikeAlive.push_back(true);
-				fallingSpikeChaser.push_back(false);
+				fallingTrigger = { xx * 64, yy * 64 };
+				hasFallingTrigger = true;
 			}
-
-			if (maps[y][x] == 14)
+			else if (cell == 13)
 			{
-				// 針が落ちるトラップ
-				POINT p = { x * 64, y * 64 };
-				fallingSpikes.push_back(p);
-				fallingSpikeAlive.push_back(true);
-				fallingSpikeChaser.push_back(true);
+				FallingSpikeInfo info;
+				info.pos = { xx * 64, yy * 64 };
+				info.alive = true;
+				info.chaser = false;
+				fallingSpikes.push_back(info);
 			}
-
-			if (maps[y][x] == 20) {
-				// ボール踏む場所
-				ballTimer.push_back(0);   // タイマー初期化
-				POINT p = { x * 64, y * 64 };
-				ballTriggers.push_back(p);
+			else if (cell == 14)
+			{
+				FallingSpikeInfo info;
+				info.pos = { xx * 64, yy * 64 };
+				info.alive = true;
+				info.chaser = true;
+				fallingSpikes.push_back(info);
+			}
+			else if (cell == 20)
+			{
+				ballTriggers.push_back({ xx * 64, yy * 64 });
 				ballTriggered.push_back(false);
+				ballTimer.push_back(0);
 			}
-
-			if (maps[y][x] == 21) {
-				// ボールが出る場所
-				POINT p = { x * 64, y * 64 };
-				ballSpawns.push_back(p);
-			}
-
-			if (maps[y][x] == 40)
+			else if (cell == 21)
 			{
-				// トリガータイル
-				POINT p = { x * 64, y * 64 };
-				wallTriggers.push_back(p);
+				ballSpawns.push_back({ xx * 64, yy * 64 });
+			}
+			else if (cell == 40)
+			{
+				wallTriggers.push_back({ xx * 64, yy * 64 });
 				wallTriggered.push_back(false);
 			}
-			if (maps[y][x] == 41)
+			else if (cell == 41)
 			{
-				// 壁が出現する位置（下のブロックの位置）
-				POINT p = { x * 64, y * 64 };
-				wallSpawns.push_back(p);
+				wallSpawns.push_back({ xx * 64, yy * 64 });
 			}
-
-			if (maps[y][x] == 90)
+			else if (cell == 90)
 			{
-				new EnemyChaser(x * 64, y * 64);
+				new EnemyChaser(xx * 64, yy * 64);
 			}
-
-			if (maps[y][x] == 91)
+			else if (cell == 91)
 			{
-				new Boss(x * 64, y * 64 - 192); // 足場の上に出す
+				new Boss(xx * 64, yy * 64 - 192);
 			}
-
 		}
 	}
 }
 
 //------------------------------------------------------------
-// デストラクタ
+// デストラクタ（A対策：画像解放）
 //------------------------------------------------------------
-Field::~Field() {}
+Field::~Field()
+{
+	if (hImage != -1) DeleteGraph(hImage);
+	if (fallingSpikeImage != -1) DeleteGraph(fallingSpikeImage);
+}
 
 //------------------------------------------------------------
 // Update()
@@ -219,40 +174,38 @@ Field::~Field() {}
 void Field::Update()
 {
 	Player* player = FindGameObject<Player>();
-	if (player == nullptr) return;
+	if (!player) return;
 
 	float px = player->GetX();
 	float py = player->GetY();
 
-	int tx = int(px + 32) / 64; // 中心X
-	int ty = int(py + 63) / 64; // 足元Y
+	int tx = int(px + 32) / 64;
+	int ty = int(py + 63) / 64;
 
-	if (ty < 0 || ty >= maps.size()) return;
-	if (tx < 0 || tx >= maps[ty].size()) return;
-
+	if (ty < 0 || ty >= (int)maps.size()) return;
+	if (tx < 0 || tx >= (int)maps[ty].size()) return;
 
 	//------------------------------------------
-	// 転がってくる球の処理
+	// 転がってくる球
 	//------------------------------------------
-	// プレイヤーがトリガー上に来たら起動	
-	for (int i = 0; i < ballTriggers.size(); i++)
+	for (int i = 0; i < (int)ballTriggers.size(); i++)
 	{
+		if (i >= (int)ballTriggered.size() || i >= (int)ballTimer.size()) break;
+
 		int trigX = ballTriggers[i].x / 64;
 		int trigY = ballTriggers[i].y / 64;
 
 		if (!ballTriggered[i] && tx == trigX && ty == trigY)
 		{
-			ballTriggered[i] = true;  // 起動
-			// 最初のボールはすぐ発射したいなら 0 にする
-			// 少し遅らせたいなら 30〜60 くらい
-			ballTimer[i] = 0; // タイマー初期化
+			ballTriggered[i] = true;
+			ballTimer[i] = 0;
 		}
 	}
 
-	// 一定時間ごとにボール発射
-	for (int i = 0; i < ballTriggers.size(); i++)
+	for (int i = 0; i < (int)ballTriggers.size(); i++)
 	{
-		if (!ballTriggered[i]) continue;  // 起動していないトリガーは無視
+		if (i >= (int)ballTriggered.size() || i >= (int)ballTimer.size()) break;
+		if (!ballTriggered[i]) continue;
 
 		if (ballTimer[i] > 0)
 		{
@@ -260,66 +213,62 @@ void Field::Update()
 			continue;
 		}
 
-		// タイマーが 0 になったら発射
-		if (i < ballSpawns.size())
+		if (i < (int)ballSpawns.size())
 		{
 			POINT spawn = ballSpawns[i];
 			new RollingBall(spawn.x, spawn.y, -1.0f);
 		}
 
-		// 次の発射までの時間
 		ballTimer[i] = 95;
 	}
 
 	//------------------------------------------------------
-	// 上から落下してくる針の処理
+	// 上から落下してくる針
 	//------------------------------------------------------
-	int tX = fallingTrigger.x / 64;
-	int tY = fallingTrigger.y / 64;
-
-	if (!fallingActivated && tx == tX && ty == tY)
+	if (hasFallingTrigger)
 	{
-		fallingActivated = true;
-		fallingIndex = 0;
-		fallingTimer = 0;
-	}
+		int tX = fallingTrigger.x / 64;
+		int tY = fallingTrigger.y / 64;
 
-	// 順番に針を落とす処理
-	if (fallingActivated)
-	{
-		if (fallingTimer > 0)
+		if (!fallingActivated && tx == tX && ty == tY)
 		{
-			fallingTimer--;
+			fallingActivated = true;
+			fallingIndex = 0;
+			fallingTimer = 0;
 		}
-		else
+
+		if (fallingActivated)
 		{
-			if (fallingIndex < fallingSpikes.size())
+			if (fallingTimer > 0)
 			{
-				POINT p = fallingSpikes[fallingIndex];
-
-				bool chase = false;
-				if (fallingIndex < (int)fallingSpikeChaser.size())
+				fallingTimer--;
+			}
+			else
+			{
+				if (fallingIndex < (int)fallingSpikes.size())
 				{
-					chase = fallingSpikeChaser[fallingIndex];
+					auto& info = fallingSpikes[fallingIndex];
+
+					if (info.alive)
+					{
+						new FallingSpike(info.pos.x, info.pos.y, info.chaser);
+						info.alive = false;
+					}
+
+					fallingIndex++;
+					fallingTimer = 20;
 				}
-				// 落下針を生成
-				new FallingSpike(p.x, p.y, chase);
-
-				// --- 天井の待機針を消す ---
-				fallingSpikeAlive[fallingIndex] = false;
-
-				fallingIndex++;
-				fallingTimer = 20; // 次の針を落とすまでの間隔
 			}
 		}
 	}
 
-	// --------------------------
-	//  壁トラップのトリガー処理
-	// --------------------------
+	//------------------------------------------------------
+	// 動く壁トラップ
+	//------------------------------------------------------
 	for (int i = 0; i < (int)wallTriggers.size(); ++i)
 	{
-		if (wallTriggered[i]) continue; // もう起動済み
+		if (i >= (int)wallTriggered.size()) break;
+		if (wallTriggered[i]) continue;
 
 		int trigX = wallTriggers[i].x / 64;
 		int trigY = wallTriggers[i].y / 64;
@@ -328,24 +277,19 @@ void Field::Update()
 		{
 			wallTriggered[i] = true;
 
-			if (i < wallSpawns.size())
+			if (i < (int)wallSpawns.size())
 			{
 				POINT sp = wallSpawns[i];
-
-				// プレイヤーのどっち側に出すかで向きを変える
 				int dir = (player->GetX() < sp.x) ? -1 : +1;
-
-				// sp は「一番下のブロック」の位置とする
 				new MovingWall((float)sp.x, (float)sp.y, dir);
 			}
 		}
 	}
 
 	//------------------------------------------
-	// その他の判定
+	// その他
 	//------------------------------------------
 	int cell = maps[ty][tx];
-
 	if (cell == 5)
 	{
 		SpawnFlyingSpike(tx * 64, ty * 64, -1.0f);
@@ -359,48 +303,29 @@ void Field::Update()
 //------------------------------------------------------------
 void Field::Draw()
 {
-	// --- マップ走査してブロック描画 ---
-	for (int y = 0; y < maps.size(); y++)
+	// ブロック描画（1だけ）
+	for (int yy = 0; yy < (int)maps.size(); yy++)
 	{
-		for (int x = 0; x < maps[y].size(); x++)
+		for (int xx = 0; xx < (int)maps[yy].size(); xx++)
 		{
-			if (maps[y][x] == 1)
+			if (maps[yy][xx] == 1)
 			{
-				// 各マスを64x64のタイルとして描画
-				DrawRectGraph(
-					x * 64,          // 描画X位置
-					y * 64,          // 描画Y位置
-					0, 0,            // 画像上の切り出し位置
-					64, 64,          // タイルサイズ
-					hImage,          // 画像ハンドル
-					TRUE             // 透過あり
-				);
+				DrawRectGraph(xx * 64, yy * 64, 0, 0, 64, 64, hImage, TRUE);
 			}
 		}
 	}
 
-	// --- 待機状態の針の描画 ---
-	for (int i = 0; i < fallingSpikes.size(); i++)
+	// 待機状態の針（13/14）
+	for (auto& s : fallingSpikes)
 	{
-		if (!fallingSpikeAlive[i]) continue;  // 落下済みなら描画しない
-
-		DrawGraph(
-			fallingSpikes[i].x,
-			fallingSpikes[i].y,
-			fallingSpikeImage,
-			TRUE
-		);
+		if (!s.alive) continue;
+		DrawGraph(s.pos.x, s.pos.y, fallingSpikeImage, TRUE);
 	}
 }
 
 //------------------------------------------------------------
-// 当たり判定処理（上下左右）
-// ─────────────────────────────
-// 引数 : px, py → プレイヤーの座標（左上基準）
-// 戻り値 : 押し戻すべきピクセル数（0なら衝突なし）
+// 当たり判定（押し戻し）
 //------------------------------------------------------------
-
-// 右方向の当たり判定
 int Field::HitCheckRight(int px, int py)
 {
 	if (py < 0) return 0;
@@ -408,16 +333,13 @@ int Field::HitCheckRight(int px, int py)
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y < 0 || y >= maps.size()) return 0;
-	if (x < 0 || x >= maps[y].size()) return 0;
+	if (y < 0 || y >= (int)maps.size()) return 0;
+	if (x < 0 || x >= (int)maps[y].size()) return 0;
 
-	if (IsSolidCell(maps[y][x])) {
-		return px % 64 + 1;
-	}
+	if (IsSolidCell(maps[y][x])) return px % 64 + 1;
 	return 0;
 }
 
-// 左方向
 int Field::HitCheckLeft(int px, int py)
 {
 	if (py < 0) return 0;
@@ -425,16 +347,13 @@ int Field::HitCheckLeft(int px, int py)
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y < 0 || y >= maps.size()) return 0;
-	if (x < 0 || x >= maps[y].size()) return 0;
+	if (y < 0 || y >= (int)maps.size()) return 0;
+	if (x < 0 || x >= (int)maps[y].size()) return 0;
 
-	if (IsSolidCell(maps[y][x])) {
-		return 64 - (px % 64);
-	}
+	if (IsSolidCell(maps[y][x])) return 64 - (px % 64);
 	return 0;
 }
 
-// 上方向
 int Field::HitCheckUp(int px, int py)
 {
 	if (py < 0) return 0;
@@ -442,16 +361,13 @@ int Field::HitCheckUp(int px, int py)
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y < 0 || y >= maps.size()) return 0;
-	if (x < 0 || x >= maps[y].size()) return 0;
+	if (y < 0 || y >= (int)maps.size()) return 0;
+	if (x < 0 || x >= (int)maps[y].size()) return 0;
 
-	if (IsSolidCell(maps[y][x])) {
-		return 64 - (py % 64);
-	}
+	if (IsSolidCell(maps[y][x])) return 64 - (py % 64);
 	return 0;
 }
 
-// 下方向
 int Field::HitCheckDown(int px, int py)
 {
 	if (py < 0) return 0;
@@ -459,49 +375,37 @@ int Field::HitCheckDown(int px, int py)
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y < 0 || y >= maps.size()) return 0;
-	if (x < 0 || x >= maps[y].size()) return 0;
+	if (y < 0 || y >= (int)maps.size()) return 0;
+	if (x < 0 || x >= (int)maps[y].size()) return 0;
 
-	if (IsSolidCell(maps[y][x])) {
-		return (py % 64) + 1;
-	}
+	if (IsSolidCell(maps[y][x])) return (py % 64) + 1;
 	return 0;
 }
 
 bool Field::IsBlock(int tx, int ty)
 {
-	if (ty < 0 || ty >= maps.size()) return false;
-	if (tx < 0 || tx >= maps[ty].size()) return false;
-
-	return maps[ty][tx] == 1;
+	int cell = GetCell(tx, ty);
+	return IsSolidCell(cell);
 }
 
 void Field::SpawnFlyingSpike(float x, float y, float direction)
 {
-	float speed = 30.0f * direction; // 方向付きスピード
-
-	// 針が飛んでくる
+	float speed = 30.0f * direction;
 	new FlyingSpike(x + 64 * 5, y, speed);
 }
 
 bool Field::IsGoal(int px, int py)
 {
-	if (py < 0) {
-		return 0;
-	}
-	int x = px / 64;
-	int y = (py - 0) / 64;
-	if (y >= maps.size())
-		return 0;
-	if (maps[y][x] == 9) {
-		return true;
-	}
-	return false;
+	int tx = px / 64;
+	int ty = py / 64;
+
+	int cell = GetCell(tx, ty);
+	return (cell == 9 || cell == 99);
 }
 
 int Field::GetCell(int tx, int ty)
 {
-	if (ty < 0 || ty >= maps.size()) return -1;
-	if (tx < 0 || tx >= maps[ty].size()) return -1;
+	if (ty < 0 || ty >= (int)maps.size()) return -1;
+	if (tx < 0 || tx >= (int)maps[ty].size()) return -1;
 	return maps[ty][tx];
 }

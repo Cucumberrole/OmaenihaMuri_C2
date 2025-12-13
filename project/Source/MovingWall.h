@@ -21,25 +21,28 @@ public:
 private:
 	enum class State
 	{
-		BUILDING,   // 積み上げ中
-		MOVING,     // 横移動中
-		STOPPED     // 止まった
+		BUILDING,
+		MOVING,
+		STOPPED
 	};
 
-	int   hImage;        // ブロック画像
-	float x, y;          // 一番下のブロックの左上座標
-	int   width;         // 横幅（64）
-	int   blockSize;     // 1マス 64
-	int   buildLevel;    // 今何段目まで出ているか 0〜3
-	int   maxLevel;      // 3 段
-	int   buildTimer;    // 次の段を出すまでのカウンタ
-	int   buildInterval; // 段を追加する間隔(フレーム)
+	int   hImage;
+	float x, y;
+	int   width;
+	int   blockSize;
+	int   buildLevel;
+	int   maxLevel;
+	int   buildTimer;
+	int   buildInterval;
 
-	float moveSpeed;     // 横移動スピード
-	int   dir;           // -1 or +1
+	float moveSpeed;
+	int   dir;
 	State state;
 
-	void BuildStep();          // 1 段積み上げる
-	void MoveStep();           // 横移動（壁 vs Field）
-	void CheckCrushWithPlayer(); // 毎フレーム押し潰しチェック
+	// このフレームで壁が実際に動いた量（壁に当たって止まったら 0）
+	float lastMoveDx;
+
+	void BuildStep();
+	void MoveStep();
+	void CheckCrushWithPlayer();
 };

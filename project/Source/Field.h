@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <vector>
 #include "../Library/GameObject.h"
 
@@ -12,57 +11,66 @@ public:
 	void Update() override;
 	void Draw() override;
 
+	// “固いタイルか？”（ブロック・土管など）
 	bool IsBlock(int tx, int ty);
+
 	void SpawnFlyingSpike(float x, float y, float direction);
+
+	// ゴール判定（9 または 99 両対応にして安全側に）
 	bool IsGoal(int px, int py);
 
-	std::vector<POINT> pipesIn;   // 土管入り口(7)
-	std::vector<POINT> pipesOut;  // 土管出口(8)
-
-	// RollingBall 用
-	std::vector<POINT> ballTriggers;   // トリガー地点
-	std::vector<POINT> ballSpawns;     // 出現地点
-	std::vector<bool> ballTriggered;  // トリガーが既に発動したか
-	std::vector<int> ballTimer;
-
+	// マップのセル取得（範囲外は -1）
 	int GetCell(int tx, int ty);
 
-	//--------------------------------------------------------
-	// 落下する針の処理
-	//--------------------------------------------------------
-	// 落下針の元位置（天井）
-	std::vector<POINT> fallingSpikes;
-	std::vector<bool> fallingSpikeAlive;  // 天井針の生存フラグ（待機表示用）
+	// 土管
+	std::vector<POINT> pipesIn;
+	std::vector<POINT> pipesOut;
 
-	// トリガー位置（1つなら POINT でOK）
-	POINT fallingTrigger;
+	// RollingBall 用（今は現状維持）
+	std::vector<POINT> ballTriggers;
+	std::vector<POINT> ballSpawns;
+	std::vector<bool>  ballTriggered;
+	std::vector<int>   ballTimer;
 
-	// トリガーが踏まれたか
+	//--------------------------------------------------------
+	// 落下する針（struct で一括管理）
+	//--------------------------------------------------------
+	struct FallingSpikeInfo
+	{
+		POINT pos{};
+		bool  alive = true;   // 天井で待機表示するか
+		bool  chaser = false; // 落下後に追尾飛行するか（14用）
+	};
+
+	std::vector<FallingSpikeInfo> fallingSpikes;
+
+	POINT fallingTrigger{ -9999, -9999 }; // 無効値で初期化
+	bool  hasFallingTrigger = false;
+
 	bool fallingActivated = false;
-
-	// 次に落とす針のインデックス
-	int fallingIndex = 0;
-
-	// 針落下の間隔タイマー
-	int fallingTimer = 0;
-
-	// この針は追尾するか？
-	std::vector<bool> fallingSpikeChaser;
+	int  fallingIndex = 0;
+	int  fallingTimer = 0;
 
 	//--------------------------------------------------------
 	// 当たり判定（衝突チェック）
 	//--------------------------------------------------------
-	int HitCheckRight(int px, int py);  // 右方向の当たり判定
-	int HitCheckLeft(int px, int py);   // 左方向の当たり判定
-	int HitCheckDown(int px, int py);   // 下方向の当たり判定（床）
-	int HitCheckUp(int px, int py);     // 上方向の当たり判定（天井）
+	int HitCheckRight(int px, int py);
+	int HitCheckLeft(int px, int py);
+	int HitCheckDown(int px, int py);
+	int HitCheckUp(int px, int py);
 
 private:
-	int hImage; // 地形画像ハンドル
-	int fallingSpikeImage; // 針画像ハンドル
-	float x, y; // ステージの座標（主にスクロール時に使用）
-	int scrollX; // 横スクロール量（カメラ位置）
+	// マップはグローバルからメンバへ
+	std::vector<std::vector<int>> maps;
 
+	int hImage = -1;
+	int fallingSpikeImage = -1;
+
+	float x = 0;
+	float y = 0;
+	int scrollX = 0;
+
+	// 動く壁トラップ
 	std::vector<POINT> wallTriggers;
 	std::vector<POINT> wallSpawns;
 	std::vector<bool>  wallTriggered;
