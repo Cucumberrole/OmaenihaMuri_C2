@@ -8,3 +8,7 @@ struct GameResult
 };
 
 extern GameResult g_GameResult;
+
+extern float g_ClearTimeSeconds;
+
+extern int g_RetryCount;

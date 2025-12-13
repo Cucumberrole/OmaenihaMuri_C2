@@ -10,6 +10,7 @@
 int PlayScene::SelectedStage = -1;
 static int g_Life = 5; // ‰Šúc‹@
 static int g_RetryCount = 0; // €‚ñ‚¾‰ñ”
+float g_ClearTimeSeconds = 0.0f;
 
 PlayScene::PlayScene()
 {
@@ -41,6 +42,8 @@ void PlayScene::Update()
 	playTime += Time::DeltaTime();
 
 	score = 10000 - (int)(playTime) * 10 - retryCount * 500;
+
+	g_ClearTimeSeconds += Time::DeltaTime();
 
 	Player* player = FindGameObject<Player>();
 	Field* field = FindGameObject<Field>();
