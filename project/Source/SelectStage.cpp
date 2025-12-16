@@ -9,7 +9,7 @@
 
 SelectStage::SelectStage()
 {
-	backgroundImage = LoadGraph("data/image/title.png");
+	backgroundImage = LoadGraph("data/image/WhiteBack.png");
 
 	// 表示するステージ名
 	stageNames = { "STAGE 1", "STAGE 2", "STAGE 3", "DEBUG STAGE" };
@@ -30,23 +30,15 @@ SelectStage::~SelectStage()
 void SelectStage::Update()
 {
 	Fader* fader = FindGameObject<Fader>();
-	// --- 上下でカーソル移動 ---
+	 
 	// --- 上移動 ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_LEFT)) {
 		rectSelect = RECT_LEFT;
-		//do {
-		//	cursor--;
-		//	if (cursor < 0) cursor = stageNames.size() - 1;
-		//} while (!stageEnabled[cursor]);  // 無効なら飛ばす
 	}
 
 	// --- 下移動 ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_RIGHT)) {
 		rectSelect = RECT_RIGHT;
-		//do {
-		//	cursor++;
-		//	if (cursor >= stageNames.size()) cursor = 0;
-		//} while (!stageEnabled[cursor]);  // 無効なら飛ばす
 	}
 
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_B)) {
@@ -159,8 +151,16 @@ void SelectStage::Draw()
 	DrawString(1250, 500, "HARD", GetColor(0, 0, 0));
 
 	// 説明文も中央
-	const char* msg = "← → で選択 / ENTERで決定";
-	int w = GetDrawStringWidth(msg, -1);
-	DrawString((Screen::WIDTH - w) / 2, Screen::HEIGHT - 80, msg, GetColor(0, 0, 0));
+	const char* msg1 = "タイトルへ戻る  Push to [T]";
+	int w = GetDrawStringWidth(msg1, -1);
+	DrawString((Screen::WIDTH - w) / 2, Screen::HEIGHT - 80, msg1, GetColor(0, 0, 0));
 
+	const char* msg2 = "挑戦したいステージのキーを押してください";
+	int w2 = GetDrawStringWidth(msg2, -1);
+	DrawString((Screen::WIDTH - w2) / 2, Screen::HEIGHT - 900, msg2, GetColor(0, 0, 0));
+
+	SetFontSize(100);
+	const char* msg3 = "ステージ選択";
+	int w3 = GetDrawStringWidth(msg3, -1);
+	DrawString((Screen::WIDTH - w3) / 2, Screen::HEIGHT - 1050, msg3, GetColor(255, 255, 0));
 }
