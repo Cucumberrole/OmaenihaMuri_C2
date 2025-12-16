@@ -30,7 +30,7 @@ SelectStage::~SelectStage()
 void SelectStage::Update()
 {
 	Fader* fader = FindGameObject<Fader>();
-	 
+
 	// --- è„à⁄ìÆ ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_LEFT)) {
 		rectSelect = RECT_LEFT;
@@ -112,11 +112,11 @@ void SelectStage::Draw()
 	{
 		if (rectSelect == RECT_LEFT)
 		{
-			DrawRoundRect(315, 295, 805, 785, 8, 8,GetColor(0, 0, 0), FALSE);
+			DrawRoundRect(315, 295, 805, 785, 8, 8, GetColor(0, 0, 0), FALSE);
 		}
 		else
 		{
-			DrawRoundRect(1115, 295, 1605, 785, 8, 8,GetColor(0, 0, 0), FALSE);
+			DrawRoundRect(1115, 295, 1605, 785, 8, 8, GetColor(0, 0, 0), FALSE);
 		}
 	}
 
