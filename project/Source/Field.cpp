@@ -4,6 +4,7 @@
 #include "Trap.h"
 #include "Telop.h"
 #include "SmallTrap.h"
+#include "SmallTrap2.h"
 #include "FallingFloor.h"
 #include "FakeFloor.h"
 #include "FlyingSpike.h"
@@ -109,10 +110,14 @@ Field::Field(int stage)
 			}
 			else if (cell == 12)
 			{
+				new SmallTrap2(xx * 64 + 24, yy * 64);
+			}
+			else if (cell == 13)
+			{
 				fallingTrigger = { xx * 64, yy * 64 };
 				hasFallingTrigger = true;
 			}
-			else if (cell == 13)
+			else if (cell == 14)
 			{
 				FallingSpikeInfo info;
 				info.pos = { xx * 64, yy * 64 };
@@ -120,7 +125,7 @@ Field::Field(int stage)
 				info.chaser = false;
 				fallingSpikes.push_back(info);
 			}
-			else if (cell == 14)
+			else if (cell == 15)
 			{
 				FallingSpikeInfo info;
 				info.pos = { xx * 64, yy * 64 };
