@@ -56,17 +56,13 @@ void SmallTrap2::Draw()
 		SImage,
 		TRUE
 	);
-	DrawBox(
-		static_cast<int>(x),
-		static_cast<int>(y),
-		static_cast<int>(x + width),
-		static_cast<int>(y + height),
-		GetColor(255, 0, 0), // ê‘êF
-		FALSE                // ìhÇËÇ¬Ç‘ÇµÇ»Çµ
-	);
+	//DrawBox(
+	//	static_cast<int>(x),
+	//	static_cast<int>(y),
+	//	static_cast<int>(x + width),
+	//	static_cast<int>(y + height),
+	//	GetColor(255, 0, 0), // ê‘êF
+	//	FALSE                // ìhÇËÇ¬Ç‘ÇµÇ»Çµ
+	//);
 }
 
-bool SmallTrap2::CheckHit(int px, int py, int pw, int ph)
-{
-    return false;
-}
