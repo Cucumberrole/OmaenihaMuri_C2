@@ -118,6 +118,9 @@
     <ClCompile Include="Source\GameResult.cpp">
       <Filter>ClearScene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\SmallTrap2.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -329,6 +332,9 @@
     <ClInclude Include="Source\Fader.h" />
     <ClInclude Include="Source\GameResult.h">
       <Filter>ClearScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SmallTrap2.h">
+      <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
