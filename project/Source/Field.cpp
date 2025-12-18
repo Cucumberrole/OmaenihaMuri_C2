@@ -125,14 +125,6 @@ Field::Field(int stage)
 				info.chaser = false;
 				fallingSpikes.push_back(info);
 			}
-			else if (cell == 15)
-			{
-				FallingSpikeInfo info;
-				info.pos = { xx * 64, yy * 64 };
-				info.alive = true;
-				info.chaser = true;
-				fallingSpikes.push_back(info);
-			}
 			else if (cell == 20)
 			{
 				ballTriggers.push_back({ xx * 64, yy * 64 });

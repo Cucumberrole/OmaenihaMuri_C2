@@ -13,20 +13,17 @@ public:
 	void Draw() override;
 
 private:
-	int backgroundImage;
-	std::vector<bool> stageEnabled;
-	std::vector<std::string> stageNames;  // ステージ名一覧
-	int cursor;                          // 選択中の番号
-	
-	// 四角選択
-	enum RectSelect
+	struct Option
 	{
-		RECT_LEFT,
-		RECT_RIGHT
+		std::string title;
+		std::string sub1;
+		std::string sub2;
+		int lives = 5;
+		int stageId = 1;
+		int hotKey = 0;     // KEY_INPUT_***
+		int boxColor = 0;   // GetColor(...)
 	};
-	RectSelect rectSelect;
 
-	// 点滅
-	int blinkTimer;
-	bool blinkOn;
+	std::vector<Option> options;
+	int cursor = 0;
 };

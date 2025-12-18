@@ -367,5 +367,8 @@
     <Filter Include="StageSelect">
       <UniqueIdentifier>{f78fe6bc-8697-4244-b3d9-a5a2daecdf45}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Debug">
+      <UniqueIdentifier>{0c8fc6b0-a4c9-47b0-bdb6-6bcfdc7fd4c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
