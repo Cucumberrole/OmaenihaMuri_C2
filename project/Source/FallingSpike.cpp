@@ -2,6 +2,10 @@
 #include "Field.h"
 #include "Player.h"
 #include <DxLib.h>
+#include <algorithm>
+#include <vector>
+
+std::vector<FallingSpike*> FallingSpike::s_allSpikes;
 
 //--------------------------------------
 // 円と線分の当たり判定
@@ -67,12 +71,12 @@ static bool HitCheck_Circle_Triangle(
 //--------------------------------------
 // コンストラクタ
 //--------------------------------------
-FallingSpike::FallingSpike(int sx, int sy, bool chaseAfterLand)
+FallingSpike::FallingSpike(int sx, int sy, bool chaseAfterLand, int triggerGroupId)
 {
 	hImage = LoadGraph("data/image/hariBottom.png");
 
-	x = (float)sx;
-	y = (float)sy;
+	x = static_cast<float>(sx);
+	y = static_cast<float>(sy);
 
 	vy = 0.0f;
 	gravity = 0.8f;
@@ -83,11 +87,19 @@ FallingSpike::FallingSpike(int sx, int sy, bool chaseAfterLand)
 	width = w;
 	height = h;
 
+	// トリガー関連
+	this->triggerGroupId = triggerGroupId;
+	// groupId = 0 → 最初から動く / 0以外 → トリガーが来るまで停止
+	active = (triggerGroupId == 0);
+
 	// 追尾関連
 	isChaser = chaseAfterLand;
 	startedChase = false;
 	vx = 0.0f;
 	chaseSpeed = 6.0f;  // 横に走る速さ（好みで調整）
+
+	// 登録
+	s_allSpikes.push_back(this);
 }
 
 //--------------------------------------
@@ -95,6 +107,13 @@ FallingSpike::FallingSpike(int sx, int sy, bool chaseAfterLand)
 //--------------------------------------
 FallingSpike::~FallingSpike()
 {
+	// 自分をリストから外す
+	auto it = std::find(s_allSpikes.begin(), s_allSpikes.end(), this);
+	if (it != s_allSpikes.end())
+	{
+		s_allSpikes.erase(it);
+	}
+
 	DeleteGraph(hImage);
 }
 
@@ -103,6 +122,8 @@ FallingSpike::~FallingSpike()
 //--------------------------------------
 void FallingSpike::Update()
 {
+	if (!active) { return; } // トリガーが起動されるまで完全停止
+
 	Field* field = FindGameObject<Field>();
 
 	//----------------------------------
@@ -224,4 +245,22 @@ void FallingSpike::Draw()
 	int col = GetColor(0, 255, 0);
 	DrawTriangle(tx1, ty1, tx2, ty2, tx3, ty3, col, FALSE);
 #endif
+}
+
+// 起動用
+void FallingSpike::Activate()
+{
+	active = true;
+}
+
+void FallingSpike::ActivateGroup(int groupId)
+{
+	for (FallingSpike* spike : s_allSpikes)
+	{
+		if (!spike) continue;
+		if (spike->triggerGroupId == groupId)
+		{
+			spike->Activate();
+		}
+	}
 }

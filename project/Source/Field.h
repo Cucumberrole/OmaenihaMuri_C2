@@ -42,14 +42,16 @@ public:
 		bool  chaser = false; // 落下後に追尾飛行するか（14用）
 	};
 
+	struct FallingSpikeTrigger
+	{
+		POINT triggerPos{};
+		int spikeIndex;
+		bool activated = false;
+		int timer = 0;
+	};
+
 	std::vector<FallingSpikeInfo> fallingSpikes;
-
-	POINT fallingTrigger{ -9999, -9999 }; // 無効値で初期化
-	bool  hasFallingTrigger = false;
-
-	bool fallingActivated = false;
-	int  fallingIndex = 0;
-	int  fallingTimer = 0;
+	std::vector<FallingSpikeTrigger> fallingSpikeTriggers;
 
 	//--------------------------------------------------------
 	// 当たり判定（衝突チェック）
@@ -65,6 +67,9 @@ private:
 
 	int hImage = -1;
 	int fallingSpikeImage = -1;
+
+	int fallingSpikeWidth;
+	int fallingSpikeHeight;
 
 	float x = 0;
 	float y = 0;

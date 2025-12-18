@@ -18,6 +18,63 @@
 #include "MovingWall.h"
 #include <DxLib.h>
 
+
+
+// --- 円と線分／三角形の当たり判定 ---
+static bool HitCheck_Circle_Line(VECTOR center, float radius, VECTOR a, VECTOR b)
+{
+	VECTOR ab = VSub(b, a);
+	VECTOR ac = VSub(center, a);
+
+	float abLen2 = ab.x * ab.x + ab.y * ab.y;
+	if (abLen2 <= 0.0001f) return false;
+
+	float t = (ab.x * ac.x + ab.y * ac.y) / abLen2;
+	if (t < 0.0f) t = 0.0f;
+	if (t > 1.0f) t = 1.0f;
+
+	VECTOR closest = VAdd(a, VScale(ab, t));
+
+	float dx = center.x - closest.x;
+	float dy = center.y - closest.y;
+
+	return (dx * dx + dy * dy <= radius * radius);
+}
+
+static bool PointInTriangle(VECTOR p, VECTOR a, VECTOR b, VECTOR c)
+{
+	VECTOR v0 = VSub(c, a);
+	VECTOR v1 = VSub(b, a);
+	VECTOR v2 = VSub(p, a);
+
+	float dot00 = VDot(v0, v0);
+	float dot01 = VDot(v0, v1);
+	float dot02 = VDot(v0, v2);
+	float dot11 = VDot(v1, v1);
+	float dot12 = VDot(v1, v2);
+
+	float invDenom = 1.0f / (dot00 * dot11 - dot01 * dot01);
+	float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+	float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+	return (u >= 0.0f) && (v >= 0.0f) && (u + v < 1.0f);
+}
+
+static bool HitCheck_Circle_Triangle(
+	VECTOR center, float radius,
+	VECTOR t1, VECTOR t2, VECTOR t3)
+{
+	if (HitCheck_Circle_Line(center, radius, t1, t2)) return true;
+	if (HitCheck_Circle_Line(center, radius, t2, t3)) return true;
+	if (HitCheck_Circle_Line(center, radius, t3, t1)) return true;
+
+	if (PointInTriangle(center, t1, t2, t3)) return true;
+
+	return false;
+}
+
+
+
 // ブロック扱い（押し戻し/床/壁として固いセル）
 static bool IsSolidCell(int cell)
 {
@@ -56,16 +113,15 @@ Field::Field(int stage)
 	hImage = LoadGraph("data/image/NewBlock.png");
 	fallingSpikeImage = LoadGraph("data/image/hariBottom.png");
 
+	int w = 0;
+	int h = 0;
+	GetGraphSize(fallingSpikeImage, &w, &h);
+	fallingSpikeWidth = w;
+	fallingSpikeHeight = h;
+
 	x = 0;
 	y = 0;
 	scrollX = 0;
-
-	// 落下針のトリガー初期化（A対策）
-	hasFallingTrigger = false;
-	fallingTrigger = { -9999, -9999 };
-	fallingActivated = false;
-	fallingIndex = 0;
-	fallingTimer = 0;
 
 	// マップ走査して配置
 	for (int yy = 0; yy < (int)maps.size(); yy++)
@@ -114,15 +170,22 @@ Field::Field(int stage)
 			}
 			else if (cell == 13)
 			{
-				fallingTrigger = { xx * 64, yy * 64 };
-				hasFallingTrigger = true;
+				// 落下針トリガー（1トリガー = 1針）
+				FallingSpikeTrigger trig;
+				trig.triggerPos = { xx * 64, yy * 64 };
+				trig.activated = false;
+				trig.timer = 0;
+				trig.spikeIndex = -1;
+				fallingSpikeTriggers.push_back(trig);
 			}
-			else if (cell == 14)
+			else if (cell == 14 || cell == 15)
 			{
+				// 上から落ちてくる針本体
 				FallingSpikeInfo info;
 				info.pos = { xx * 64, yy * 64 };
 				info.alive = true;
-				info.chaser = false;
+				info.chaser = (cell == 15); // 15は追尾する針
+
 				fallingSpikes.push_back(info);
 			}
 			else if (cell == 20)
@@ -154,6 +217,12 @@ Field::Field(int stage)
 			}
 		}
 	}
+
+	int pairCount = (int)min(fallingSpikeTriggers.size(), fallingSpikes.size());
+	for (int i = 0; i < pairCount; ++i)
+	{
+		fallingSpikeTriggers[i].spikeIndex = i;
+	}
 }
 
 //------------------------------------------------------------
@@ -181,6 +250,33 @@ void Field::Update()
 
 	if (ty < 0 || ty >= (int)maps.size()) return;
 	if (tx < 0 || tx >= (int)maps[ty].size()) return;
+
+	//------------------------------------------
+	// 待機状態の落下針との当たり判定
+	//------------------------------------------
+	{
+		VECTOR center = VGet(px + 32.0f, py + 32.0f, 0.0f);
+		float  radius = player->GetRadius();  // Player に合わせて
+
+		for (auto& s : fallingSpikes)
+		{
+			if (!s.alive) continue; // もう落下開始した針は無視
+
+			float sx = (float)s.pos.x;
+			float sy = (float)s.pos.y;
+
+			VECTOR t1 = VGet(sx, sy, 0.0f);                     // 左上
+			VECTOR t2 = VGet(sx + fallingSpikeWidth, sy, 0.0f);                     // 右上
+			VECTOR t3 = VGet(sx + fallingSpikeWidth / 2.0f, sy + fallingSpikeHeight, 0.0f);// 下の先端
+
+			if (HitCheck_Circle_Triangle(center, radius, t1, t2, t3))
+			{
+				player->ForceDie();
+				player->SetDead();
+				return; // 死んだら他の処理はスキップ
+			}
+		}
+	}
 
 	//------------------------------------------
 	// 転がってくる球
@@ -220,43 +316,47 @@ void Field::Update()
 	}
 
 	//------------------------------------------------------
-	// 上から落下してくる針
+	// 上から落下してくる針（トリガーごと）
 	//------------------------------------------------------
-	if (hasFallingTrigger)
+	for (auto& trig : fallingSpikeTriggers)
 	{
-		int tX = fallingTrigger.x / 64;
-		int tY = fallingTrigger.y / 64;
+		int tX = trig.triggerPos.x / 64;
+		int tY = trig.triggerPos.y / 64;
 
-		if (!fallingActivated && tx == tX && ty == tY)
+		// まだ起動していなくて、プレイヤーがトリガーマスに乗ったら起動
+		if (!trig.activated && tx == tX && ty == tY)
 		{
-			fallingActivated = true;
-			fallingIndex = 0;
-			fallingTimer = 0;
+			trig.activated = true;
+			trig.timer = 20;  // 落ちるまでの待ちフレーム（好みで調整）
 		}
 
-		if (fallingActivated)
+		if (!trig.activated)
 		{
-			if (fallingTimer > 0)
-			{
-				fallingTimer--;
-			}
-			else
-			{
-				if (fallingIndex < (int)fallingSpikes.size())
-				{
-					auto& info = fallingSpikes[fallingIndex];
+			continue;
+		}
 
-					if (info.alive)
-					{
-						new FallingSpike(info.pos.x, info.pos.y, info.chaser);
-						info.alive = false;
-					}
+		// タイマー待ち
+		if (trig.timer > 0)
+		{
+			trig.timer--;
+			continue;
+		}
 
-					fallingIndex++;
-					fallingTimer = 20;
-				}
+		// ここに来たら「落とすタイミング」
+		if (trig.spikeIndex >= 0 && trig.spikeIndex < (int)fallingSpikes.size())
+		{
+			auto& info = fallingSpikes[trig.spikeIndex];
+
+			if (info.alive)
+			{
+				// chaser が true のものは、FallingSpike 側で追尾モードになる
+				new FallingSpike(info.pos.x, info.pos.y, info.chaser);
+				info.alive = false;
 			}
 		}
+
+		// 一度落としたら、このトリガーは用済み
+		trig.activated = false;
 	}
 
 	//------------------------------------------------------
@@ -312,13 +412,23 @@ void Field::Draw()
 		}
 	}
 
-	// 待機状態の針（13/14）
+	// 待機状態の針（13/14/15）
 	for (auto& s : fallingSpikes)
 	{
 		if (!s.alive) continue;
 		DrawGraph(s.pos.x, s.pos.y, fallingSpikeImage, TRUE);
 	}
 }
+
+
+
+
+
+
+
+
+
+
 
 //------------------------------------------------------------
 // 当たり判定（押し戻し）
@@ -327,56 +437,108 @@ int Field::HitCheckRight(int px, int py)
 {
 	if (py < 0) return 0;
 
+	int hit = 0;
+
+	// --- まず通常ブロック（マップ） ---
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y < 0 || y >= (int)maps.size()) return 0;
-	if (x < 0 || x >= (int)maps[y].size()) return 0;
+	if (y >= 0 && y < (int)maps.size() &&
+		x >= 0 && x < (int)maps[y].size() &&
+		IsSolidCell(maps[y][x]))
+	{
+		hit = px % 64 + 1;
+	}
 
-	if (IsSolidCell(maps[y][x])) return px % 64 + 1;
-	return 0;
+	// --- 移動壁も見る ---
+	if (auto wall = FindGameObject<MovingWall>())
+	{
+		int w = wall->HitCheckRight(px, py);
+		if (w > hit) hit = w;
+	}
+
+	return hit;
 }
 
 int Field::HitCheckLeft(int px, int py)
 {
 	if (py < 0) return 0;
 
+	int hit = 0;
+
+	// 通常ブロック
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y < 0 || y >= (int)maps.size()) return 0;
-	if (x < 0 || x >= (int)maps[y].size()) return 0;
+	if (y >= 0 && y < (int)maps.size() &&
+		x >= 0 && x < (int)maps[y].size() &&
+		IsSolidCell(maps[y][x]))
+	{
+		hit = 64 - (px % 64);
+	}
 
-	if (IsSolidCell(maps[y][x])) return 64 - (px % 64);
-	return 0;
+	// 移動壁
+	if (auto wall = FindGameObject<MovingWall>())
+	{
+		int w = wall->HitCheckLeft(px, py);
+		if (w > hit) hit = w;
+	}
+
+	return hit;
 }
 
 int Field::HitCheckUp(int px, int py)
 {
 	if (py < 0) return 0;
 
+	int hit = 0;
+
+	// 通常ブロック
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y < 0 || y >= (int)maps.size()) return 0;
-	if (x < 0 || x >= (int)maps[y].size()) return 0;
+	if (y >= 0 && y < (int)maps.size() &&
+		x >= 0 && x < (int)maps[y].size() &&
+		IsSolidCell(maps[y][x]))
+	{
+		hit = 64 - (py % 64);
+	}
 
-	if (IsSolidCell(maps[y][x])) return 64 - (py % 64);
-	return 0;
+	// 移動壁
+	if (auto wall = FindGameObject<MovingWall>())
+	{
+		int w = wall->HitCheckUp(px, py);
+		if (w > hit) hit = w;
+	}
+
+	return hit;
 }
 
 int Field::HitCheckDown(int px, int py)
 {
 	if (py < 0) return 0;
 
+	int hit = 0;
+
+	// 通常ブロック
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y < 0 || y >= (int)maps.size()) return 0;
-	if (x < 0 || x >= (int)maps[y].size()) return 0;
+	if (y >= 0 && y < (int)maps.size() &&
+		x >= 0 && x < (int)maps[y].size() &&
+		IsSolidCell(maps[y][x]))
+	{
+		hit = (py % 64) + 1;
+	}
 
-	if (IsSolidCell(maps[y][x])) return (py % 64) + 1;
-	return 0;
+	// 移動壁
+	if (auto wall = FindGameObject<MovingWall>())
+	{
+		int w = wall->HitCheckDown(px, py);
+		if (w > hit) hit = w;
+	}
+
+	return hit;
 }
 
 bool Field::IsBlock(int tx, int ty)
