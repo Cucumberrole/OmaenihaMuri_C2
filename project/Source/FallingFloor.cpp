@@ -1,94 +1,26 @@
 #include "FallingFloor.h"
 #include "Player.h"
 #include "Field.h"
-#include <vector>
 #include <DxLib.h>
+#include <algorithm>
 
 FallingFloor::FallingFloor(int sx, int sy)
 {
 	hImage = LoadGraph("data/image/NewBlock.png");
-	x = sx;
-	y = sy;
+	x = static_cast<float>(sx);
+	y = static_cast<float>(sy);
 
 	velocityY = 0.0f;
 	isFalling = false;
 	isLanded = false;
 	gravity = 0.8f;
-	SetDrawOrder(-1); // 描画順位
+
+	SetDrawOrder(-1);
 }
 
 FallingFloor::~FallingFloor()
 {
 	DeleteGraph(hImage);
-}
-
-void FallingFloor::Update()
-{
-	if (isLanded) return; // もう止まっているなら何もしない
-
-	Player* player = FindGameObject<Player>();
-	if (player == nullptr) return;
-
-	float px = player->GetX();
-	float py = player->GetY();
-
-	// --- プレイヤーが真下を通過したら落下開始 ---
-	if (!isFalling && px + 64 > x && px < x + 64 && py > y)
-	{
-		StartFalling();
-	}
-
-	// --- 落下処理 ---
-	if (isFalling)
-	{
-		velocityY += gravity;
-		y += velocityY;
-
-		// --- 下のFieldブロックに当たったら停止 ---
-		Field* field = FindGameObject<Field>();
-		if (field)
-		{
-			int push1 = field->HitCheckDown(x + 5, y + 64);
-			int push2 = field->HitCheckDown(x + 59, y + 64);
-			int push = max(push1, push2);
-
-			if (push > 0)
-			{
-				y -= push;        // 押し戻して止める
-				velocityY = 0.0f;
-				isFalling = false;
-				isLanded = true;  // 着地完了
-			}
-		}
-	}
-	// --- 落下中のプレイヤー潰し判定 ---
-	if (isFalling)
-	{
-		// 床の矩形
-		float fx1 = x;
-		float fx2 = x + 64;
-		float fy1 = y;
-		float fy2 = y + 64;
-
-		// プレイヤーの矩形
-		float px1 = px;
-		float px2 = px + 64;
-		float py1 = py;
-		float py2 = py + 64;
-
-		// --- 条件：床が上からプレイヤーに重なったら即死 ---
-		bool hit =
-			(fx1 < px2) && (fx2 > px1) &&  // 横重なり
-			(fy1 < py2) && (fy2 > py1) &&  // 縦重なり
-			(velocityY > 0);               // 落下中のみ判定
-
-		if (hit)
-		{
-			player->ForceDie();
-			player->SetDead();
-		}
-	}
-
 }
 
 void FallingFloor::StartFalling()
@@ -97,57 +29,149 @@ void FallingFloor::StartFalling()
 	velocityY = 0.0f;
 }
 
-void FallingFloor::Draw()
+void FallingFloor::Update()
 {
-	DrawRectGraph(static_cast<int>(x), static_cast<int>(y), 0, 0, 64, 64, hImage, TRUE);
+	if (isLanded) return;
+
+	Player* player = FindGameObject<Player>();
+	if (!player) return;
+
+	Field* field = FindGameObject<Field>();
+	if (!field) return;
+
+	float px = player->GetX();
+	float py = player->GetY();
+
+	// -----------------------------
+	// プレイヤーが床の「真下」を通過したら落下開始
+	// ここが一番ブレやすいので強めに判定する
+	// -----------------------------
+// --- プレイヤーが真下を通過したら落下開始 ---（改良版）
+	if (!isFalling)
+	{
+		Field* field = FindGameObject<Field>();
+		if (!field) return;
+
+		// 横が重なっているか
+		bool overlapX = (px + 64 > x) && (px < x + 64);
+
+		// プレイヤーが床の「下」にいるか（床の下端より下）
+		bool isBelow = (py >= y + 64);
+
+		if (overlapX && isBelow)
+		{
+			// 落ちる床の真下の列(tileX)を調べる
+			int tileX = int((x + 32) / 64);
+
+			// 落ちる床の「1つ下」タイルから、プレイヤーのいるタイルまで走査
+			int startTy = int((y + 64) / 64);
+			int endTy = int((py + 32) / 64);
+
+			bool blocked = false;
+			for (int ty = startTy; ty <= endTy; ++ty)
+			{
+				if (field->IsBlock(tileX, ty))   // 途中にブロックがあった（天井など）
+				{
+					blocked = true;
+					break;
+				}
+			}
+
+			// 途中に遮るブロックがない＝同じ空間にいる → 発動
+			if (!blocked)
+			{
+				StartFalling();
+			}
+		}
+	}
+
+	// -----------------------------
+	// 落下処理
+	// -----------------------------
+	if (isFalling)
+	{
+		velocityY += gravity;
+		y += velocityY;
+
+		// -----------------------------
+		// 落下中にプレイヤーと重なったら潰して死亡（常時判定）
+		// -----------------------------
+		{
+			float fx1 = x;
+			float fx2 = x + 64;
+			float fy1 = y;
+			float fy2 = y + 64;
+
+			float px1 = px;
+			float px2 = px + 64;
+			float py1 = py;
+			float py2 = py + 64;
+
+			bool hit =
+				(fx1 < px2) && (fx2 > px1) &&
+				(fy1 < py2) && (fy2 > py1) &&
+				(velocityY > 0.0f);
+
+			if (hit)
+			{
+				player->ForceDie();
+				player->SetDead();
+			}
+		}
+
+		// -----------------------------
+		// 下のブロックに当たったら停止
+		// -----------------------------
+		int push1 = field->HitCheckDown((int)(x + 5), (int)(y + 64));
+		int push2 = field->HitCheckDown((int)(x + 59), (int)(y + 64));
+		int push = max(push1, push2);
+
+		if (push > 0)
+		{
+			y -= push;          // 押し戻し
+			velocityY = 0.0f;
+			isFalling = false;
+			isLanded = true;
+		}
+	}
 }
 
+void FallingFloor::Draw()
+{
+	DrawRectGraph((int)x, (int)y, 0, 0, 64, 64, hImage, TRUE);
+}
+
+// -----------------------------
+// 当たり判定（Player.cpp が使うポイント判定方式）
+// -----------------------------
 int FallingFloor::HitCheckRight(int px, int py)
 {
-	// px,py → プレイヤーの判定点
-	if (py < y || py >= y + 64) return 0; // 縦方向が重なっていない
-
-	int localX = px - x;
-	if (localX >= 0 && localX < 64)
-	{
-		return localX + 1;
-	}
+	if (py < y || py >= y + 64) return 0;
+	int localX = (int)(px - x);
+	if (localX >= 0 && localX < 64) return localX + 1;
 	return 0;
 }
 
 int FallingFloor::HitCheckLeft(int px, int py)
 {
 	if (py < y || py >= y + 64) return 0;
-
-	int localX = px - x;
-	if (localX >= 0 && localX < 64)
-	{
-		return 64 - localX;
-	}
+	int localX = (int)(px - x);
+	if (localX >= 0 && localX < 64) return 64 - localX;
 	return 0;
 }
 
 int FallingFloor::HitCheckDown(int px, int py)
 {
-	// px が床の横範囲にない
 	if (px < x || px >= x + 64) return 0;
-
-	int localY = py - y;
-	if (localY >= 0 && localY < 64)
-	{
-		return localY + 1;
-	}
+	int localY = (int)(py - y);
+	if (localY >= 0 && localY < 64) return localY + 1;
 	return 0;
 }
 
 int FallingFloor::HitCheckUp(int px, int py)
 {
 	if (px < x || px >= x + 64) return 0;
-
-	int localY = py - y;
-	if (localY >= 0 && localY < 64)
-	{
-		return 64 - localY;
-	}
+	int localY = (int)(py - y);
+	if (localY >= 0 && localY < 64) return 64 - localY;
 	return 0;
 }

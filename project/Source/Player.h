@@ -12,8 +12,8 @@ public:
 	void Update() override;
 	void Draw() override;
 
-	float GetX() const;
-	float GetY() const;
+	float GetX() const { return x; }
+	float GetY() const { return y; }
 
 	void SetDead() { isDead = true; }
 	bool IsDead() const { return isDead; }
@@ -24,7 +24,6 @@ public:
 	void GetHitCircle(float& outX, float& outY, float& outRadius) const;
 
 	void PushByWall(float dx);
-
 	// （もしデバッグ用に描画したければ）
 	// void DrawHitCircleDebug() const;
 

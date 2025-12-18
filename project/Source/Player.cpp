@@ -81,8 +81,6 @@ Player::~Player()
 //--------------------------------------
 // 座標取得用
 //--------------------------------------
-float Player::GetX() const { return x; }
-float Player::GetY() const { return y; }
 
 // 円形当たり判定を取得
 void Player::GetHitCircle(float& outX, float& outY, float& outRadius) const
