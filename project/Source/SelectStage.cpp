@@ -9,6 +9,8 @@ SelectStage::SelectStage()
 {
 	options.clear();
 
+	debugUnlocked = false;
+
 	Option easy;
 	easy.title = "易しいチュートリアル";
 	easy.sub1 = "すぐイライラしちゃう人に";
@@ -43,6 +45,24 @@ void SelectStage::Update()
 	{
 		SceneManager::ChangeScene("TITLE");
 		return;
+	}
+
+	// ============================
+	// デバッグステージ解放 (F9)
+	// ============================
+	if (!debugUnlocked && KeyTrigger::CheckTrigger(KEY_INPUT_F9))
+	{
+		debugUnlocked = true;
+
+		Option debug;
+		debug.title = "Debugステージ";
+		debug.sub1 = "開発者用テスト";
+		debug.sub2 = "";
+		debug.lives = 99;
+		debug.stageId = 0;              // ← Debug 用のステージIDに合わせて変更
+		debug.hotKey = KEY_INPUT_G;    // ← 好きなキーに変更
+		debug.boxColor = GetColor(80, 80, 160);
+		options.push_back(debug);
 	}
 
 	// 左右カーソル（任意）

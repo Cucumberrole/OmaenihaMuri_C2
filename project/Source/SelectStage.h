@@ -28,7 +28,7 @@ private:
 	};
 
 	std::vector<Option> options;
-
-	// カーソル（左右キーでも選べるように残してある）
 	int cursor;
+
+	bool debugUnlocked;
 };
