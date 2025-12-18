@@ -6,6 +6,11 @@
 // 静的メンバの定義
 bool VanishingFloor::s_triggered = false;
 
+void VanishingFloor::ResetAll()
+{
+	s_triggered = false;
+}
+
 VanishingFloor::VanishingFloor(int sx, int sy)
 {
 	floorImage = LoadGraph("data/image/NewBlock.png"); // 床画像
@@ -32,41 +37,31 @@ void VanishingFloor::Update()
 	float px = player->GetX();
 	float py = player->GetY();
 
-	// ------------------------------
-	// まだ一度もトリガーされていないとき：
-	// どれか1つでも近づいたら「全床消滅」状態に移行
-	// ------------------------------
+	// --- 近づき判定はヒット円の中心で行う ---
+	float cx, cy, cr;
+	player->GetHitCircle(cx, cy, cr);
+
 	if (!s_triggered)
 	{
-		float dx = px - (x + 32.0f);
-		float dy = py - (y + 32.0f);
+		float dx = cx - (x + 32.0f);
+		float dy = cy - (y + 32.0f);
 		float dist2 = dx * dx + dy * dy;
 
 		if (dist2 < vanishRange * vanishRange)
 		{
-			// トリガーが発動したら全ての床を消す
 			s_triggered = true;
 		}
 	}
 
-	// グローバルフラグに合わせて床の有効/無効を更新する
 	isActive = !s_triggered;
 
-	// ------------------------------
-	// 床が消えたあとは「針」としてダメージ判定だけ持つ
-	// ------------------------------
 	if (s_triggered)
 	{
-		float cx, cy, cr;
-		player->GetHitCircle(cx, cy, cr);
-
-		// この床タイル（針）の矩形範囲
 		float left = x;
 		float right = x + 64.0f;
 		float top = y;
 		float bottom = y + 64.0f;
 
-		// 円と矩形の当たり判定（最近接点との距離で判定）
 		float nearestX = max(left, min(cx, right));
 		float nearestY = max(top, min(cy, bottom));
 
@@ -75,7 +70,6 @@ void VanishingFloor::Update()
 
 		if (dx * dx + dy * dy <= cr * cr)
 		{
-			// 針に当たったら即死系処理
 			player->ForceDie();
 			player->SetDead();
 		}

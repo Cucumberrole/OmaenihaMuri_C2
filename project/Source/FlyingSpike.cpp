@@ -1,6 +1,7 @@
 #include "FlyingSpike.h"
 #include "Player.h"
 #include "Field.h"
+#include "Collision.h"
 #include <DxLib.h>
 
 FlyingSpike::FlyingSpike(float startX, float startY, float speed)
@@ -31,17 +32,22 @@ void FlyingSpike::Update()
 	{
 		float px = player->GetX();
 		float py = player->GetY();
-		float pw = 64;
-		float ph = 64;
+		float pw = 64.0f;
+		float ph = 64.0f;
 
-		// --- AABB 当たり判定 ---
-		bool hit =
-			(x < px + pw) &&
-			(x + width > px) &&
-			(y < py + ph) &&
-			(y + height > py);
+		// プレイヤーの中心と半径
+		VECTOR center = VGet(px + pw * 0.5f, py + ph * 0.5f, 0.0f);
+		float  radius = pw * 0.5f;
 
-		if (hit)
+		// 左向きトゲの三角形
+		float sx = x;
+		float sy = y;
+
+		VECTOR t1 = VGet(sx + width, sy, 0.0f);          // 右上
+		VECTOR t2 = VGet(sx + width, sy + height, 0.0f); // 右下
+		VECTOR t3 = VGet(sx, sy + height / 2, 0.0f); // 左側の先端
+
+		if (HitCheck_Circle_Triangle(center, radius, t1, t2, t3))
 		{
 			player->ForceDie();
 			player->SetDead();

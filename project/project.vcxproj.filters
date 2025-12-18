@@ -121,6 +121,12 @@
     <ClCompile Include="Source\SmallTrap2.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Collision.cpp">
+      <Filter>PlayScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\HiddenSpike.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -334,6 +340,12 @@
       <Filter>ClearScene</Filter>
     </ClInclude>
     <ClInclude Include="Source\SmallTrap2.h">
+      <Filter>Trap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Collision.h">
+      <Filter>PlayScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\HiddenSpike.h">
       <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>

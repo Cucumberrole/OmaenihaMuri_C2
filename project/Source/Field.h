@@ -68,6 +68,13 @@ private:
 	int hImage = -1;
 	int fallingSpikeImage = -1;
 
+	enum { GOAL_ANIM_FRAMES = 7 };
+	int goalImages[GOAL_ANIM_FRAMES]{};
+
+	int goalAnimFrame = 0;
+	int goalAnimTimer = 0;
+	int goalAnimInterval = 6;
+
 	int fallingSpikeWidth;
 	int fallingSpikeHeight;
 

@@ -1,4 +1,5 @@
 #include "Field.h"
+#include "Collision.h"
 #include "Player.h"
 #include "CsvReader.h"
 #include "Trap.h"
@@ -16,64 +17,8 @@
 #include "EnemyChaser.h"
 #include "Boss.h"
 #include "MovingWall.h"
+#include "HiddenSpike.h"
 #include <DxLib.h>
-
-
-
-// --- 円と線分／三角形の当たり判定 ---
-static bool HitCheck_Circle_Line(VECTOR center, float radius, VECTOR a, VECTOR b)
-{
-	VECTOR ab = VSub(b, a);
-	VECTOR ac = VSub(center, a);
-
-	float abLen2 = ab.x * ab.x + ab.y * ab.y;
-	if (abLen2 <= 0.0001f) return false;
-
-	float t = (ab.x * ac.x + ab.y * ac.y) / abLen2;
-	if (t < 0.0f) t = 0.0f;
-	if (t > 1.0f) t = 1.0f;
-
-	VECTOR closest = VAdd(a, VScale(ab, t));
-
-	float dx = center.x - closest.x;
-	float dy = center.y - closest.y;
-
-	return (dx * dx + dy * dy <= radius * radius);
-}
-
-static bool PointInTriangle(VECTOR p, VECTOR a, VECTOR b, VECTOR c)
-{
-	VECTOR v0 = VSub(c, a);
-	VECTOR v1 = VSub(b, a);
-	VECTOR v2 = VSub(p, a);
-
-	float dot00 = VDot(v0, v0);
-	float dot01 = VDot(v0, v1);
-	float dot02 = VDot(v0, v2);
-	float dot11 = VDot(v1, v1);
-	float dot12 = VDot(v1, v2);
-
-	float invDenom = 1.0f / (dot00 * dot11 - dot01 * dot01);
-	float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
-	float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
-
-	return (u >= 0.0f) && (v >= 0.0f) && (u + v < 1.0f);
-}
-
-static bool HitCheck_Circle_Triangle(
-	VECTOR center, float radius,
-	VECTOR t1, VECTOR t2, VECTOR t3)
-{
-	if (HitCheck_Circle_Line(center, radius, t1, t2)) return true;
-	if (HitCheck_Circle_Line(center, radius, t2, t3)) return true;
-	if (HitCheck_Circle_Line(center, radius, t3, t1)) return true;
-
-	if (PointInTriangle(center, t1, t2, t3)) return true;
-
-	return false;
-}
-
-
 
 // ブロック扱い（押し戻し/床/壁として固いセル）
 static bool IsSolidCell(int cell)
@@ -118,6 +63,8 @@ Field::Field(int stage)
 	GetGraphSize(fallingSpikeImage, &w, &h);
 	fallingSpikeWidth = w;
 	fallingSpikeHeight = h;
+
+	LoadDivGraph("data/image/Goal.png", GOAL_ANIM_FRAMES, GOAL_ANIM_FRAMES, 1, 64, 64, goalImages);
 
 	x = 0;
 	y = 0;
@@ -188,6 +135,11 @@ Field::Field(int stage)
 
 				fallingSpikes.push_back(info);
 			}
+			else if (cell == 16)
+			{
+				// 近づいたら姿を見せる隠しトゲ
+				new HiddenSpike(xx * 64.0f, yy * 64.0f, 90.0f);
+			}
 			else if (cell == 20)
 			{
 				ballTriggers.push_back({ xx * 64, yy * 64 });
@@ -232,6 +184,13 @@ Field::~Field()
 {
 	if (hImage != -1) DeleteGraph(hImage);
 	if (fallingSpikeImage != -1) DeleteGraph(fallingSpikeImage);
+	for (int i = 0;i < GOAL_ANIM_FRAMES;++i)
+	{
+		if (goalImages[i] != 1)
+		{
+			DeleteGraph(goalImages[i]);
+		}
+	}
 }
 
 //------------------------------------------------------------
@@ -250,6 +209,17 @@ void Field::Update()
 
 	if (ty < 0 || ty >= (int)maps.size()) return;
 	if (tx < 0 || tx >= (int)maps[ty].size()) return;
+
+	goalAnimTimer++;
+	if (goalAnimTimer >= goalAnimInterval)
+	{
+		goalAnimTimer = 0;
+		goalAnimFrame++;
+		if (goalAnimFrame >= GOAL_ANIM_FRAMES)
+		{
+			goalAnimFrame = 0;
+		}
+	}
 
 	//------------------------------------------
 	// 待機状態の落下針との当たり判定
@@ -400,14 +370,36 @@ void Field::Update()
 //------------------------------------------------------------
 void Field::Draw()
 {
-	// ブロック描画（1だけ）
+	// ブロック＆ゴール描画
 	for (int yy = 0; yy < (int)maps.size(); yy++)
 	{
 		for (int xx = 0; xx < (int)maps[yy].size(); xx++)
 		{
-			if (maps[yy][xx] == 1)
+			int cell = maps[yy][xx];
+
+			// 通常ブロック
+			if (cell == 1)
 			{
 				DrawRectGraph(xx * 64, yy * 64, 0, 0, 64, 64, hImage, TRUE);
+			}
+
+			// ゴールマス（9 / 99）にアニメーション描画
+			if (cell == 9 || cell == 99)
+			{
+				const float GOAL_SCALE = 2.1f;
+
+				int gw, gh;
+				GetGraphSize(goalImages[goalAnimFrame], &gw, &gh); // ここでは 64x64 のはず
+
+				int drawW = int(gw * GOAL_SCALE);
+				int drawH = int(gh * GOAL_SCALE);
+
+				// マスの中心座標（1マスが 64x64 前提）
+				int cx = xx * 64 + 32;
+				int cy = yy * 64 + 32;
+
+				// 中心合わせで拡大描画
+				DrawExtendGraph(cx - drawW / 2, cy - drawH / 2, cx + drawW / 2, cy + drawH / 2, goalImages[goalAnimFrame], TRUE);
 			}
 		}
 	}
@@ -419,8 +411,6 @@ void Field::Draw()
 		DrawGraph(s.pos.x, s.pos.y, fallingSpikeImage, TRUE);
 	}
 }
-
-
 
 
 

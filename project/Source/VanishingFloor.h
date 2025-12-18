@@ -18,6 +18,8 @@ public:
 	int HitCheckLeft(int px, int py);
 	int HitCheckRight(int px, int py);
 
+	static void ResetAll();
+
 private:
 	int floorImage;      // ƒuƒƒbƒN‰æ‘œ
 	int spikeImage;      // j‰æ‘œ

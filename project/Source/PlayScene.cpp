@@ -4,6 +4,7 @@
 #include "Field.h"
 #include "Fader.h"
 #include "Background.h"
+#include "VanishingFloor.h"
 #include "../Library/SceneManager.h"
 #include "../Library/Trigger.h"
 
