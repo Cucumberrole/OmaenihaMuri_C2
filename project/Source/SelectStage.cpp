@@ -14,8 +14,8 @@ SelectStage::SelectStage()
 	easy.sub1 = "すぐイライラしちゃう人に";
 	easy.sub2 = "おすすめ";
 	easy.lives = 5;
-	easy.stageId = 1;                 // stage01.csv
-	easy.hotKey = KEY_INPUT_E;       // E
+	easy.stageId = 1;                 // Stage01
+	easy.hotKey = KEY_INPUT_E;        // Eキー
 	easy.boxColor = GetColor(80, 160, 80);
 	options.push_back(easy);
 
@@ -24,8 +24,8 @@ SelectStage::SelectStage()
 	hard.sub1 = "たくさん死にたい人におすすめ";
 	hard.sub2 = "";
 	hard.lives = 3;
-	hard.stageId = 2;                 // stage02.csv
-	hard.hotKey = KEY_INPUT_D;       // D
+	hard.stageId = 2;                 // Stage02
+	hard.hotKey = KEY_INPUT_D;        // Dキー
 	hard.boxColor = GetColor(220, 30, 30);
 	options.push_back(hard);
 
@@ -45,7 +45,7 @@ void SelectStage::Update()
 		return;
 	}
 
-	// 左右で移動（任意）
+	// 左右カーソル（任意）
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_LEFT))
 	{
 		cursor--;
@@ -64,13 +64,12 @@ void SelectStage::Update()
 		{
 			cursor = i;
 			PlayScene::SelectedStage = options[i].stageId;
-			// 難易度別残機をここで渡すなら、PlayScene側に static を用意して代入
 			SceneManager::ChangeScene("PLAY");
 			return;
 		}
 	}
 
-	// Enterでも決定
+	// Enterで決定
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_RETURN))
 	{
 		PlayScene::SelectedStage = options[cursor].stageId;
@@ -78,6 +77,7 @@ void SelectStage::Update()
 		return;
 	}
 
+	// ESCで終了
 	if (CheckHitKey(KEY_INPUT_ESCAPE))
 	{
 		SceneManager::Exit();
@@ -86,117 +86,115 @@ void SelectStage::Update()
 
 void SelectStage::Draw()
 {
+	int screenW = 0, screenH = 0;
+	GetDrawScreenSize(&screenW, &screenH);
+
+	// 念のため毎フレームクリア
 	ClearDrawScreen();
 
-	int scrW = 0, scrH = 0;
-	GetDrawScreenSize(&scrW, &scrH);
+	// 背景（全面）
+	DrawBox(0, 0, screenW, screenH, GetColor(255, 255, 255), TRUE);
 
-	// 背景
-	DrawBox(0, 0, scrW, scrH, GetColor(255, 255, 255), TRUE);
-
-	// 画面サイズに応じて余白を自動調整
-	int margin = max(30, min(scrW, scrH) / 20);
+	// 外枠(青)
+	int margin = max(20, (int)(min(screenW, screenH) * 0.03f)); // 3% or 20px
 	int frameL = margin;
 	int frameT = margin;
-	int frameR = scrW - margin;
-	int frameB = scrH - margin;
+	int frameR = screenW - margin;
+	int frameB = screenH - margin;
 
+	int frameColor = GetColor(20, 60, 200);
 	DrawBox(frameL, frameT, frameR, frameB, GetColor(255, 255, 255), TRUE);
+	//DrawBox(frameL, frameT, frameR, frameB, frameColor, FALSE);
+
+	int insideW = frameR - frameL;
+	int insideH = frameB - frameT;
 
 	// タイトル
-	SetFontSize(max(40, scrH / 12));
-	int titleColor = GetColor(255, 180, 0);
 	const char* title = "ステージ選択";
+	SetFontSize(max(48, (int)(insideH * 0.08f))); // 画面に応じて
+	int titleColor = GetColor(255, 180, 0);
 	int titleW = GetDrawStringWidth(title, -1);
-	DrawString((scrW - titleW) / 2, frameT + margin / 2, title, titleColor);
+	int titleY = frameT + (int)(insideH * 0.06f);
+	DrawString(frameL + (insideW - titleW) / 2, titleY, title, titleColor);
 
 	// サブ
-	SetFontSize(max(18, scrH / 40));
-	int textColor = GetColor(0, 0, 0);
 	const char* sub = "挑戦したいステージのキーを押して下さい";
+	SetFontSize(max(20, (int)(insideH * 0.035f)));
+	int subColor = GetColor(0, 0, 0);
 	int subW = GetDrawStringWidth(sub, -1);
-	DrawString((scrW - subW) / 2, frameT + margin / 2 + max(60, scrH / 10), sub, textColor);
+	int subY = titleY + (int)(insideH * 0.10f);
+	DrawString(frameL + (insideW - subW) / 2, subY, sub, subColor);
 
-	// ボックスレイアウト（2列）
+	// 2つのボックス（左右）
 	int cols = 2;
-	int gapX = max(40, scrW / 12);
-	int gapY = max(30, scrH / 18);
 
-	// フレーム内の使用可能領域
-	int areaL = frameL + margin;
-	int areaR = frameR - margin;
-	int areaT = frameT + margin + max(140, scrH / 5);     // タイトル領域ぶん下げる
-	int areaB = frameB - margin - max(60, scrH / 12);     // 下の説明ぶん確保
+	// ボックス間隔・サイズは「内側領域」から自動計算
+	int gapX = max(40, (int)(insideW * 0.06f));
+	int gapY = max(30, (int)(insideH * 0.05f));
 
-	int areaW = areaR - areaL;
-	int areaH = areaB - areaT;
+	int areaTop = subY + (int)(insideH * 0.08f);
+	int areaBottom = frameB - (int)(insideH * 0.12f);
+	int areaH = max(0, areaBottom - areaTop);
 
-	int boxW = (areaW - gapX) / 2;
-	int boxH = min((int)(areaH * 0.75f), boxW); // 縦を詰めすぎない＆正方形寄り
+	int boxW = (insideW - gapX * (cols - 1)) / cols;
+	int boxH = min(areaH, (int)(insideH * 0.55f)); // 高さはほどほどに
 
-	// 全体を縦中央寄せしたい場合は rows を計算して startY を調整
-	int n = (int)options.size();
-	int rows = (n + cols - 1) / cols;
-	int totalH = rows * boxH + (rows - 1) * gapY;
-	int startY = areaT + max(0, (areaH - totalH) / 2);
-	int startX = areaL + max(0, (areaW - (boxW * cols + gapX * (cols - 1))) / 2);
+	int areaLeft = frameL + (insideW - (boxW * cols + gapX * (cols - 1))) / 2;
 
-	auto drawCenter = [&](int bx, int by, int bw, const std::string& s, int yy, int fontSize, int col)
-		{
-			if (s.empty()) return;
-			SetFontSize(fontSize);
-			int w = GetDrawStringWidth(s.c_str(), -1);
-			DrawString(bx + (bw - w) / 2, yy, s.c_str(), col);
-		};
-
-	for (int i = 0; i < n; ++i)
+	for (int i = 0; i < (int)options.size(); ++i)
 	{
 		int r = i / cols;
 		int c = i % cols;
 
-		int bx = startX + c * (boxW + gapX);
-		int by = startY + r * (boxH + gapY);
+		int bx = areaLeft + c * (boxW + gapX);
+		int by = areaTop + r * (boxH + gapY);
 
-		// 塗り
 		DrawBox(bx, by, bx + boxW, by + boxH, options[i].boxColor, TRUE);
 
-		// 枠（選択中は太く）
+		// 選択枠
 		int border = (i == cursor) ? 6 : 2;
-		int borderColor = (i == cursor) ? GetColor(255, 255, 255) : GetColor(0, 0, 0);
+		int borderColor = (i == cursor) ? GetColor(0, 0, 0) : GetColor(255, 255, 255);
 		for (int t = 0; t < border; ++t)
 		{
 			DrawBox(bx - t, by - t, bx + boxW + t, by + boxH + t, borderColor, FALSE);
 		}
 
-		int white = GetColor(255, 255, 255);
+		int textColor = GetColor(255, 255, 255);
 
-		int y = by + boxH / 4;
-		drawCenter(bx, by, boxW, options[i].title, y, max(26, scrH / 28), white); y += max(40, scrH / 18);
-		drawCenter(bx, by, boxW, options[i].sub1, y, max(20, scrH / 36), white); y += max(32, scrH / 24);
-		drawCenter(bx, by, boxW, options[i].sub2, y, max(20, scrH / 36), white); y += max(44, scrH / 18);
+		auto drawCenter = [&](const std::string& s, int yy, int fontSize)
+			{
+				if (s.empty()) return;
+				SetFontSize(fontSize);
+				int w = GetDrawStringWidth(s.c_str(), -1);
+				DrawString(bx + (boxW - w) / 2, yy, s.c_str(), textColor);
+			};
 
-		// 残機
+		int y = by + (int)(boxH * 0.25f);
+		drawCenter(options[i].title, y, max(24, (int)(boxH * 0.09f))); y += (int)(boxH * 0.13f);
+		drawCenter(options[i].sub1, y, max(18, (int)(boxH * 0.07f))); y += (int)(boxH * 0.10f);
+		drawCenter(options[i].sub2, y, max(18, (int)(boxH * 0.07f))); y += (int)(boxH * 0.14f);
+
 		{
 			char buf[64];
 			sprintf_s(buf, "残機数 %d", options[i].lives);
-			drawCenter(bx, by, boxW, buf, y, max(20, scrH / 36), white);
-			y += max(44, scrH / 18);
+			drawCenter(buf, y, max(18, (int)(boxH * 0.07f)));
+			y += (int)(boxH * 0.12f);
 		}
 
-		// Push
 		{
 			std::string keyStr = "Push to[";
 			if (options[i].hotKey == KEY_INPUT_E) keyStr += "E";
 			else if (options[i].hotKey == KEY_INPUT_D) keyStr += "D";
 			else keyStr += "?";
 			keyStr += "]";
-			drawCenter(bx, by, boxW, keyStr, y, max(20, scrH / 36), white);
+			drawCenter(keyStr, y, max(18, (int)(boxH * 0.07f)));
 		}
 	}
 
 	// 下の説明
-	SetFontSize(max(18, scrH / 42));
-	const char* msg = "タイトルへ戻る  Push to[Space]";
+	const char* msg = "タイトルへ戻る Push to[Space]";
+	SetFontSize(max(18, (int)(insideH * 0.03f)));
 	int msgW = GetDrawStringWidth(msg, -1);
-	DrawString((scrW - msgW) / 2, frameB - margin - max(30, scrH / 30), msg, textColor);
+	int msgY = frameB - (int)(insideH * 0.07f);
+	DrawString(frameL + (insideW - msgW) / 2, msgY, msg, subColor);
 }

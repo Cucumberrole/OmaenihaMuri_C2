@@ -13,17 +13,22 @@ public:
 	void Draw() override;
 
 private:
+	int backgroundImage;
+
+	// 選択肢（増やしたいときは cpp 側の options に追加する）
 	struct Option
 	{
-		std::string title;
-		std::string sub1;
-		std::string sub2;
-		int lives = 5;
-		int stageId = 1;
-		int hotKey = 0;     // KEY_INPUT_***
-		int boxColor = 0;   // GetColor(...)
+		std::string title;     // 大見出し
+		std::string sub1;      // 2行目
+		std::string sub2;      // 3行目
+		int lives;             // 残機数（表示用）
+		int stageId;           // PlayScene::SelectedStage に入れる値
+		int hotKey;            // 直接選択キー（KEY_INPUT_E など）
+		int boxColor;          // 枠内の色
 	};
 
 	std::vector<Option> options;
-	int cursor = 0;
+
+	// カーソル（左右キーでも選べるように残してある）
+	int cursor;
 };
