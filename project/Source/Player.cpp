@@ -368,6 +368,12 @@ void Player::Draw()
 	DrawCircle((int)cx, (int)cy, (int)r, GetColor(0, 255, 0), FALSE);
 }
 
+void Player::Move(int dx, int dy)
+{
+	x += dx;
+	y += dy;
+}
+
 void Player::ForceDie()
 {
 	// 画面外へ
