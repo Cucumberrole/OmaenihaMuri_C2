@@ -126,7 +126,7 @@ void ClearScene::Update()
 // --------- Draw ---------
 void ClearScene::Draw()
 {
-	// 背景を白で塗りつぶし
+	// 背景
 	DrawBox(0, 0, Screen::WIDTH, Screen::HEIGHT,
 		GetColor(255, 255, 255), TRUE);
 
@@ -134,38 +134,20 @@ void ClearScene::Draw()
 	DrawBox(40, 40, Screen::WIDTH - 40, Screen::HEIGHT - 40,
 		GetColor(0, 0, 128), FALSE);
 
-	// 左右のキャラ枠
-	int charBoxW = 260;
-	int charBoxH = 420;
-	int charBoxY = 140;
-
-	int leftX = 80;
-	int rightX = Screen::WIDTH - 80 - charBoxW;
-
-	int charColor = GetColor(255, 204, 0); // 黄色
-
-	DrawBox(leftX, charBoxY, leftX + charBoxW, charBoxY + charBoxH, charColor, TRUE);
-	DrawBox(rightX, charBoxY, rightX + charBoxW, charBoxY + charBoxH, charColor, TRUE);
-
 	// タイトル
-	SetFontSize(72);
-	int titleColor = GetColor(255, 204, 0);
-	const char* titleStr = "GAME  CLEAR";
-	int wTitle = GetDrawStringWidth(titleStr, -1);
-	DrawString((Screen::WIDTH - wTitle) / 2, 80, titleStr, titleColor);
-
-	// Thank you
 	SetFontSize(48);
-	const char* thanksStr = "Thank you  for  Playing";
-	int wThanks = GetDrawStringWidth(thanksStr, -1);
-	DrawString((Screen::WIDTH - wThanks) / 2, 170, thanksStr, titleColor);
+	const char* title = "GAME CLEAR !!";
+	int wTitle = GetDrawStringWidth(title, -1);
+	DrawString((Screen::WIDTH - wTitle) / 2, 80, title, GetColor(0, 0, 0));
 
-	// ランク表示
 	SetFontSize(40);
+
+	// 「ランク」ラベル
 	int wRankLabel = GetDrawStringWidth("ランク", -1);
 	DrawString((Screen::WIDTH - wRankLabel) / 2 - 150, 240,
 		"ランク", GetColor(0, 0, 0));
 
+	// 実際のランク文字（S RANK / A RANK など）
 	int wRank = GetDrawStringWidth(rankText.c_str(), -1);
 	DrawString((Screen::WIDTH - wRank) / 2 + 50, 240,
 		rankText.c_str(), rankColor);
