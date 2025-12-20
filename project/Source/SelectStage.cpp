@@ -11,9 +11,14 @@ SelectStage::SelectStage()
 	options.clear();
 
 	selectSE = LoadSoundMem("data/bgm/cursor.mp3");
+	decideSE = LoadSoundMem("data/bgm/decision.mp3");
 
 	debugUnlocked = false;
 	cursor = 0;
+
+	deciding = false;
+	decideTimer = 0;
+	decideStageId = 0;
 
 	cursorBlinkFrame = 0;
 	subTextAnimFrame = 0;
@@ -43,10 +48,28 @@ SelectStage::SelectStage()
 
 SelectStage::~SelectStage()
 {
+	DeleteSoundMem(selectSE);
+	DeleteSoundMem(decideSE);
 }
 
 void SelectStage::Update()
 {
+
+	if (deciding)
+	{
+		// 演出用タイマーを進める
+		decideTimer++;
+
+		// 30フレーム（0.5秒くらい）待ってからゲーム画面へ
+		const int WAIT_FRAMES = 30;
+		if (decideTimer >= WAIT_FRAMES)
+		{
+			PlayScene::SelectedStage = decideStageId;
+			SceneManager::ChangeScene("PLAY");
+		}
+		return; // 決定中は他の入力は受け付けない
+	}
+
 	// タイトルに戻る
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE))
 	{
@@ -86,23 +109,36 @@ void SelectStage::Update()
 		if (cursor >= (int)options.size()) cursor = 0;
 	}
 
-	// ホットキーで即決定
+	// 決定処理をまとめたラムダ（共通関数みたいなもの）
+	auto startDecide = [&](int index)
+		{
+			if (deciding) return;          // 二重決定防止
+
+			deciding = true;
+			decideTimer = 0;
+			cursor = index;
+			decideStageId = options[index].stageId;
+
+			if (decideSE >= 0)
+			{
+				PlaySoundMem(decideSE, DX_PLAYTYPE_BACK);
+			}
+		};
+
+	// ショートカットキーで決定
 	for (int i = 0; i < (int)options.size(); ++i)
 	{
 		if (KeyTrigger::CheckTrigger(options[i].hotKey))
 		{
-			cursor = i;
-			PlayScene::SelectedStage = options[i].stageId;
-			SceneManager::ChangeScene("PLAY");
+			startDecide(i);
 			return;
 		}
 	}
 
-	// Enterで決定
+	// Enter で決定
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_RETURN))
 	{
-		PlayScene::SelectedStage = options[cursor].stageId;
-		SceneManager::ChangeScene("PLAY");
+		startDecide(cursor);
 		return;
 	}
 
@@ -257,4 +293,24 @@ void SelectStage::Draw()
 	int msgW = GetDrawStringWidth(msg, -1);
 	int msgY = frameB - (int)(insideH * 0.07f);
 	DrawString(frameL + (insideW - msgW) / 2, msgY, msg, subColor);
+
+	// ★ 決定中なら、画面全体を黒くフェードアウト
+	if (deciding)
+	{
+		int screenW = 0, screenH = 0;
+		GetDrawScreenSize(&screenW, &screenH);
+
+		const int WAIT_FRAMES = 30;
+		int t = decideTimer;
+		if (t > WAIT_FRAMES) t = WAIT_FRAMES;
+
+		// 0 → 255 に変化
+		int alpha = (int)(255.0f * (float)t / (float)WAIT_FRAMES);
+		if (alpha < 0) alpha = 0;
+		if (alpha > 255) alpha = 255;
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+		DrawBox(0, 0, screenW, screenH, GetColor(0, 0, 0), TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
 }

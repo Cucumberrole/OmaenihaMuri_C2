@@ -20,6 +20,12 @@ private:
 	float cursorBlinkFrame;   // セレクト枠点滅
 	float subTextAnimFrame;   // 上の説明文アニメ
 
+
+	bool deciding;       // 決定演出中かどうか
+	int  decideTimer;    // 決定演出の経過フレーム
+	int  decideStageId;  // 決定したステージID
+	int  decideSE;       // 決定音SE
+
 	// 選択肢（増やしたいときは cpp 側の options に追加する）
 	struct Option
 	{
