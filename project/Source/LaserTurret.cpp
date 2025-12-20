@@ -122,7 +122,7 @@ void LaserTurret::Draw()
 	int t = animCount % period;
 	bool isFiring = (t < beamDuration);
 
-	if (!isFiring) return;
+	//if (!isFiring) return;
 
 	// --- ƒr[ƒ€ü ---
 	float sx = x + 32.0f;
@@ -171,7 +171,7 @@ void LaserTurret::Draw()
 		}
 	}
 
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 192);
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
 	DrawBox(
 		(int)min(sx, ex),
 		(int)min(sy, ey),
