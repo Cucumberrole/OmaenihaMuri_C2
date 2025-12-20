@@ -11,16 +11,41 @@ LaserTurret::LaserTurret(float sx, float sy, Dir dir)
 	y = sy;
 	this->dir = dir;
 
-	// 砲台画像（仮：共通のやつ。専用画像があるなら差し替え）
-	hTurret = LoadGraph("data/image/houda.png"); // なければあとで用意
-	SetDrawOrder(-1);
+	// 砲台画像（2コマ：通常 / 発射中）
+	int heads[2];
+	if (LoadDivGraph("data/image/BreathHead.png",
+		2, 2, 1,
+		64, 64,
+		heads) == 0)
+	{
+		hHead[0] = heads[0]; // 左：通常
+		hHead[1] = heads[1]; // 右：発射中
+	}
+
+	// レーザー画像
+	hLaser = LoadGraph("data/image/BOAAA.png");
+	if (hLaser != -1)
+	{
+		GetGraphSize(hLaser, &laserW, &laserH);
+	}
+
+	SetDrawOrder(40);
 }
 
 LaserTurret::~LaserTurret()
 {
-	if (hTurret != -1)
+	for (int i = 0; i < 2; ++i)
 	{
-		DeleteGraph(hTurret);
+		if (hHead[i] != -1)
+		{
+			DeleteGraph(hHead[i]);
+			hHead[i] = -1;
+		}
+	}
+	if (hLaser != -1)
+	{
+		DeleteGraph(hLaser);
+		hLaser = -1;
 	}
 }
 
@@ -31,14 +56,69 @@ void LaserTurret::Update()
 	int period = fireInterval + beamDuration;
 	if (period <= 0) period = 1;
 
-	// 0～period-1 の中で、先頭 beamDuration フレームだけ撃つ
 	int t = animCount % period;
-	bool isFiring = (t < beamDuration);
+	isFiring = (t < beamDuration);
 
+	// ビーム始点
+	float sx = x + 64.0f;
+	float sy = y + 32.0f;
+
+	beamStartX = sx;
+	beamStartY = sy;
+	beamEndX = sx;
+	beamEndY = sy;
+
+	// ビーム方向
+	float dirX = 0.0f;
+	float dirY = 0.0f;
+	switch (dir)
+	{
+	case Dir::Right: dirX = 1.0f; dirY = 0.0f; break;
+	case Dir::Left:  dirX = -1.0f; dirY = 0.0f; break;
+	case Dir::Up:    dirX = 0.0f; dirY = -1.0f; break;
+	case Dir::Down:  dirX = 0.0f; dirY = 1.0f; break;
+	}
+
+	Field* field = FindGameObject<Field>();
+
+	float ex = sx;
+	float ey = sy;
+
+	const float step = 32.0f;
+	const int   maxSteps = 100;
+
+	for (int i = 0; i < maxSteps; ++i)
+	{
+		ex += dirX * step;
+		ey += dirY * step;
+
+		if (field)
+		{
+			int tx = static_cast<int>(ex) / 64;
+			int ty = static_cast<int>(ey) / 64;
+			if (field->IsBlock(tx, ty))
+			{
+				ex -= dirX * step;
+				ey -= dirY * step;
+				break;
+			}
+		}
+
+		float dx = ex - sx;
+		float dy = ey - sy;
+		if (dx * dx + dy * dy >= maxLength * maxLength)
+		{
+			break;
+		}
+	}
+
+	beamEndX = ex;
+	beamEndY = ey;
+
+	// 撃っていないときはダメージなし
 	if (!isFiring) return;
 
-	// --- ここから下は「撃ってる間だけ」の当たり判定 ---
-
+	// --- 当たり判定 ---
 	Player* player = FindGameObject<Player>();
 	if (!player) return;
 
@@ -46,57 +126,8 @@ void LaserTurret::Update()
 	player->GetHitCircle(cx, cy, cr);
 	VECTOR center = VGet(cx, cy, 0.0f);
 
-	// ビームの始点（砲台の中心）
-	float sx = x + 32.0f;
-	float sy = y + 32.0f;
-
-	// 方向ベクトル
-	float dirX = 0.0f;
-	float dirY = 0.0f;
-	switch (dir)
-	{
-	case Dir::Right: dirX = 1.0f; dirY = 0.0f; break;
-	case Dir::Left:  dirX = -1.0f; dirY = 0.0f; break;
-	case Dir::Up:    dirX = 0.0f; dirY = -1.0f; break;
-	case Dir::Down:  dirX = 0.0f; dirY = 1.0f; break;
-	}
-
-	float ex = sx;
-	float ey = sy;
-
-	Field* field = FindGameObject<Field>();
-
-	const float step = 32.0f;
-	const int   maxSteps = 100;
-
-	for (int i = 0; i < maxSteps; ++i)
-	{
-		ex += dirX * step;
-		ey += dirY * step;
-
-		if (field)
-		{
-			int tx = static_cast<int>(ex) / 64;
-			int ty = static_cast<int>(ey) / 64;
-			if (field->IsBlock(tx, ty))
-			{
-				// ぶつかる直前で止める
-				ex -= dirX * step;
-				ey -= dirY * step;
-				break;
-			}
-		}
-
-		float dx = ex - sx;
-		float dy = ey - sy;
-		if (dx * dx + dy * dy >= maxLength * maxLength)
-		{
-			break;
-		}
-	}
-
-	VECTOR a = VGet(sx, sy, 0.0f);
-	VECTOR b = VGet(ex, ey, 0.0f);
+	VECTOR a = VGet(beamStartX, beamStartY, 0.0f);
+	VECTOR b = VGet(beamEndX, beamEndY, 0.0f);
 
 	if (HitCheck_Circle_Line(center, cr, a, b))
 	{
@@ -104,81 +135,64 @@ void LaserTurret::Update()
 		player->SetDead();
 	}
 }
+
 void LaserTurret::Draw()
 {
 	// 砲台本体
-	if (hTurret != -1)
+	int headIndex = isFiring ? 1 : 0;
+	int headHandle = hHead[headIndex];
+
+	// とりあえず右向き画像前提で描画
+	// 左向きにしたいときは左右反転（DrawTurnGraph）を使う
+	if (headHandle != -1)
 	{
-		DrawGraph((int)x, (int)y, hTurret, TRUE);
+		if (dir == Dir::Right)
+		{
+			DrawGraph(x, y, headHandle, TRUE);
+		}
+		else if (dir == Dir::Left)
+		{
+			// 左右反転
+			DrawTurnGraph(x, y, headHandle, TRUE);
+		}
+		else
+		{
+			// 上下はとりあえずそのまま（必要なら後で回転対応）
+			DrawGraph(x, y, headHandle, TRUE);
+		}
 	}
 	else
 	{
-		DrawBox((int)x, (int)y, (int)x + 64, (int)y + 64,
-			GetColor(128, 128, 128), TRUE);
+		DrawBox(x, y, x + 64, y + 64, GetColor(128, 128, 128), TRUE);
 	}
 
-	int period = fireInterval + beamDuration;
-	if (period <= 0) period = 1;
-	int t = animCount % period;
-	bool isFiring = (t < beamDuration);
+	// ビーム描画
+	if (!isFiring) return;
+	if (hLaser == -1) return;
 
-	//if (!isFiring) return;
+	float sx = beamStartX;
+	float sy = beamStartY;
+	float ex = beamEndX;
+	float ey = beamEndY;
 
-	// --- ビーム線 ---
-	float sx = x + 32.0f;
-	float sy = y + 32.0f;
-
-	float dirX = 0.0f;
-	float dirY = 0.0f;
-	switch (dir)
+	// 今回は横方向（Right/Left）前提で画像を伸ばす
+	if (dir == Dir::Right || dir == Dir::Left)
 	{
-	case Dir::Right: dirX = 1.0f; dirY = 0.0f; break;
-	case Dir::Left:  dirX = -1.0f; dirY = 0.0f; break;
-	case Dir::Up:    dirX = 0.0f; dirY = -1.0f; break;
-	case Dir::Down:  dirX = 0.0f; dirY = 1.0f; break;
+		float yTop = sy - laserH * 0.5f;
+		float yBot = sy + laserH * 0.5f;
+
+		float left = min(sx, ex);
+		float right = max(sx, ex);
+
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 240);
+		DrawRectExtendGraph(left, yTop, right, yBot, 0, 0, laserW, laserH, hLaser, TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
-
-	float ex = sx;
-	float ey = sy;
-
-	Field* field = FindGameObject<Field>();
-
-	const float step = 32.0f;
-	const int   maxSteps = 100;
-
-	for (int i = 0; i < maxSteps; ++i)
+	else
 	{
-		ex += dirX * step;
-		ey += dirY * step;
-
-		if (field)
-		{
-			int tx = static_cast<int>(ex) / 64;
-			int ty = static_cast<int>(ey) / 64;
-			if (field->IsBlock(tx, ty))
-			{
-				ex -= dirX * step;
-				ey -= dirY * step;
-				break;
-			}
-		}
-
-		float dx = ex - sx;
-		float dy = ey - sy;
-		if (dx * dx + dy * dy >= maxLength * maxLength)
-		{
-			break;
-		}
+		// 上下方向のときは、ひとまず線で描く（画像回転は後で追加してもOK）
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 240);
+		DrawLine(sx, sy, ex, ey, GetColor(255, 255, 255), 8);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
-
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255);
-	DrawBox(
-		(int)min(sx, ex),
-		(int)min(sy, ey),
-		(int)max(sx, ex),
-		(int)max(sy, ey),
-		GetColor(0, 255, 255),
-		TRUE
-	);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }

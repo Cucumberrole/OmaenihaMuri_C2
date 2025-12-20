@@ -6,10 +6,10 @@ class LaserTurret : public GameObject
 public:
 	enum class Dir
 	{
-		Up,
-		Down,
+		Right,
 		Left,
-		Right
+		Up,
+		Down
 	};
 
 	LaserTurret(float sx, float sy, Dir dir);
@@ -24,11 +24,26 @@ private:
 
 	Dir dir;
 
-	int  hTurret = -1;
+	// 砲台（0:通常, 1:発射中）
+	int  hHead[2] = { -1, -1 };
 
-	// ★ ここにデフォルト値を「直接」入れておく
+	// レーザー画像
+	int  hLaser = -1;
+	int  laserW = 0;
+	int  laserH = 0;
+
+	// タイミング
 	int  animCount = 0;
 	int  fireInterval = 90;   // 何フレームおきに撃つか
 	int  beamDuration = 30;   // 何フレームレーザーを出すか
-	float maxLength = 640.0f; // 最大射程
+
+	// 今フレーム撃っているか
+	bool isFiring = false;
+
+	// ビーム情報
+	float maxLength = 640.0f;
+	float beamStartX = 0.0f;
+	float beamStartY = 0.0f;
+	float beamEndX = 0.0f;
+	float beamEndY = 0.0f;
 };
