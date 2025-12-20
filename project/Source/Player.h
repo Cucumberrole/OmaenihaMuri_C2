@@ -14,7 +14,10 @@ public:
 
 	float GetX() const { return x; }
 	float GetY() const { return y; }
-	void Move(int dx, int dy);
+
+	// 絶対座標セット
+	//void SetX(float nx) { x = nx; }
+	//void SetY(float ny) { y = ny; }
 
 	void SetDead() { isDead = true; }
 	bool IsDead() const { return isDead; }

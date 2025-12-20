@@ -18,6 +18,7 @@
 #include "Boss.h"
 #include "MovingWall.h"
 #include "HiddenSpike.h"
+#include "DirectionalSpike.h"
 #include <DxLib.h>
 
 // ブロック扱い（押し戻し/床/壁として固いセル）
@@ -149,6 +150,26 @@ Field::Field(int stage)
 			else if (cell == 21)
 			{
 				ballSpawns.push_back({ xx * 64, yy * 64 });
+			}
+			else if (cell == 30)
+			{
+				// 上向き針
+				new DirectionalSpike(xx * 64.0f, yy * 64.0f, SpikeDir::Up);
+			}
+			else if (cell == 31)
+			{
+				// 下向き針
+				new DirectionalSpike(xx * 64.0f, yy * 64.0f, SpikeDir::Down);
+			}
+			else if (cell == 32)
+			{
+				// 左向き針
+				new DirectionalSpike(xx * 64.0f, yy * 64.0f, SpikeDir::Left);
+			}
+			else if (cell == 33)
+			{
+				// 右向き針
+				new DirectionalSpike(xx * 64.0f, yy * 64.0f, SpikeDir::Right);
 			}
 			else if (cell == 40)
 			{

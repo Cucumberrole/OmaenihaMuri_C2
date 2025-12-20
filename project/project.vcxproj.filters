@@ -130,6 +130,9 @@
     <ClCompile Include="..\..\..\1年生チーム制作\おまえにはむりC1\ひな形\project\Source\Debug.cpp">
       <Filter>Debug</Filter>
     </ClCompile>
+    <ClCompile Include="Source\DirectionalSpike.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -353,6 +356,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\1年生チーム制作\おまえにはむりC1\ひな形\project\Source\Debug.h">
       <Filter>Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\DirectionalSpike.h">
+      <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
