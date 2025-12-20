@@ -16,4 +16,5 @@ public:
 	void Draw() override;
 private:
 	int TitleImage;
+	int sHandle;
 };

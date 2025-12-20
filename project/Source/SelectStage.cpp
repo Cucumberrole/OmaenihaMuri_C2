@@ -10,6 +10,8 @@ SelectStage::SelectStage()
 {
 	options.clear();
 
+	selectSE = LoadSoundMem("data/BGM/cursor.mp3");
+
 	debugUnlocked = false;
 	cursor = 0;
 
@@ -73,11 +75,13 @@ void SelectStage::Update()
 	// 左右カーソル
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_LEFT))
 	{
+		PlaySoundMem(selectSE, DX_PLAYTYPE_BACK);
 		cursor--;
 		if (cursor < 0) cursor = (int)options.size() - 1;
 	}
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_RIGHT))
 	{
+		PlaySoundMem(selectSE, DX_PLAYTYPE_BACK);
 		cursor++;
 		if (cursor >= (int)options.size()) cursor = 0;
 	}

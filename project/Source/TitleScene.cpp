@@ -7,16 +7,19 @@
 TitleScene::TitleScene()
 {
 	TitleImage = LoadGraph("data/image/title.png");
+	sHandle = LoadSoundMem("data/BGM/Title.mp3");
+	PlaySoundMem(sHandle, DX_PLAYTYPE_BACK);
 }
 
 TitleScene::~TitleScene()
 {
 	DeleteGraph(TitleImage);
+	DeleteSoundMem(sHandle);
 }
 
 void TitleScene::Update()
 {
-	
+
 	if (CheckHitKey(KEY_INPUT_LSHIFT) || CheckHitKey(KEY_INPUT_RSHIFT)) {
 		SceneManager::ChangeScene("STAGE");
 		g_ClearTimeSeconds = 0.0f;
