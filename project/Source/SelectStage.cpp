@@ -10,7 +10,7 @@ SelectStage::SelectStage()
 {
 	options.clear();
 
-	selectSE = LoadSoundMem("data/BGM/cursor.mp3");
+	selectSE = LoadSoundMem("data/bgm/cursor.mp3");
 
 	debugUnlocked = false;
 	cursor = 0;

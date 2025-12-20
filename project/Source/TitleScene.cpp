@@ -7,7 +7,7 @@
 TitleScene::TitleScene()
 {
 	TitleImage = LoadGraph("data/image/title.png");
-	sHandle = LoadSoundMem("data/BGM/Title.mp3");
+	sHandle = LoadSoundMem("data/bgm/Title.mp3");
 	PlaySoundMem(sHandle, DX_PLAYTYPE_BACK);
 }
 
