@@ -135,7 +135,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\1年生チーム制作\おまえにはむりC1\ひな形\project\Source\Debug.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
     <ClInclude Include="ImGui\imgui_impl_dx11.h" />
@@ -188,7 +187,6 @@
     <ClInclude Include="Source\VanishingFloor.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\1年生チーム制作\おまえにはむりC1\ひな形\project\Source\Debug.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_draw.cpp" />
     <ClCompile Include="ImGui\imgui_impl_dx11.cpp" />

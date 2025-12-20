@@ -42,11 +42,7 @@ void FallingFloor::Update()
 	float px = player->GetX();
 	float py = player->GetY();
 
-	// -----------------------------
-	// プレイヤーが床の「真下」を通過したら落下開始
-	// ここが一番ブレやすいので強めに判定する
-	// -----------------------------
-// --- プレイヤーが真下を通過したら落下開始 ---
+	// --- プレイヤーが真下を通過したら落下開始 ---
 	if (!isFalling)
 	{
 		Field* field = FindGameObject<Field>();
