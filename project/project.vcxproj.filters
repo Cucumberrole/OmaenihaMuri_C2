@@ -130,6 +130,9 @@
     <ClCompile Include="Source\DirectionalSpike.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
+    <ClCompile Include="Source\LaserTurret.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -352,6 +355,9 @@
       <Filter>Trap</Filter>
     </ClInclude>
     <ClInclude Include="Source\DirectionalSpike.h">
+      <Filter>Trap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\LaserTurret.h">
       <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>

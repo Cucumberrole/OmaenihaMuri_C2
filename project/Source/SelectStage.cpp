@@ -4,17 +4,22 @@
 #include "../Library/Trigger.h"
 #include <DxLib.h>
 #include <algorithm>
+#include <math.h>
 
 SelectStage::SelectStage()
 {
 	options.clear();
 
 	debugUnlocked = false;
+	cursor = 0;
+
+	cursorBlinkFrame = 0;
+	subTextAnimFrame = 0;
 
 	Option easy;
-	easy.title = "易しいチュートリアル";
-	easy.sub1 = "すぐイライラしちゃう人に";
-	easy.sub2 = "おすすめ";
+	easy.title = "易しい｢チュートリアル｣";
+	easy.sub1 = "すぐイライラしちゃう人向け";
+	easy.sub2 = "【おすすめ】";
 	easy.lives = 5;
 	easy.stageId = 1;                 // Stage01
 	easy.hotKey = KEY_INPUT_E;        // Eキー
@@ -22,12 +27,12 @@ SelectStage::SelectStage()
 	options.push_back(easy);
 
 	Option hard;
-	hard.title = "難しい";
-	hard.sub1 = "たくさん死にたい人におすすめ";
+	hard.title = "難しいステージ";
+	hard.sub1 = "たくさん死にたい人はこちら";
 	hard.sub2 = "";
 	hard.lives = 3;
 	hard.stageId = 2;                 // Stage02
-	hard.hotKey = KEY_INPUT_D;        // Dキー
+	hard.hotKey = KEY_INPUT_H;        // Dキー
 	hard.boxColor = GetColor(220, 30, 30);
 	options.push_back(hard);
 
@@ -48,7 +53,7 @@ void SelectStage::Update()
 	}
 
 	// ============================
-	// デバッグステージ解放 (F9)
+	// デバッグステージ解放
 	// ============================
 	if (!debugUnlocked && KeyTrigger::CheckTrigger(KEY_INPUT_F9))
 	{
@@ -59,13 +64,13 @@ void SelectStage::Update()
 		debug.sub1 = "開発者用テスト";
 		debug.sub2 = "";
 		debug.lives = 99;
-		debug.stageId = 0;              // ← Debug 用のステージIDに合わせて変更
-		debug.hotKey = KEY_INPUT_G;    // ← 好きなキーに変更
+		debug.stageId = 0;
+		debug.hotKey = KEY_INPUT_G;
 		debug.boxColor = GetColor(80, 80, 160);
 		options.push_back(debug);
 	}
 
-	// 左右カーソル（任意）
+	// 左右カーソル
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_LEFT))
 	{
 		cursor--;
@@ -101,6 +106,19 @@ void SelectStage::Update()
 	if (CheckHitKey(KEY_INPUT_ESCAPE))
 	{
 		SceneManager::Exit();
+	}
+
+	// アニメーション用カウンタ
+	cursorBlinkFrame += 0.13f; // 速さ
+	if (cursorBlinkFrame > DX_PI * 2.0f)
+	{
+		cursorBlinkFrame -= DX_PI * 2.0f;
+	}
+
+	subTextAnimFrame += 0.08; // 速さ
+	if (subTextAnimFrame > DX_PI * 2.0f)
+	{
+		subTextAnimFrame -= DX_PI * 2.0f;
 	}
 }
 
@@ -143,7 +161,9 @@ void SelectStage::Draw()
 	int subColor = GetColor(0, 0, 0);
 	int subW = GetDrawStringWidth(sub, -1);
 	int subY = titleY + (int)(insideH * 0.10f);
-	DrawString(frameL + (insideW - subW) / 2, subY, sub, subColor);
+	float offset = 4.0f * sinf(subTextAnimFrame); // ±4pxくらい
+	int subYAnim = subY + (int)offset;
+	DrawString(frameL + (insideW - subW) / 2, subYAnim, sub, subColor);
 
 	// 2つのボックス（左右）
 	int cols = 2;
@@ -172,11 +192,27 @@ void SelectStage::Draw()
 		DrawBox(bx, by, bx + boxW, by + boxH, options[i].boxColor, TRUE);
 
 		// 選択枠
+		bool isCursor = (i == cursor);
 		int border = (i == cursor) ? 6 : 2;
 		int borderColor = (i == cursor) ? GetColor(0, 0, 0) : GetColor(255, 255, 255);
+		if (isCursor)
+		{
+			float s = sinf(cursorBlinkFrame);
+			int alpha = 128 + (int)(127 * s);
+			if (alpha < 0)alpha = 0;
+			if (alpha > 255)alpha = 255;
+
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+		}
+
 		for (int t = 0; t < border; ++t)
 		{
 			DrawBox(bx - t, by - t, bx + boxW + t, by + boxH + t, borderColor, FALSE);
+		}
+
+		if (isCursor)
+		{
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		}
 
 		int textColor = GetColor(255, 255, 255);
@@ -204,7 +240,7 @@ void SelectStage::Draw()
 		{
 			std::string keyStr = "Push to[";
 			if (options[i].hotKey == KEY_INPUT_E) keyStr += "E";
-			else if (options[i].hotKey == KEY_INPUT_D) keyStr += "D";
+			else if (options[i].hotKey == KEY_INPUT_H) keyStr += "H";
 			else keyStr += "?";
 			keyStr += "]";
 			drawCenter(keyStr, y, max(18, (int)(boxH * 0.07f)));

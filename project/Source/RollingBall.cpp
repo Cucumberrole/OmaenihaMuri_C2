@@ -5,7 +5,7 @@
 
 RollingBall::RollingBall(float sx, float sy, float dir)
 {
-	hImage = LoadGraph("data/image/ball.png");
+	hImage = LoadGraph("data/image/ironball.png");
 
 	x = sx;
 	y = sy;

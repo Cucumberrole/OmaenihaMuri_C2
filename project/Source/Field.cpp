@@ -19,6 +19,7 @@
 #include "MovingWall.h"
 #include "HiddenSpike.h"
 #include "DirectionalSpike.h"
+#include "LaserTurret.h"
 #include <DxLib.h>
 
 // ブロック扱い（押し戻し/床/壁として固いセル）
@@ -180,6 +181,26 @@ Field::Field(int stage)
 			{
 				wallSpawns.push_back({ xx * 64, yy * 64 });
 			}
+			else if (cell == 51)
+			{
+				// 右向きレーザー砲台
+				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Right);
+			}
+			else if (cell == 52)
+			{
+				// 左向き
+				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Left);
+			}
+			else if (cell == 53)
+			{
+				// 上向き
+				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Up);
+			}
+			else if (cell == 54)
+			{
+				// 下向き
+				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Down);
+			}
 			else if (cell == 90)
 			{
 				new EnemyChaser(xx * 64, yy * 64);
@@ -191,11 +212,39 @@ Field::Field(int stage)
 		}
 	}
 
-	int pairCount = (int)min(fallingSpikeTriggers.size(), fallingSpikes.size());
-	for (int i = 0; i < pairCount; ++i)
+	// それぞれのトリガーに「真上にある針」を対応付ける
+	for (auto& trig : fallingSpikeTriggers)
 	{
-		fallingSpikeTriggers[i].spikeIndex = i;
+		int trigX = trig.triggerPos.x;
+		int trigY = trig.triggerPos.y;
+
+		int bestIndex = -1;
+		int bestDy = 100000000;
+
+		// すべての落下針候補をチェック
+		for (int i = 0; i < (int)fallingSpikes.size(); ++i)
+		{
+			auto& info = fallingSpikes[i];
+
+			// 同じ列（X座標が同じ）の針だけを見る
+			if (info.pos.x != trigX) continue;
+
+			// トリガーより上にある針だけ対象
+			if (info.pos.y >= trigY) continue;
+
+			int dy = trigY - info.pos.y;  // 縦方向の距離（小さいほど近い）
+
+			if (dy < bestDy)
+			{
+				bestDy = dy;
+				bestIndex = i;
+			}
+		}
+
+		// 見つからなかった場合は -1 のまま(なにも落ちない)
+		trig.spikeIndex = bestIndex;
 	}
+
 }
 
 //------------------------------------------------------------
@@ -432,6 +481,36 @@ void Field::Draw()
 		DrawGraph(s.pos.x, s.pos.y, fallingSpikeImage, TRUE);
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

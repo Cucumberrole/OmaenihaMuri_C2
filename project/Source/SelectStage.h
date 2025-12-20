@@ -15,6 +15,10 @@ public:
 private:
 	int backgroundImage;
 
+	// アニメーション用
+	float cursorBlinkFrame;   // セレクト枠点滅
+	float subTextAnimFrame;   // 上の説明文アニメ
+
 	// 選択肢（増やしたいときは cpp 側の options に追加する）
 	struct Option
 	{
