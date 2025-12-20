@@ -5,6 +5,7 @@
 #include "GameOver.h"
 #include "VanishingFloor.h"
 #include "MovingWall.h"
+#include "Common.h"
 #include "../Library/Trigger.h"
 #include <assert.h>
 
@@ -370,6 +371,10 @@ void Player::Draw()
 
 void Player::ForceDie()
 {
+	if (Common::GetInstance() && Common::GetInstance()->invincible)
+	{
+		return;
+	}
 	// 画面外へ
 	x = -9999;
 	y = -9999;

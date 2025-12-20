@@ -133,6 +133,7 @@
     <ClCompile Include="Source\LaserTurret.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Common.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -360,6 +361,7 @@
     <ClInclude Include="Source\LaserTurret.h">
       <Filter>Trap</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Common.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">

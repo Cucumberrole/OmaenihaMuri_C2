@@ -156,6 +156,7 @@
     <ClInclude Include="Source\Background.h" />
     <ClInclude Include="Source\Boss.h" />
     <ClInclude Include="Source\Collision.h" />
+    <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\DirectionalSpike.h" />
     <ClInclude Include="Source\EnemyChaser.h" />
     <ClInclude Include="Source\Fader.h" />
@@ -205,6 +206,7 @@
     <ClCompile Include="Source\Background.cpp" />
     <ClCompile Include="Source\Boss.cpp" />
     <ClCompile Include="Source\Collision.cpp" />
+    <ClCompile Include="Source\Common.cpp" />
     <ClCompile Include="Source\DirectionalSpike.cpp" />
     <ClCompile Include="Source\EnemyChaser.cpp" />
     <ClCompile Include="Source\Fader.cpp" />

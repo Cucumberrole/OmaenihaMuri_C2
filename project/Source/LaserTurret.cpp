@@ -11,7 +11,7 @@ LaserTurret::LaserTurret(float sx, float sy, Dir dir)
 	y = sy;
 	this->dir = dir;
 
-	// 砲台画像（2コマ：通常 / 発射中）
+	// 砲台画像
 	int heads[2];
 	if (LoadDivGraph("data/image/BreathHead.png",
 		2, 2, 1,
@@ -22,7 +22,7 @@ LaserTurret::LaserTurret(float sx, float sy, Dir dir)
 		hHead[1] = heads[1]; // 右：発射中
 	}
 
-	// レーザー画像
+	// レーザー画像（横棒）
 	hLaser = LoadGraph("data/image/BOAAA.png");
 	if (hLaser != -1)
 	{
@@ -148,22 +148,23 @@ void LaserTurret::Draw()
 	{
 		if (dir == Dir::Right)
 		{
-			DrawGraph(x, y, headHandle, TRUE);
+			DrawGraph((int)x, (int)y, headHandle, TRUE);
 		}
 		else if (dir == Dir::Left)
 		{
 			// 左右反転
-			DrawTurnGraph(x, y, headHandle, TRUE);
+			DrawTurnGraph((int)x, (int)y, headHandle, TRUE);
 		}
 		else
 		{
 			// 上下はとりあえずそのまま（必要なら後で回転対応）
-			DrawGraph(x, y, headHandle, TRUE);
+			DrawGraph((int)x, (int)y, headHandle, TRUE);
 		}
 	}
 	else
 	{
-		DrawBox(x, y, x + 64, y + 64, GetColor(128, 128, 128), TRUE);
+		DrawBox((int)x, (int)y, (int)x + 64, (int)y + 64,
+			GetColor(128, 128, 128), TRUE);
 	}
 
 	// ビーム描画
@@ -185,14 +186,29 @@ void LaserTurret::Draw()
 		float right = max(sx, ex);
 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 240);
-		DrawRectExtendGraph(left, yTop, right, yBot, 0, 0, laserW, laserH, hLaser, TRUE);
+		DrawRectExtendGraph(
+			(int)left,
+			(int)yTop,
+			(int)right,
+			(int)yBot,
+			0, 0, laserW, laserH,
+			hLaser,
+			TRUE
+		);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 	else
 	{
 		// 上下方向のときは、ひとまず線で描く（画像回転は後で追加してもOK）
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 240);
-		DrawLine(sx, sy, ex, ey, GetColor(255, 255, 255), 8);
+		DrawLine(
+			(int)sx,
+			(int)sy,
+			(int)ex,
+			(int)ey,
+			GetColor(255, 255, 255),
+			8
+		);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 }
