@@ -140,4 +140,6 @@ void PlayScene::Draw()
 	// LIFE
 	sprintf_s(buf, "LIFE : %d", life);
 	DrawString(0, 0 + h * 5, buf, col);
+
+	DrawFormatString(0, 0 + h * 6, GetColor(255,255,255), "%4.1f", 1.0f / Time::DeltaTime());
 }
