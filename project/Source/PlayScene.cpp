@@ -38,6 +38,7 @@ PlayScene::~PlayScene()
 	InitSoundMem();
 }
 
+
 void PlayScene::Update()
 {
 	playTime += Time::DeltaTime();
@@ -49,6 +50,15 @@ void PlayScene::Update()
 	Player* player = FindGameObject<Player>();
 	Field* field = FindGameObject<Field>();
 	if (!player || !field) { return; }
+
+	// --- フェードインアウト ---
+	Fader* fader = FindGameObject<Fader>();
+	if (CheckHitKey(KEY_INPUT_I)) {
+		fader->FadeIn(0.5f);
+	}
+	if (CheckHitKey(KEY_INPUT_O)) {
+		fader->FadeOut(1.0f);
+	}
 
 	if (player && player->IsDead())
 	{
@@ -88,18 +98,12 @@ void PlayScene::Update()
 	// --- Tキーでタイトル画面 ---
 	if (CheckHitKey(KEY_INPUT_T)) {
 		SceneManager::ChangeScene("TITLE");
+		
 	}
 
 	// --- Rキーでリトライ ---
-	if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
-	{
-
-		if (life > 0)
-			SceneManager::ChangeScene("PLAY");
-		else
-			SceneManager::ChangeScene("GAMEOVER");
-
-		return;
+	if (CheckHitKey(KEY_INPUT_R)) {
+		SceneManager::ForceChangeScene("PLAY");
 	}
 
 
@@ -115,14 +119,7 @@ void PlayScene::Update()
 		SceneManager::Exit();
 	}
 
-	// --- フェードインアウト ---
-	Fader* fader = FindGameObject<Fader>();
-	if (CheckHitKey(KEY_INPUT_I)) {
-		fader->FadeIn(0.5f);
-	}
-	if (CheckHitKey(KEY_INPUT_O)) {
-		fader->FadeOut(1.0f);
-	}
+	
 
 }
 
@@ -157,3 +154,5 @@ void PlayScene::Draw()
 
 	DrawFormatString(0, 0 + h * 6, GetColor(255,255,255), "%4.1f", 1.0f / Time::DeltaTime());
 }
+
+

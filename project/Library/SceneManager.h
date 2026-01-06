@@ -47,6 +47,9 @@ namespace SceneManager
 	/// </summary>
 	/// <returns>I—¹‚µ‚æ‚¤‚Æ‚µ‚Ä‚¢‚éê‡‚Étrue</returns>
 	bool IsExit();
+
+	void ForceChangeScene(const std::string& sceneName);
+
 };
 
 template<class C>
