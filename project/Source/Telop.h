@@ -9,5 +9,7 @@ public:
 	void Update() override;
 	void Draw() override;
 	bool g_isPlayerTouchedTrap = false;
+private:
+	int a, b, c, d, e, f, g;
 };
 

@@ -73,6 +73,12 @@ void SceneManager::ChangeScene(const std::string& sceneName)
 	*m_nextName = sceneName;
 }
 
+void SceneManager::ForceChangeScene(const std::string& sceneName)
+{
+	*m_nextName = sceneName;
+	*m_currentName = "";
+}
+
 SceneBase* SceneManager::CurrentScene()
 {
 	return m_currentScene;
