@@ -110,6 +110,13 @@ void PlayScene::Update()
 		return;
 	}
 
+
+	if (KeyTrigger::CheckTrigger(KEY_INPUT_G))
+	{
+		SceneManager::ChangeScene("GAMEOVER");
+		return;
+	}
+
 	// --- ESCAPEÉLÅ[Ç≈èIóπ ---
 	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
 		SceneManager::Exit();

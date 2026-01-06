@@ -20,6 +20,7 @@
 #include "HiddenSpike.h"
 #include "DirectionalSpike.h"
 #include "LaserTurret.h"
+#include "PatrolEnemy.h"
 #include <DxLib.h>
 
 // ブロック扱い（押し戻し/床/壁として固いセル）
@@ -201,6 +202,10 @@ Field::Field(int stage)
 				// 下向き
 				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Down);
 			}
+			else if (cell == 60)
+			{
+				new PatrolEnemy(xx * 64, yy * 64);
+				}
 			else if (cell == 90)
 			{
 				new EnemyChaser(xx * 64, yy * 64);
