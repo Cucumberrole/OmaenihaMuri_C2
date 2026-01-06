@@ -6,7 +6,7 @@
 
 Telop::Telop()
 {
-    a = LoadGraph("data/Font/Ç†...png");
+    a = LoadGraph("data/Font/Ç†Ç¡.png");
     b = LoadGraph("data/Font/Ç¶ÅH.png");
     c = LoadGraph("data/Font/â≥.png");
     d = LoadGraph("data/Font/é„.png");
@@ -27,7 +27,7 @@ void Telop::Draw()
 {
     if (g_isPlayerTouchedTrap)
     {
-        DrawGraph(550, 200, c, FALSE);
+        DrawGraph(550, 200, a, FALSE);
     }
 }
 
