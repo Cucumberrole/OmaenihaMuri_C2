@@ -85,20 +85,34 @@ void PlayScene::Update()
 		return;
 	}
 
-	if (CheckHitKey(KEY_INPUT_F2)) {
+	// --- Tキーでタイトル画面 ---
+	if (CheckHitKey(KEY_INPUT_T)) {
 		SceneManager::ChangeScene("TITLE");
-	}
-
-	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
-		SceneManager::Exit();
 	}
 
 	// --- Rキーでリトライ ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
 	{
-		g_RetryCount++;
+
+		if (life > 0)
+			SceneManager::ChangeScene("PLAY");
+		else
+			SceneManager::ChangeScene("GAMEOVER");
+
+		return;
+	}
+
+
+	// --- Eキーでステージ選択画面 ---
+	if (KeyTrigger::CheckTrigger(KEY_INPUT_E))
+	{
 		SceneManager::ChangeScene("STAGE");
 		return;
+	}
+
+	// --- ESCAPEキーで終了 ---
+	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
+		SceneManager::Exit();
 	}
 
 	// --- フェードインアウト ---
