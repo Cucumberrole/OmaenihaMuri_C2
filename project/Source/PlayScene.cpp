@@ -103,6 +103,8 @@ void PlayScene::Update()
 
 	// --- Rキーでリトライ ---
 	if (CheckHitKey(KEY_INPUT_R)) {
+		fader->FadeOut(0.5f);
+		fader->FadeIn (1.0f);
 		SceneManager::ForceChangeScene("PLAY");
 	}
 
