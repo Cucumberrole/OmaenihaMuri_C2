@@ -8,8 +8,18 @@ public:
 	~Telop();
 	void Update() override;
 	void Draw() override;
-	bool g_isPlayerTouchedTrap = false;
+	bool TouchedTrap1 = false;
+	bool TouchedTrap2 = false;
+	bool TouchedTrap3 = false;
+	bool TouchedTrap4 = false;
+	bool TouchedTrap5 = false;
+	bool TouchedTrap6 = false;
+	bool TouchedTrap7 = false;
+	bool TouchedTrap8 = false;
+	bool TouchedTrap9 = false;
+	bool TouchedTrap10 = false;
+
 private:
-	int a, b, c, d, e, f, g;
+	
 };
 

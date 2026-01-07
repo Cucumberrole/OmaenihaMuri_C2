@@ -39,7 +39,7 @@ void SmallTrap2::Update()
 
 		if (hit)
 		{
-			telop->g_isPlayerTouchedTrap = true;
+			telop->TouchedTrap1 = true;
 
 			player->ForceDie();
 			player->SetDead();
