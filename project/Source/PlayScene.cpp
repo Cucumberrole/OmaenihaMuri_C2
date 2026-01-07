@@ -68,14 +68,14 @@ void PlayScene::Update()
 		g_Life = life;
 		g_RetryCount = retryCount;
 
-		if (life > 0)
+		/*if (life > 0)
 		{
 			SceneManager::ChangeScene("PLAY");
 		}
 		else {
 			SceneManager::ChangeScene("GAMEOVER");
 		}
-		return;
+		return;*/
 	}
 
 	if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
