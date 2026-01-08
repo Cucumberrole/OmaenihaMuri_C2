@@ -53,10 +53,10 @@ void PlayScene::Update()
 
 	// --- フェードインアウト ---
 	Fader* fader = FindGameObject<Fader>();
-	if (CheckHitKey(KEY_INPUT_I)) {
+	if (CheckHitKey(KEY_INPUT_K)) {
 		fader->FadeIn(0.5f);
 	}
-	if (CheckHitKey(KEY_INPUT_O)) {
+	if (CheckHitKey(KEY_INPUT_L)) {
 		fader->FadeOut(1.0f);
 	}
 
@@ -68,14 +68,14 @@ void PlayScene::Update()
 		g_Life = life;
 		g_RetryCount = retryCount;
 
-		/*if (life > 0)
+		if (life > 0)
 		{
 			SceneManager::ChangeScene("PLAY");
 		}
 		else {
 			SceneManager::ChangeScene("GAMEOVER");
 		}
-		return;*/
+		return;
 	}
 
 	if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
