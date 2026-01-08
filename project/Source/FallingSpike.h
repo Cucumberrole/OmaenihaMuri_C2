@@ -44,4 +44,7 @@ private:
 	// トリガー関連
 	int   triggerGroupId;   // どのトリガーグループに属するか
 	bool  active;           // 今この針は動いて良いか
+
+	const char* tauntText; // 煽り文字
+	bool showTaunt;        // 表示フラグ
 };
