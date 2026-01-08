@@ -40,8 +40,10 @@ Player::Player()
 	// 円当たり判定の半径
 	hitRadius = 22.0f;
 
-	hDeadUpImage = LoadGraph("data/image/お前ガチでちんこ.png");   
-	hDeadFallImage = LoadGraph("data/image/お前ガチでまんこ.png"); 
+	hDeadUpImage = LoadGraph("data/image/お前ガチでちんこ.png");
+	hDeadFallImage = LoadGraph("data/image/お前ガチでまんこ.png");
+	assert(hDeadUpImage != -1);
+	assert(hDeadFallImage != -1);
 
 	deathState = DeathState::None;
 	deathAnimEnd = false;
@@ -83,6 +85,9 @@ Player::Player(int sx, int sy)
 Player::~Player()
 {
 	DeleteGraph(hImage);
+	if (hImage != -1) DeleteGraph(hImage);
+	if (hDeadUpImage != -1) DeleteGraph(hDeadUpImage);
+	if (hDeadFallImage != -1) DeleteGraph(hDeadFallImage);
 }
 
 //--------------------------------------
@@ -141,22 +146,26 @@ bool Player::IsdeathAnimEnd() const
 void Player::Update()
 {
 	// --- 死亡していたら完全固定 ---
-	if (isDead) {
+	if (isDead)
+	{
 		y += velocity;
 		velocity += Gravity;
 
-		// 上昇 → 落下に切り替え
-		if (velocity >= 0 && deathState == DeathState::Up)
+		if (deathState == DeathState::Up && velocity >= 0.0f)
 		{
 			deathState = DeathState::Fall;
 		}
 
-		if (y > 720)
+		int sw = 0, sh = 0;
+		GetDrawScreenSize(&sw, &sh);
+
+		// when completely off the bottom -> end
+		if (y > sh + 100)
 		{
 			deathAnimEnd = true;
 		}
 
-		return; // 通常処理はしない
+		return; // no input / no collision / no normal update
 	}
 
 	Field* field = FindGameObject<Field>();
@@ -379,6 +388,19 @@ void Player::Update()
 //--------------------------------------
 void Player::Draw()
 {
+	if (isDead)
+	{
+		if (deathState == DeathState::Up)
+		{
+			DrawGraph((int)x, (int)y, hDeadUpImage, TRUE);
+		}
+		else
+		{
+			DrawGraph((int)x, (int)y, hDeadFallImage, TRUE);
+		}
+		return;
+	}
+
 	// 現在のスプライトシート上での位置
 	int xRect = (animIndex % ATLAS_WIDTH) * CHARACTER_WIDTH;
 	int yRect = (animIndex / ATLAS_WIDTH) * CHARACTER_HEIGHT;
@@ -395,19 +417,6 @@ void Player::Draw()
 		frip
 	);
 
-	if (isDead)
-	{
-		if (deathState == DeathState::Up)
-		{
-			DrawGraph((int)x, (int)y, hDeadUpImage, TRUE);
-		}
-		else
-		{
-			DrawGraph((int)x, (int)y, hDeadFallImage, TRUE);
-		}
-		return;
-	}
-
 	// デバッグ用：当たり判定円
 	float cx, cy, r;
 	GetHitCircle(cx, cy, r);
@@ -420,14 +429,14 @@ void Player::ForceDie()
 	{
 		return;
 	}
-	// 画面外へ
-	x = -9999;
-	y = -9999;
 
-	velocity = 0;
+	if (isDead) return;        // or: if (IsDead()) return;
+
 	onGround = false;
 
-	// ここで確実に固定状態にする
+	// Death animation start
 	isDead = true;
 	deathAnimEnd = false;
+	deathState = DeathState::Up;
+	velocity = V0;
 }
