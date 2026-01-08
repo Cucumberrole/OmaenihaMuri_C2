@@ -40,8 +40,8 @@ Player::Player()
 	// 円当たり判定の半径
 	hitRadius = 22.0f;
 
-	hDeadUpImage = LoadGraph("data/image/お前ガチでちんこ.png");
-	hDeadFallImage = LoadGraph("data/image/お前ガチでまんこ.png");
+	hDeadUpImage = LoadGraph("data/image/Death.png");
+	hDeadFallImage = LoadGraph("data/image/DeathBottom.png");
 	assert(hDeadUpImage != -1);
 	assert(hDeadFallImage != -1);
 
@@ -56,6 +56,14 @@ Player::Player(int sx, int sy)
 {
 	hImage = LoadGraph("data/image/OMAEwalk.png");
 	assert(hImage != -1);
+
+	hDeadUpImage = LoadGraph("data/image/Death.png");
+	hDeadFallImage = LoadGraph("data/image/DeathBottom.png");
+	assert(hDeadUpImage != -1);
+	assert(hDeadFallImage != -1);
+
+	deathState = DeathState::None;
+	deathAnimEnd = false;
 
 	x = (float)sx;
 	y = (float)sy;
@@ -84,7 +92,6 @@ Player::Player(int sx, int sy)
 //--------------------------------------
 Player::~Player()
 {
-	DeleteGraph(hImage);
 	if (hImage != -1) DeleteGraph(hImage);
 	if (hDeadUpImage != -1) DeleteGraph(hDeadUpImage);
 	if (hDeadFallImage != -1) DeleteGraph(hDeadFallImage);
@@ -145,7 +152,7 @@ bool Player::IsdeathAnimEnd() const
 //--------------------------------------
 void Player::Update()
 {
-	// --- 死亡していたら完全固定 ---
+	// --- 死亡演出 ---
 	if (isDead)
 	{
 		y += velocity;
@@ -159,13 +166,12 @@ void Player::Update()
 		int sw = 0, sh = 0;
 		GetDrawScreenSize(&sw, &sh);
 
-		// when completely off the bottom -> end
 		if (y > sh + 100)
 		{
 			deathAnimEnd = true;
 		}
 
-		return; // no input / no collision / no normal update
+		return;
 	}
 
 	Field* field = FindGameObject<Field>();
@@ -405,9 +411,6 @@ void Player::Draw()
 	int xRect = (animIndex % ATLAS_WIDTH) * CHARACTER_WIDTH;
 	int yRect = (animIndex / ATLAS_WIDTH) * CHARACTER_HEIGHT;
 
-	DrawRotaGraph(0, 0, 0.015625, 1, hDeadUpImage, TRUE, 0, 0);
-	DrawRotaGraph(0, 0, 0.015625, 1, hDeadFallImage, TRUE, 0, 0);
-
 	DrawRectGraph(
 		(int)x, (int)y,
 		xRect, yRect,
@@ -430,11 +433,10 @@ void Player::ForceDie()
 		return;
 	}
 
-	if (isDead) return;        // or: if (IsDead()) return;
+	if (isDead) return;
 
 	onGround = false;
 
-	// Death animation start
 	isDead = true;
 	deathAnimEnd = false;
 	deathState = DeathState::Up;

@@ -53,7 +53,7 @@ void PlayScene::Update()
 	if (!fader) return;
 
 	// =========================
-	// 1) 死亡中の処理（ここで完全に止める）
+	// 死亡中の処理
 	// =========================
 	if (player->IsDead())
 	{
@@ -97,7 +97,7 @@ void PlayScene::Update()
 	deathHandled = false;
 
 	// =========================
-	// 2) クリア判定（生存中のみ）
+	// クリア判定（生存中のみ）
 	// =========================
 	if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
 	{
@@ -114,7 +114,7 @@ void PlayScene::Update()
 	}
 
 	// =========================
-	// 3) 生存中の入力
+	// 生存中の入力
 	// =========================
 	if (CheckHitKey(KEY_INPUT_K)) fader->FadeIn(0.5f);
 	if (CheckHitKey(KEY_INPUT_L)) fader->FadeOut(1.0f);
