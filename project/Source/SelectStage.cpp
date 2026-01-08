@@ -12,6 +12,8 @@ SelectStage::SelectStage()
 
 	selectSE = LoadSoundMem("data/bgm/cursor.mp3");
 	decideSE = LoadSoundMem("data/bgm/decision.mp3");
+	sHandle = LoadSoundMem("data/bgm/002.ogg");
+	PlaySoundMem(sHandle, DX_PLAYTYPE_BACK);
 
 	debugUnlocked = false;
 	cursor = 0;
@@ -50,6 +52,7 @@ SelectStage::~SelectStage()
 {
 	DeleteSoundMem(selectSE);
 	DeleteSoundMem(decideSE);
+	DeleteSoundMem(sHandle);
 }
 
 void SelectStage::Update()
