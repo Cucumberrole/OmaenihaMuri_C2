@@ -17,6 +17,7 @@ private:
 	bool sound;
 
 	int   life;        // 残機 (5スタート)
+	bool deathHandled = false;
 	int   retryCount;  // 死んだ回数
 	float playTime;    // 経過時間(秒)
 	int   score;       // 現在スコア
