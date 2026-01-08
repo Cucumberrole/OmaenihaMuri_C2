@@ -95,8 +95,8 @@ void PlayScene::Update()
 		return;
 	}
 
-	// --- Tキーでタイトル画面 ---
-	if (CheckHitKey(KEY_INPUT_T)) {
+	// --- Oキーでタイトル画面 ---
+	if (CheckHitKey(KEY_INPUT_O)) {
 		SceneManager::ChangeScene("TITLE");
 		
 	}
