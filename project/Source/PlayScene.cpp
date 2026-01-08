@@ -42,92 +42,109 @@ PlayScene::~PlayScene()
 void PlayScene::Update()
 {
 	playTime += Time::DeltaTime();
-
 	score = 10000 - (int)(playTime) * 10 - retryCount * 500;
-
 	g_ClearTimeSeconds += Time::DeltaTime();
 
 	Player* player = FindGameObject<Player>();
 	Field* field = FindGameObject<Field>();
-	if (!player || !field) { return; }
+	if (!player || !field) return;
 
-	// --- フェードインアウト ---
 	Fader* fader = FindGameObject<Fader>();
-	if (CheckHitKey(KEY_INPUT_K)) {
-		fader->FadeIn(0.5f);
-	}
-	if (CheckHitKey(KEY_INPUT_L)) {
-		fader->FadeOut(1.0f);
-	}
+	if (!fader) return;
 
-	if (player && player->IsDead() && player->IsdeathAnimEnd())
+	// =========================
+	// 1) 死亡中の処理（ここで完全に止める）
+	// =========================
+	if (player->IsDead())
 	{
+		// 演出が終わっていない間は何もさせない（操作不能）
+		if (!player->IsdeathAnimEnd())
+		{
+			return;
+		}
+
+		// 演出が終わった瞬間に1回だけライフ減算など
 		if (!deathHandled)
 		{
 			deathHandled = true;
+
 			life--;
 			retryCount++;
+
 			g_Life = life;
 			g_RetryCount = retryCount;
 		}
-		// ここでR待ちにするか、演出後に遷移するか
+
+		// ライフが尽きたらGAMEOVERへ
+		if (life <= 0)
+		{
+			SceneManager::ChangeScene("GAMEOVER");
+			return;
+		}
+
+		// 演出終了後：Rでリトライだけ許可（他キーは無視）
+		if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
+		{
+			fader->FadeOut(0.5f);
+			fader->FadeIn(1.0f);
+			SceneManager::ForceChangeScene("PLAY");
+		}
+
 		return;
 	}
+
+	// 生存中に戻ったら次の死亡に備えて解除
 	deathHandled = false;
 
-
+	// =========================
+	// 2) クリア判定（生存中のみ）
+	// =========================
 	if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
 	{
-		// ボーナス付与
 		int finalScore = score;
-		if (retryCount == 0) { finalScore += 2000; } // ノーミス
-		if (playTime <= 60.0f) { finalScore += 1000; } // 1分以内
+		if (retryCount == 0)  finalScore += 2000;
+		if (playTime <= 60.0f) finalScore += 1000;
 
-		// 結果をグローバルに保存
 		g_GameResult.score = finalScore;
 		g_GameResult.clearTime = playTime;
 		g_GameResult.retryCount = retryCount;
 
-		// CLEARシーンへ
 		SceneManager::ChangeScene("CLEAR");
 		return;
 	}
 
-	// --- Oキーでタイトル画面 ---
-	if (CheckHitKey(KEY_INPUT_O)) {
-		SceneManager::ChangeScene("TITLE");
+	// =========================
+	// 3) 生存中の入力
+	// =========================
+	if (CheckHitKey(KEY_INPUT_K)) fader->FadeIn(0.5f);
+	if (CheckHitKey(KEY_INPUT_L)) fader->FadeOut(1.0f);
 
+	if (CheckHitKey(KEY_INPUT_O))
+	{
+		SceneManager::ChangeScene("TITLE");
 	}
 
-	// --- Rキーでリトライ ---
-	if (CheckHitKey(KEY_INPUT_R)) {
+	if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
+	{
 		fader->FadeOut(0.5f);
 		fader->FadeIn(1.0f);
 		SceneManager::ForceChangeScene("PLAY");
 	}
 
-
-	// --- Eキーでステージ選択画面 ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_E))
 	{
 		SceneManager::ChangeScene("STAGE");
-		return;
 	}
-
 
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_G))
 	{
 		SceneManager::ChangeScene("GAMEOVER");
-		return;
 	}
 
-	// --- ESCAPEキーで終了 ---
-	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
+	if (CheckHitKey(KEY_INPUT_ESCAPE))
+	{
 		SceneManager::Exit();
 	}
-
-
-
 }
 
 void PlayScene::Draw()
@@ -161,5 +178,3 @@ void PlayScene::Draw()
 
 	DrawFormatString(0, 0 + h * 6, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
 }
-
-
