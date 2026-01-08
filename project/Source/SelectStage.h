@@ -15,6 +15,7 @@ public:
 private:
 	int backgroundImage;
 	int selectSE;
+	int sHandle;
 
 	// アニメーション用
 	float cursorBlinkFrame;   // セレクト枠点滅
