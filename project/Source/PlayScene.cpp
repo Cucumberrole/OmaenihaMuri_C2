@@ -62,21 +62,19 @@ void PlayScene::Update()
 
 	if (player && player->IsDead())
 	{
-		life--;
-		retryCount++;
-
-		g_Life = life;
-		g_RetryCount = retryCount;
-
-		if (life > 0)
+		if (!deathHandled)
 		{
-			SceneManager::ChangeScene("PLAY");
+			deathHandled = true;
+			life--;
+			retryCount++;
+			g_Life = life;
+			g_RetryCount = retryCount;
 		}
-		else {
-			SceneManager::ChangeScene("GAMEOVER");
-		}
+		// ここでR待ちにするか、演出後に遷移するか
 		return;
 	}
+	deathHandled = false;
+
 
 	if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
 	{
@@ -98,13 +96,13 @@ void PlayScene::Update()
 	// --- Oキーでタイトル画面 ---
 	if (CheckHitKey(KEY_INPUT_O)) {
 		SceneManager::ChangeScene("TITLE");
-		
+
 	}
 
 	// --- Rキーでリトライ ---
 	if (CheckHitKey(KEY_INPUT_R)) {
 		fader->FadeOut(0.5f);
-		fader->FadeIn (1.0f);
+		fader->FadeIn(1.0f);
 		SceneManager::ForceChangeScene("PLAY");
 	}
 
@@ -128,7 +126,7 @@ void PlayScene::Update()
 		SceneManager::Exit();
 	}
 
-	
+
 
 }
 
@@ -161,7 +159,7 @@ void PlayScene::Draw()
 	sprintf_s(buf, "LIFE : %d", life);
 	DrawString(0, 0 + h * 5, buf, col);
 
-	DrawFormatString(0, 0 + h * 6, GetColor(255,255,255), "%4.1f", 1.0f / Time::DeltaTime());
+	DrawFormatString(0, 0 + h * 6, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
 }
 
 
