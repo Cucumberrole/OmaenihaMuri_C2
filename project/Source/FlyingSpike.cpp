@@ -1,8 +1,11 @@
 #include "FlyingSpike.h"
 #include "Player.h"
 #include "Field.h"
+#include "Telop.h"
 #include "Collision.h"
 #include <DxLib.h>
+
+static const char* Text = nullptr;
 
 FlyingSpike::FlyingSpike(float startX, float startY, float speed)
 {
@@ -14,6 +17,20 @@ FlyingSpike::FlyingSpike(float startX, float startY, float speed)
 
 	width = 64;
 	height = 64;
+
+	if (Text == nullptr)
+	{
+		const char* messages[] = {
+			"ÇÊÇØÇÎ",
+			"ìñÇΩÇÈÇÊÅH",
+			"íxÇ¢",
+			"å©Ç¶ÇƒÇÈÅH",
+			"Ç‚Ç¡ÇŸÅ["
+		};
+
+		int count = sizeof(messages) / sizeof(messages[0]);
+		Text = messages[GetRand(count - 1)];
+	}
 }
 
 FlyingSpike::~FlyingSpike()
@@ -72,9 +89,12 @@ void FlyingSpike::Update()
 	{
 		DestroyMe();
 	}
+
+	
 }
 
 void FlyingSpike::Draw()
 {
 	DrawGraph((int)x, (int)y, hImage, TRUE);
+	DrawString((int)(x + width),(int)(y - 20),Text,GetColor(255, 255, 255));
 }

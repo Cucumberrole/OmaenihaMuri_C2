@@ -40,6 +40,16 @@ FallingSpike::FallingSpike(int sx, int sy, bool chaseAfterLand, int triggerGroup
 
 	// 登録
 	s_allSpikes.push_back(this);
+
+	const char* messages[] = {
+	"動くよ～ん",
+	"死んじゃった？",
+	};
+
+	int count = sizeof(messages) / sizeof(messages[0]);
+	tauntText = messages[GetRand(count - 1)];
+
+	showTaunt = false; // まだ表示しない
 }
 
 //--------------------------------------
@@ -65,6 +75,8 @@ void FallingSpike::Update()
 	if (!active) { return; } // トリガーが起動されるまで完全停止
 
 	Field* field = FindGameObject<Field>();
+
+	
 
 	//----------------------------------
 	// まだ落下中なら重力処理
@@ -109,6 +121,8 @@ void FallingSpike::Update()
 					vx = chaseSpeed;   // 右へ
 
 				startedChase = true;
+
+				showTaunt = true;
 			}
 
 			// 横に平行移動
@@ -170,6 +184,16 @@ void FallingSpike::Update()
 void FallingSpike::Draw()
 {
 	DrawGraph(static_cast<int>(x), static_cast<int>(y), hImage, TRUE);
+
+	if (showTaunt)
+	{
+		DrawString(
+			(int)(x + width + 4), // 右側
+			(int)(y - 20),        // 少し上
+			tauntText,
+			GetColor(255, 255, 255)
+		);
+	}
 
 #ifdef _DEBUG
 	// 当たり判定三角形の表示（デバッグ用）

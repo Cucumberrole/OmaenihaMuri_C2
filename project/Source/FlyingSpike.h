@@ -16,4 +16,6 @@ private:
 	float speed;    // 移動速度（正：右、負：左）
 	int width;      // 画像幅
 	int height;     // 画像高さ
+
+	const char* Text;
 };
