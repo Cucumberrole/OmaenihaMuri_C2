@@ -60,7 +60,7 @@ void PlayScene::Update()
 		fader->FadeOut(1.0f);
 	}
 
-	if (player && player->IsDead())
+	if (player && player->IsDead() && player->IsdeathAnimEnd())
 	{
 		life--;
 		retryCount++;

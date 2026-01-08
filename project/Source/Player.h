@@ -30,6 +30,7 @@ public:
 	void PushByWall(float dx);
 	// （もしデバッグ用に描画したければ）
 	// void DrawHitCircleDebug() const;
+	bool IsdeathAnimEnd() const;
 
 private:
 	// --- 基本パラメータ ---
@@ -59,4 +60,18 @@ private:
 	int  animIndex;
 	int  animFrame;
 	bool frip;
+
+	// ---死亡演出 ---
+	enum class DeathState
+	{
+		None,
+		Up,     // 上に飛ぶ
+		Fall    // 落下
+	};
+
+	DeathState deathState;
+	int hDeadUpImage;    // 左の画像
+	int hDeadFallImage;  // 右の画像
+	
+	bool deathAnimEnd;
 };

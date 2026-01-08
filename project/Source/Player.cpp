@@ -39,6 +39,12 @@ Player::Player()
 
 	// 円当たり判定の半径
 	hitRadius = 22.0f;
+
+	hDeadUpImage = LoadGraph("data/image/お前ガチでちんこ.png");   
+	hDeadFallImage = LoadGraph("data/image/お前ガチでまんこ.png"); 
+
+	deathState = DeathState::None;
+	deathAnimEnd = false;
 }
 
 //--------------------------------------
@@ -122,6 +128,13 @@ void Player::PushByWall(float dx)
 	}
 }
 
+bool Player::IsdeathAnimEnd() const
+{
+	return deathAnimEnd;
+}
+
+
+
 //--------------------------------------
 // Update()
 //--------------------------------------
@@ -129,7 +142,21 @@ void Player::Update()
 {
 	// --- 死亡していたら完全固定 ---
 	if (isDead) {
-		return;
+		y += velocity;
+		velocity += Gravity;
+
+		// 上昇 → 落下に切り替え
+		if (velocity >= 0 && deathState == DeathState::Up)
+		{
+			deathState = DeathState::Fall;
+		}
+
+		if (y > 720)
+		{
+			deathAnimEnd = true;
+		}
+
+		return; // 通常処理はしない
 	}
 
 	Field* field = FindGameObject<Field>();
@@ -345,6 +372,8 @@ void Player::Update()
 	}
 }
 
+
+
 //--------------------------------------
 // Draw()
 //--------------------------------------
@@ -354,6 +383,9 @@ void Player::Draw()
 	int xRect = (animIndex % ATLAS_WIDTH) * CHARACTER_WIDTH;
 	int yRect = (animIndex / ATLAS_WIDTH) * CHARACTER_HEIGHT;
 
+	DrawRotaGraph(0, 0, 0.015625, 1, hDeadUpImage, TRUE, 0, 0);
+	DrawRotaGraph(0, 0, 0.015625, 1, hDeadFallImage, TRUE, 0, 0);
+
 	DrawRectGraph(
 		(int)x, (int)y,
 		xRect, yRect,
@@ -362,6 +394,19 @@ void Player::Draw()
 		TRUE,
 		frip
 	);
+
+	if (isDead)
+	{
+		if (deathState == DeathState::Up)
+		{
+			DrawGraph((int)x, (int)y, hDeadUpImage, TRUE);
+		}
+		else
+		{
+			DrawGraph((int)x, (int)y, hDeadFallImage, TRUE);
+		}
+		return;
+	}
 
 	// デバッグ用：当たり判定円
 	float cx, cy, r;
@@ -384,4 +429,5 @@ void Player::ForceDie()
 
 	// ここで確実に固定状態にする
 	isDead = true;
+	deathAnimEnd = false;
 }
