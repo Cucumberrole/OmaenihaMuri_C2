@@ -47,6 +47,8 @@ Player::Player()
 
 	deathState = DeathState::None;
 	deathAnimEnd = false;
+
+	
 }
 
 //--------------------------------------

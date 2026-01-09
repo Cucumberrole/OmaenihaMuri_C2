@@ -12,6 +12,8 @@ public:
 	void Update() override;
 	void Draw() override;
 
+	int hImage;
+
 private:
 	int Ssound;
 	bool sound;
@@ -21,4 +23,12 @@ private:
 	int   retryCount;  // 死んだ回数
 	float playTime;    // 経過時間(秒)
 	int   score;       // 現在スコア
+
+	enum class Playstate {
+		Play,
+		Death,
+		Zanki
+	};
+	Playstate state;
+	int deathTimer;
 };
