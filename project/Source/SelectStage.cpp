@@ -41,7 +41,7 @@ SelectStage::SelectStage()
 	hard.sub2 = "";
 	hard.lives = 3;
 	hard.stageId = 2;                 // Stage02
-	hard.hotKey = KEY_INPUT_H;        // Dキー
+	hard.hotKey = KEY_INPUT_H;        // Hキー
 	hard.boxColor = GetColor(220, 30, 30);
 	options.push_back(hard);
 
@@ -74,7 +74,7 @@ void SelectStage::Update()
 	}
 
 	// タイトルに戻る
-	if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE))
+	if (KeyTrigger::CheckTrigger(KEY_INPUT_T))
 	{
 		SceneManager::ChangeScene("TITLE");
 		return;
@@ -291,7 +291,7 @@ void SelectStage::Draw()
 	}
 
 	// 下の説明
-	const char* msg = "タイトルへ戻る Push to[Space]";
+	const char* msg = "タイトルへ戻る Push to[T]";
 	SetFontSize(max(18, (int)(insideH * 0.03f)));
 	int msgW = GetDrawStringWidth(msg, -1);
 	int msgY = frameB - (int)(insideH * 0.07f);
