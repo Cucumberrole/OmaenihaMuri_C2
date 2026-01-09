@@ -30,6 +30,112 @@ static bool IsSolidCell(int cell)
 }
 
 //------------------------------------------------------------
+// cell番号 -> 生成処理 登録
+//------------------------------------------------------------
+void Field::RegisterCellSpawners()
+{
+	cellSpawners.clear();
+	cellSpawners.reserve(64);
+
+	// 2: Player
+	cellSpawners.emplace(2, [this](int tx, int ty)
+		{
+			new Player(tx * 64, ty * 64);
+		});
+
+	// 3: PopUp Trap
+	cellSpawners.emplace(3, [this](int tx, int ty)
+		{
+			new Trap(tx * 64, ty * 64 + 64);
+		});
+
+	cellSpawners.emplace(4, [this](int tx, int ty) { new FallingFloor(tx * 64, ty * 64); });
+	cellSpawners.emplace(6, [this](int tx, int ty) { new FakeFloor(tx * 64, ty * 64); });
+	cellSpawners.emplace(7, [this](int tx, int ty) { new Dokan(tx * 64, ty * 64); });
+	cellSpawners.emplace(8, [this](int tx, int ty) { new Dokan2(tx * 64, ty * 64); });
+	cellSpawners.emplace(10, [this](int tx, int ty) { new VanishingFloor(tx * 64, ty * 64); });
+	cellSpawners.emplace(11, [this](int tx, int ty) { new SmallTrap(tx * 64 + 24, ty * 64 + 48); });
+	cellSpawners.emplace(12, [this](int tx, int ty) { new SmallTrap2(tx * 64 + 24, ty * 64); });
+
+	// 13: Falling spike trigger
+	cellSpawners.emplace(13, [this](int tx, int ty)
+		{
+			FallingSpikeTrigger trig;
+			trig.triggerPos = { tx * 64, ty * 64 };
+			trig.activated = false;
+			trig.timer = 0;
+			trig.spikeIndex = -1;
+			fallingSpikeTriggers.push_back(trig);
+		});
+
+	// 14/15: Falling spike body (15 is chaser)
+	cellSpawners.emplace(14, [this](int tx, int ty)
+		{
+			FallingSpikeInfo info;
+			info.pos = { tx * 64, ty * 64 };
+			info.alive = true;
+			info.chaser = false;
+			fallingSpikes.push_back(info);
+		});
+
+	cellSpawners.emplace(15, [this](int tx, int ty)
+		{
+			FallingSpikeInfo info;
+			info.pos = { tx * 64, ty * 64 };
+			info.alive = true;
+			info.chaser = true;
+			fallingSpikes.push_back(info);
+		});
+
+	cellSpawners.emplace(16, [this](int tx, int ty)
+		{
+			new HiddenSpike(tx * 64.0f, ty * 64.0f, 90.0f);
+		});
+
+	// 20/21: Rolling ball trigger/spawn
+	cellSpawners.emplace(20, [this](int tx, int ty)
+		{
+			ballTriggers.push_back({ tx * 64, ty * 64 });
+			ballTriggered.push_back(false);
+			ballTimer.push_back(0);
+		});
+
+	cellSpawners.emplace(21, [this](int tx, int ty)
+		{
+			ballSpawns.push_back({ tx * 64, ty * 64 });
+		});
+
+	// 30-33: Directional spikes
+	cellSpawners.emplace(30, [this](int tx, int ty) { new DirectionalSpike(tx * 64.0f, ty * 64.0f, SpikeDir::Up); });
+	cellSpawners.emplace(31, [this](int tx, int ty) { new DirectionalSpike(tx * 64.0f, ty * 64.0f, SpikeDir::Down); });
+	cellSpawners.emplace(32, [this](int tx, int ty) { new DirectionalSpike(tx * 64.0f, ty * 64.0f, SpikeDir::Left); });
+	cellSpawners.emplace(33, [this](int tx, int ty) { new DirectionalSpike(tx * 64.0f, ty * 64.0f, SpikeDir::Right); });
+
+	// 40/41: Moving wall trigger/spawn
+	cellSpawners.emplace(40, [this](int tx, int ty)
+		{
+			wallTriggers.push_back({ tx * 64, ty * 64 });
+			wallTriggered.push_back(false);
+		});
+
+	cellSpawners.emplace(41, [this](int tx, int ty)
+		{
+			wallSpawns.push_back({ tx * 64, ty * 64 });
+		});
+
+	// 51-54: Laser turrets
+	cellSpawners.emplace(51, [this](int tx, int ty) { new LaserTurret(tx * 64.0f, ty * 64.0f, LaserTurret::Dir::Right); });
+	cellSpawners.emplace(52, [this](int tx, int ty) { new LaserTurret(tx * 64.0f, ty * 64.0f, LaserTurret::Dir::Left); });
+	cellSpawners.emplace(53, [this](int tx, int ty) { new LaserTurret(tx * 64.0f, ty * 64.0f, LaserTurret::Dir::Up); });
+	cellSpawners.emplace(54, [this](int tx, int ty) { new LaserTurret(tx * 64.0f, ty * 64.0f, LaserTurret::Dir::Down); });
+
+	// Enemies / Boss
+	cellSpawners.emplace(60, [this](int tx, int ty) { new PatrolEnemy(tx * 64, ty * 64); });
+	cellSpawners.emplace(90, [this](int tx, int ty) { new EnemyChaser(tx * 64, ty * 64); });
+	cellSpawners.emplace(91, [this](int tx, int ty) { new Boss(tx * 64, ty * 64 - 192); });
+}
+
+//------------------------------------------------------------
 // コンストラクタ
 //------------------------------------------------------------
 Field::Field(int stage)
@@ -39,39 +145,41 @@ Field::Field(int stage)
 	char filename[60];
 	sprintf_s<60>(filename, "data/stage%02d.csv", stage);
 
-	// CSV 読み込み
+	// CSV読み込み
+	CsvReader reader(filename);
+
+	maps.clear();
+
+	const int lines = reader.GetLines();
+	maps.resize(lines);
+
+	for (int y = 0; y < lines; ++y)
 	{
-		CsvReader* csv = new CsvReader(filename);
-		int lines = csv->GetLines();
-		maps.resize(lines);
+		const int cols = reader.GetColumns(y);
+		maps[y].resize(cols);
 
-		for (int y = 0; y < lines; y++) {
-			int cols = csv->GetColumns(y);
-			maps[y].resize(cols);
-
-			for (int x = 0; x < cols; x++) {
-				maps[y][x] = csv->GetInt(y, x);
-			}
+		for (int x = 0; x < cols; ++x)
+		{
+			maps[y][x] = reader.GetInt(y, x);
 		}
-		delete csv;
 	}
 
-	// 画像
-	SetDrawOrder(50);
-	hImage = LoadGraph("data/image/NewBlock.png");
-	fallingSpikeImage = LoadGraph("data/image/hariBottom.png");
 
-	int w = 0;
-	int h = 0;
-	GetGraphSize(fallingSpikeImage, &w, &h);
-	fallingSpikeWidth = w;
-	fallingSpikeHeight = h;
+	// マップ画像
+	hImage = LoadGraph("data/image/field.png");
 
+	// 落下針画像
+	fallingSpikeImage = LoadGraph("data/image/hari.png");
+	GetGraphSize(fallingSpikeImage, &fallingSpikeWidth, &fallingSpikeHeight);
+
+	// ゴールアニメ（7枚）
 	LoadDivGraph("data/image/Goal.png", GOAL_ANIM_FRAMES, GOAL_ANIM_FRAMES, 1, 64, 64, goalImages);
 
 	x = 0;
 	y = 0;
 	scrollX = 0;
+
+	RegisterCellSpawners();
 
 	// マップ走査して配置
 	for (int yy = 0; yy < (int)maps.size(); yy++)
@@ -80,139 +188,10 @@ Field::Field(int stage)
 		{
 			int cell = maps[yy][xx];
 
-			if (cell == 2)
+			auto it = cellSpawners.find(cell);
+			if (it != cellSpawners.end())
 			{
-				new Player(xx * 64, yy * 64);
-			}
-			else if (cell == 3)
-			{
-				new Trap(xx * 64, yy * 64 + 64);
-			}
-			else if (cell == 4)
-			{
-				new FallingFloor(xx * 64, yy * 64);
-			}
-			else if (cell == 6)
-			{
-				new FakeFloor(xx * 64, yy * 64);
-			}
-			else if (cell == 7)
-			{
-				new Dokan(xx * 64, yy * 64);
-				pipesIn.push_back({ xx * 64, yy * 64 });
-			}
-			else if (cell == 8)
-			{
-				new Dokan2(xx * 64, yy * 64);
-				pipesOut.push_back({ xx * 64, yy * 64 });
-			}
-			else if (cell == 10)
-			{
-				new VanishingFloor(xx * 64, yy * 64);
-			}
-			else if (cell == 11)
-			{
-				new SmallTrap(xx * 64 + 24, yy * 64 + 48);
-			}
-			else if (cell == 12)
-			{
-				new SmallTrap2(xx * 64 + 24, yy * 64);
-			}
-			else if (cell == 13)
-			{
-				// 落下針トリガー（1トリガー = 1針）
-				FallingSpikeTrigger trig;
-				trig.triggerPos = { xx * 64, yy * 64 };
-				trig.activated = false;
-				trig.timer = 0;
-				trig.spikeIndex = -1;
-				fallingSpikeTriggers.push_back(trig);
-			}
-			else if (cell == 14 || cell == 15)
-			{
-				// 上から落ちてくる針本体
-				FallingSpikeInfo info;
-				info.pos = { xx * 64, yy * 64 };
-				info.alive = true;
-				info.chaser = (cell == 15); // 15は追尾する針
-
-				fallingSpikes.push_back(info);
-			}
-			else if (cell == 16)
-			{
-				// 近づいたら姿を見せる隠しトゲ
-				new HiddenSpike(xx * 64.0f, yy * 64.0f, 90.0f);
-			}
-			else if (cell == 20)
-			{
-				ballTriggers.push_back({ xx * 64, yy * 64 });
-				ballTriggered.push_back(false);
-				ballTimer.push_back(0);
-			}
-			else if (cell == 21)
-			{
-				ballSpawns.push_back({ xx * 64, yy * 64 });
-			}
-			else if (cell == 30)
-			{
-				// 上向き針
-				new DirectionalSpike(xx * 64.0f, yy * 64.0f, SpikeDir::Up);
-			}
-			else if (cell == 31)
-			{
-				// 下向き針
-				new DirectionalSpike(xx * 64.0f, yy * 64.0f, SpikeDir::Down);
-			}
-			else if (cell == 32)
-			{
-				// 左向き針
-				new DirectionalSpike(xx * 64.0f, yy * 64.0f, SpikeDir::Left);
-			}
-			else if (cell == 33)
-			{
-				// 右向き針
-				new DirectionalSpike(xx * 64.0f, yy * 64.0f, SpikeDir::Right);
-			}
-			else if (cell == 40)
-			{
-				wallTriggers.push_back({ xx * 64, yy * 64 });
-				wallTriggered.push_back(false);
-			}
-			else if (cell == 41)
-			{
-				wallSpawns.push_back({ xx * 64, yy * 64 });
-			}
-			else if (cell == 51)
-			{
-				// 右向きレーザー砲台
-				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Right);
-			}
-			else if (cell == 52)
-			{
-				// 左向き
-				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Left);
-			}
-			else if (cell == 53)
-			{
-				// 上向き
-				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Up);
-			}
-			else if (cell == 54)
-			{
-				// 下向き
-				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Down);
-			}
-			else if (cell == 60)
-			{
-				new PatrolEnemy(xx * 64, yy * 64);
-				}
-			else if (cell == 90)
-			{
-				new EnemyChaser(xx * 64, yy * 64);
-			}
-			else if (cell == 91)
-			{
-				new Boss(xx * 64, yy * 64 - 192);
+				it->second(xx, yy);
 			}
 		}
 	}
@@ -220,54 +199,38 @@ Field::Field(int stage)
 	// それぞれのトリガーに「真上にある針」を対応付ける
 	for (auto& trig : fallingSpikeTriggers)
 	{
-		int trigX = trig.triggerPos.x;
-		int trigY = trig.triggerPos.y;
-
 		int bestIndex = -1;
-		int bestDy = 100000000;
+		int bestDy = 999999;
 
-		// すべての落下針候補をチェック
-		for (int i = 0; i < (int)fallingSpikes.size(); ++i)
+		for (int i = 0; i < (int)fallingSpikes.size(); i++)
 		{
-			auto& info = fallingSpikes[i];
+			auto& s = fallingSpikes[i];
 
-			// 同じ列（X座標が同じ）の針だけを見る
-			if (info.pos.x != trigX) continue;
-
-			// トリガーより上にある針だけ対象
-			if (info.pos.y >= trigY) continue;
-
-			int dy = trigY - info.pos.y;  // 縦方向の距離（小さいほど近い）
-
-			if (dy < bestDy)
+			if (s.pos.x == trig.triggerPos.x && s.pos.y < trig.triggerPos.y)
 			{
-				bestDy = dy;
-				bestIndex = i;
+				int dy = trig.triggerPos.y - s.pos.y;
+				if (dy < bestDy)
+				{
+					bestDy = dy;
+					bestIndex = i;
+				}
 			}
 		}
 
-		// 見つからなかった場合は -1 のまま(なにも落ちない)
 		trig.spikeIndex = bestIndex;
 	}
-
 }
 
-//------------------------------------------------------------
-// デストラクタ（A対策：画像解放）
-//------------------------------------------------------------
 Field::~Field()
 {
 	if (hImage != -1) DeleteGraph(hImage);
 	if (fallingSpikeImage != -1) DeleteGraph(fallingSpikeImage);
-	for (int i = 0;i < GOAL_ANIM_FRAMES;++i)
+
+	for (int i = 0; i < GOAL_ANIM_FRAMES; i++)
 	{
-		if (goalImages[i] != 1)
-		{
-			DeleteGraph(goalImages[i]);
-		}
+		if (goalImages[i] != -1) DeleteGraph(goalImages[i]);
 	}
 }
-
 //------------------------------------------------------------
 // Update()
 //------------------------------------------------------------
