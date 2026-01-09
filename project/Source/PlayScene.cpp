@@ -15,6 +15,8 @@ float g_ClearTimeSeconds = 0.0f;
 
 PlayScene::PlayScene()
 {
+	hImage = LoadGraph("data/image/Atama.png");
+
 	new Background();
 
 	// ステージ未選択なら強制的に1へ
@@ -31,13 +33,15 @@ PlayScene::PlayScene()
 
 	playTime = 0.0f;
 	score = 10000;  // 初期スコア
+
+	state = Playstate::Play;
+	deathTimer = 0;
 }
 
 PlayScene::~PlayScene()
 {
 	InitSoundMem();
 }
-
 
 void PlayScene::Update()
 {
@@ -55,14 +59,37 @@ void PlayScene::Update()
 	// =========================
 	// 死亡中の処理
 	// =========================
-	if (player->IsDead())
-	{
-		// 演出が終わっていない間は何もさせない（操作不能）
-		if (!player->IsdeathAnimEnd())
+	if (state == Playstate::Play) {
+		if (player->IsDead())
 		{
+			// 演出が終わっていない間は何もさせない（操作不能）
+			if (!player->IsdeathAnimEnd())
+			{
+				return;
+			}
+
+			state = Playstate::Death;
+
+			// ライフが尽きたらGAMEOVERへ
+			if (life <= 0)
+			{
+				SceneManager::ChangeScene("GAMEOVER");
+				return;
+			}
+
+			// 演出終了後：Rでリトライだけ許可（他キーは無視）
+			if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
+			{
+				fader->FadeOut(0.5f);
+				fader->FadeIn(1.0f);
+				SceneManager::ForceChangeScene("PLAY");
+			}
+
 			return;
 		}
-
+	}
+	else if (state == Playstate::Death)
+	{
 		// 演出が終わった瞬間に1回だけライフ減算など
 		if (!deathHandled)
 		{
@@ -73,24 +100,23 @@ void PlayScene::Update()
 
 			g_Life = life;
 			g_RetryCount = retryCount;
-		}
 
-		// ライフが尽きたらGAMEOVERへ
-		if (life <= 0)
-		{
-			SceneManager::ChangeScene("GAMEOVER");
-			return;
+			deathTimer = 0;
+			state = Playstate::Zanki;
 		}
+	}
+	else if (state == Playstate::Zanki)
+	{
+		deathTimer++;
+		if (deathTimer > 60) {
+			if (life > 0) {
+				SceneManager::ChangeScene("PLAY");
+			}
+			else {
+				SceneManager::ChangeScene("GAMEOVER");
+			}
 
-		// 演出終了後：Rでリトライだけ許可（他キーは無視）
-		if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
-		{
-			fader->FadeOut(0.5f);
-			fader->FadeIn(1.0f);
-			SceneManager::ForceChangeScene("PLAY");
 		}
-
-		return;
 	}
 
 	// 生存中に戻ったら次の死亡に備えて解除
@@ -150,6 +176,14 @@ void PlayScene::Update()
 void PlayScene::Draw()
 {
 	Player* player = FindGameObject<Player>();
+
+	if (state == Playstate::Zanki)
+	{
+		DrawBox(0, 0, 1920, 1080, GetColor(0, 0, 0), TRUE);
+		DrawRotaGraph(900, 540, 2.0, 0, hImage, TRUE);
+		DrawFormatString(950, 540,GetColor(255, 255, 255),"　残機　 %d", life);
+		return;
+	}
 
 	int col = GetColor(255, 255, 255);
 	SetFontSize(32);
