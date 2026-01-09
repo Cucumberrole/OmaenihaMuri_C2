@@ -177,11 +177,20 @@ void PlayScene::Draw()
 {
 	Player* player = FindGameObject<Player>();
 
+	//画面中央に文字
+	const char* text = "リトライ Push to[R]";
+	int sw, sh;
+	GetDrawScreenSize(&sw, &sh);
+	int textWidth = GetDrawStringWidth(text, -1);
+	int x = (sw - textWidth) / 2;
+	int y = sh / 2;
+
 	if (state == Playstate::Zanki)
 	{
 		DrawBox(0, 0, 1920, 1080, GetColor(0, 0, 0), TRUE);
-		DrawRotaGraph(900, 540, 2.0, 0, hImage, TRUE);
-		DrawFormatString(950, 540,GetColor(255, 255, 255),"　残機　 %d", life);
+		DrawRotaGraph(x+40, y, 2.0, 0, hImage, TRUE);
+		DrawFormatString(x+150, y-10,GetColor(255, 255, 255),"　残機　 %d", life);
+		DrawString(x,y+70, text, GetColor(255, 255, 255));
 		return;
 	}
 
