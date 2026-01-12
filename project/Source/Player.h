@@ -74,4 +74,15 @@ private:
 	int hDeadFallImage;  // ‰E‚Ì‰æ‘œ
 	
 	bool deathAnimEnd;
+
+	// --- Hit Overlay ---
+	static void InitHitOverlay();
+	static void TriggerHitOverlay();
+	static void UpdateHitOverlay();
+	static void DrawHitOverlay();
+
+	static int sHitOverlayGraph;
+	static int sHitOverlayTimer;
+	static constexpr int HIT_OVERLAY_MAX = 30;
+
 };

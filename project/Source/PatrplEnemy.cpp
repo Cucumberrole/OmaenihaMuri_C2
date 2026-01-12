@@ -55,7 +55,7 @@ PatrolEnemy::PatrolEnemy(float sx, float sy, float spd)
 	speed = spd;
 	vx = -speed;
 
-	hImage = LoadGraph("data/image/Head.png"); // <- prepare any 64x64 image
+	hImage = LoadGraph("data/image/‚·‚¢1.png"); // <- prepare any 64x64 image
 	SetDrawOrder(40);
 }
 

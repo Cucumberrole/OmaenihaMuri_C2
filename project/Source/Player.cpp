@@ -6,12 +6,48 @@
 #include "VanishingFloor.h"
 #include "MovingWall.h"
 #include "Common.h"
+#include "PatrolEnemy.h"
 #include "../Library/Trigger.h"
 #include <assert.h>
 
 // --- 定数 ---
 static const float Gravity = 0.4f;  // 重力加速度
 static const float V0 = -10.0f;     // ジャンプ初速度（上方向）
+
+// --- Hit Overlay static members ---
+int Player::sHitOverlayGraph = -1;
+int Player::sHitOverlayTimer = 0;
+
+void Player::InitHitOverlay()
+{
+	if (sHitOverlayGraph != -1) return;
+	sHitOverlayGraph = LoadGraph("data/image/hit.png"); // ここを表示したい画像に
+}
+
+void Player::TriggerHitOverlay()
+{
+	InitHitOverlay();
+	sHitOverlayTimer = HIT_OVERLAY_MAX;
+}
+
+void Player::UpdateHitOverlay()
+{
+	if (sHitOverlayTimer > 0) --sHitOverlayTimer;
+}
+
+void Player::DrawHitOverlay()
+{
+	if (sHitOverlayTimer <= 0) return;
+	if (sHitOverlayGraph == -1) return;
+
+	int sw = 0, sh = 0;
+	GetDrawScreenSize(&sw, &sh);
+
+	int alpha = (255 * sHitOverlayTimer) / HIT_OVERLAY_MAX; // 255→0でフェード
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+	DrawExtendGraph(0, 0, sw, sh, sHitOverlayGraph, TRUE);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
 
 //--------------------------------------
 // デフォルトコンストラクタ
@@ -48,7 +84,7 @@ Player::Player()
 	deathState = DeathState::None;
 	deathAnimEnd = false;
 
-	
+
 }
 
 //--------------------------------------
@@ -387,6 +423,8 @@ void Player::Update()
 			}
 		}
 	}
+
+	UpdateHitOverlay();
 }
 
 
@@ -426,6 +464,8 @@ void Player::Draw()
 	float cx, cy, r;
 	GetHitCircle(cx, cy, r);
 	DrawCircle((int)cx, (int)cy, (int)r, GetColor(0, 255, 0), FALSE);
+
+	DrawHitOverlay();
 }
 
 void Player::ForceDie()
@@ -443,4 +483,6 @@ void Player::ForceDie()
 	deathAnimEnd = false;
 	deathState = DeathState::Up;
 	velocity = V0;
+
+	TriggerHitOverlay();
 }
