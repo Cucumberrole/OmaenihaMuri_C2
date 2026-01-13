@@ -104,6 +104,8 @@ void PlayScene::Update()
 
 			life--;
 			retryCount++;
+			g_Life = life;
+			g_RetryCount = retryCount;
 
 			if (life > 0)
 			{
