@@ -9,9 +9,10 @@
 #include "../Library/Trigger.h"
 
 int PlayScene::SelectedStage = -1;
-static int g_Life = 5; // ‰Šúc‹@
-static int g_RetryCount = 0; // €‚ñ‚¾‰ñ”
+static int g_Life = 5; // åˆæœŸæ®‹æ©Ÿ
+static int g_RetryCount = 0; // æ­»ã‚“ã å›æ•°
 float g_ClearTimeSeconds = 0.0f;
+static int g_deathCount = 0;
 
 PlayScene::PlayScene()
 {
@@ -19,7 +20,7 @@ PlayScene::PlayScene()
 
 	new Background();
 
-	// ƒXƒe[ƒW–¢‘I‘ğ‚È‚ç‹­§“I‚É1‚Ö
+	// ã‚¹ãƒ†ãƒ¼ã‚¸æœªé¸æŠãªã‚‰å¼·åˆ¶çš„ã«1ã¸
 	if (SelectedStage < 0)
 		SelectedStage = 1;
 
@@ -30,9 +31,11 @@ PlayScene::PlayScene()
 
 	life = g_Life;
 	retryCount = g_RetryCount;
+	deathCount = g_deathCount;
+
 
 	playTime = 0.0f;
-	score = 10000;  // ‰ŠúƒXƒRƒA
+	score = 10000;  // åˆæœŸã‚¹ã‚³ã‚¢
 
 	state = Playstate::Play;
 	deathTimer = 0;
@@ -57,12 +60,12 @@ void PlayScene::Update()
 	if (!fader) return;
 
 	// =========================
-	// €–S’†‚Ìˆ—
+	// æ­»äº¡ä¸­ã®å‡¦ç†
 	// =========================
 	if (state == Playstate::Play) {
 		if (player->IsDead())
 		{
-			// ‰‰o‚ªI‚í‚Á‚Ä‚¢‚È‚¢ŠÔ‚Í‰½‚à‚³‚¹‚È‚¢i‘€ì•s”\j
+			// æ¼”å‡ºãŒçµ‚ã‚ã£ã¦ã„ãªã„é–“ã¯ä½•ã‚‚ã•ã›ãªã„ï¼ˆæ“ä½œä¸èƒ½ï¼‰
 			if (!player->IsdeathAnimEnd())
 			{
 				return;
@@ -70,14 +73,14 @@ void PlayScene::Update()
 
 			state = Playstate::Death;
 
-			// ƒ‰ƒCƒt‚ªs‚«‚½‚çGAMEOVER‚Ö
+			// ãƒ©ã‚¤ãƒ•ãŒå°½ããŸã‚‰GAMEOVERã¸
 			if (life <= 0)
 			{
 				SceneManager::ChangeScene("GAMEOVER");
 				return;
 			}
 
-			// ‰‰oI—¹ŒãFR‚ÅƒŠƒgƒ‰ƒC‚¾‚¯‹–‰Âi‘¼ƒL[‚Í–³‹j
+			// æ¼”å‡ºçµ‚äº†å¾Œï¼šRã§ãƒªãƒˆãƒ©ã‚¤ã ã‘è¨±å¯ï¼ˆä»–ã‚­ãƒ¼ã¯ç„¡è¦–ï¼‰
 			if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
 			{
 				fader->FadeOut(0.5f);
@@ -90,7 +93,7 @@ void PlayScene::Update()
 	}
 	else if (state == Playstate::Death)
 	{
-		// ‰‰o‚ªI‚í‚Á‚½uŠÔ‚É1‰ñ‚¾‚¯ƒ‰ƒCƒtŒ¸Z‚È‚Ç
+		// æ¼”å‡ºãŒçµ‚ã‚ã£ãŸç¬é–“ã«1å›ã ã‘ãƒ©ã‚¤ãƒ•æ¸›ç®—ãªã©
 		if (!deathHandled)
 		{
 			deathHandled = true;
@@ -98,32 +101,23 @@ void PlayScene::Update()
 			life--;
 			retryCount++;
 
-			g_Life = life;
-			g_RetryCount = retryCount;
-
-			deathTimer = 0;
-			state = Playstate::Zanki;
+		if (life > 0)
+		{
+			SceneManager::ChangeScene("STAGE");
 		}
-	}
-	else if (state == Playstate::Zanki)
-	{
-		deathTimer++;
-		if (deathTimer > 60) {
-			if (life > 0) {
-				SceneManager::ChangeScene("PLAY");
-			}
-			else {
-				SceneManager::ChangeScene("GAMEOVER");
-			}
-
+		else {
+			g_Life = 5;
+			SceneManager::ChangeScene("GAMEOVER");
+			deathCount++;
+			g_deathCount = deathCount;
 		}
 	}
 
-	// ¶‘¶’†‚É–ß‚Á‚½‚çŸ‚Ì€–S‚É”õ‚¦‚Ä‰ğœ
+	// ç”Ÿå­˜ä¸­ã«æˆ»ã£ãŸã‚‰æ¬¡ã®æ­»äº¡ã«å‚™ãˆã¦è§£é™¤
 	deathHandled = false;
 
 	// =========================
-	// ƒNƒŠƒA”»’èi¶‘¶’†‚Ì‚İj
+	// ã‚¯ãƒªã‚¢åˆ¤å®šï¼ˆç”Ÿå­˜ä¸­ã®ã¿ï¼‰
 	// =========================
 	if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
 	{
@@ -140,7 +134,7 @@ void PlayScene::Update()
 	}
 
 	// =========================
-	// ¶‘¶’†‚Ì“ü—Í
+	// ç”Ÿå­˜ä¸­ã®å…¥åŠ›
 	// =========================
 	if (CheckHitKey(KEY_INPUT_K)) fader->FadeIn(0.5f);
 	if (CheckHitKey(KEY_INPUT_L)) fader->FadeOut(1.0f);
@@ -178,8 +172,8 @@ void PlayScene::Draw()
 {
 	Player* player = FindGameObject<Player>();
 
-	//‰æ–Ê’†‰›‚É•¶š
-	const char* text = "ƒŠƒgƒ‰ƒC Push to[R]";
+	//ç”»é¢ä¸­å¤®ã«æ–‡å­—
+	const char* text = "ãƒªãƒˆãƒ©ã‚¤ Push to[R]";
 	int sw, sh;
 	GetDrawScreenSize(&sw, &sh);
 	int textWidth = GetDrawStringWidth(text, -1);
@@ -189,9 +183,9 @@ void PlayScene::Draw()
 	if (state == Playstate::Zanki)
 	{
 		DrawBox(0, 0, 1920, 1080, GetColor(0, 0, 0), TRUE);
-		DrawRotaGraph(x + 40, y, 2.0, 0, hImage, TRUE);
-		DrawFormatString(x + 150, y - 10, GetColor(255, 255, 255), "@c‹@@ %d", life);
-		DrawString(x, y + 70, text, GetColor(255, 255, 255));
+		DrawRotaGraph(x+40, y, 2.0, 0, hImage, TRUE);
+		DrawFormatString(x+150, y-10,GetColor(255, 255, 255),"ã€€æ®‹æ©Ÿã€€ %d", life);
+		DrawString(x,y+70, text, GetColor(255, 255, 255));
 		return;
 	}
 
@@ -220,5 +214,14 @@ void PlayScene::Draw()
 	sprintf_s(buf, "LIFE : %d", life);
 	DrawString(0, 0 + h * 5, buf, col);
 
-	DrawFormatString(0, 0 + h * 6, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
+	DrawFormatString(0, 0 + h * 6, GetColor(255,255,255), "%4.1f", 1.0f / Time::DeltaTime());
 }
+
+int PlayScene::GetRetry(int retry)
+{
+	retry = g_deathCount;
+
+	return retry;
+}
+
+
