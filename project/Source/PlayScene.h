@@ -16,6 +16,16 @@ public:
 	int hImage;
 
 private:
+	enum class Playstate
+	{
+		Play,
+		Death,
+		Zanki
+	};
+
+	Playstate state = Playstate::Play;
+	int deathTimer = 0;
+
 	int Ssound;
 	bool sound;
 

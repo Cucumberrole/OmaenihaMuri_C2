@@ -1,4 +1,8 @@
 #include "PlayScene.h"
+
+#include <DxLib.h>
+#include "../Library/Time.h"
+
 #include "GameResult.h"
 #include "Player.h"
 #include "Field.h"
@@ -101,127 +105,127 @@ void PlayScene::Update()
 			life--;
 			retryCount++;
 
-		if (life > 0)
+			if (life > 0)
+			{
+				SceneManager::ChangeScene("STAGE");
+			}
+			else {
+				g_Life = 5;
+				SceneManager::ChangeScene("GAMEOVER");
+				deathCount++;
+				g_deathCount = deathCount;
+			}
+		}
+
+		// 生存中に戻ったら次の死亡に備えて解除
+		deathHandled = false;
+
+		// =========================
+		// クリア判定（生存中のみ）
+		// =========================
+		if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
+		{
+			int finalScore = score;
+			if (retryCount == 0)  finalScore += 2000;
+			if (playTime <= 60.0f) finalScore += 1000;
+
+			g_GameResult.score = finalScore;
+			g_GameResult.clearTime = playTime;
+			g_GameResult.retryCount = retryCount;
+
+			SceneManager::ChangeScene("CLEAR");
+			return;
+		}
+
+		// =========================
+		// 生存中の入力
+		// =========================
+		if (CheckHitKey(KEY_INPUT_K)) fader->FadeIn(0.5f);
+		if (CheckHitKey(KEY_INPUT_L)) fader->FadeOut(1.0f);
+
+		if (CheckHitKey(KEY_INPUT_O))
+		{
+			SceneManager::ChangeScene("TITLE");
+		}
+
+		if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
+		{
+			VanishingFloor::ResetAll();
+			fader->FadeOut(0.5f);
+			fader->FadeIn(1.0f);
+			SceneManager::ForceChangeScene("PLAY");
+		}
+
+		if (KeyTrigger::CheckTrigger(KEY_INPUT_E))
 		{
 			SceneManager::ChangeScene("STAGE");
 		}
-		else {
-			g_Life = 5;
+
+		if (KeyTrigger::CheckTrigger(KEY_INPUT_G))
+		{
 			SceneManager::ChangeScene("GAMEOVER");
-			deathCount++;
-			g_deathCount = deathCount;
+		}
+
+		if (CheckHitKey(KEY_INPUT_ESCAPE))
+		{
+			SceneManager::Exit();
 		}
 	}
 
-	// 生存中に戻ったら次の死亡に備えて解除
-	deathHandled = false;
-
-	// =========================
-	// クリア判定（生存中のみ）
-	// =========================
-	if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
+	void PlayScene::Draw()
 	{
-		int finalScore = score;
-		if (retryCount == 0)  finalScore += 2000;
-		if (playTime <= 60.0f) finalScore += 1000;
+		Player* player = FindGameObject<Player>();
 
-		g_GameResult.score = finalScore;
-		g_GameResult.clearTime = playTime;
-		g_GameResult.retryCount = retryCount;
+		//画面中央に文字
+		const char* text = "リトライ Push to[R]";
+		int sw, sh;
+		GetDrawScreenSize(&sw, &sh);
+		int textWidth = GetDrawStringWidth(text, -1);
+		int x = (sw - textWidth) / 2;
+		int y = sh / 2;
 
-		SceneManager::ChangeScene("CLEAR");
-		return;
+		if (state == Playstate::Zanki)
+		{
+			DrawBox(0, 0, 1920, 1080, GetColor(0, 0, 0), TRUE);
+			DrawRotaGraph(x + 40, y, 2.0, 0, hImage, TRUE);
+			DrawFormatString(x + 150, y - 10, GetColor(255, 255, 255), "　残機　 %d", life);
+			DrawString(x, y + 70, text, GetColor(255, 255, 255));
+			return;
+		}
+
+		int col = GetColor(255, 255, 255);
+		SetFontSize(32);
+		int h = GetFontSize();
+
+		char buf[128];
+		DrawString(0, 0 + h * 0, "PLAY SCENE", GetColor(255, 255, 255));
+
+		// TIME
+		sprintf_s(buf, "TIME : %.2f", playTime);
+		DrawString(0, 0 + h * 1, buf, col);
+
+		// SCORE
+		sprintf_s(buf, "SCORE : %d", score);
+		DrawString(0, 0 + h * 2, buf, col);
+
+		// PlayerX
+		DrawFormatString(0, 0 + h * 3, GetColor(255, 255, 255), "PlayerX: %.2f", player->GetX());
+
+		//PlayerY
+		DrawFormatString(0, 0 + h * 4, GetColor(255, 255, 255), "PlayerY: %.2f", player->GetY());
+
+		// LIFE
+		sprintf_s(buf, "LIFE : %d", life);
+		DrawString(0, 0 + h * 5, buf, col);
+
+		DrawFormatString(0, 0 + h * 6, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
 	}
 
-	// =========================
-	// 生存中の入力
-	// =========================
-	if (CheckHitKey(KEY_INPUT_K)) fader->FadeIn(0.5f);
-	if (CheckHitKey(KEY_INPUT_L)) fader->FadeOut(1.0f);
-
-	if (CheckHitKey(KEY_INPUT_O))
+	int PlayScene::GetRetry(int retry)
 	{
-		SceneManager::ChangeScene("TITLE");
+		retry = g_deathCount;
+
+		return retry;
 	}
-
-	if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
-	{
-		VanishingFloor::ResetAll();
-		fader->FadeOut(0.5f);
-		fader->FadeIn(1.0f);
-		SceneManager::ForceChangeScene("PLAY");
-	}
-
-	if (KeyTrigger::CheckTrigger(KEY_INPUT_E))
-	{
-		SceneManager::ChangeScene("STAGE");
-	}
-
-	if (KeyTrigger::CheckTrigger(KEY_INPUT_G))
-	{
-		SceneManager::ChangeScene("GAMEOVER");
-	}
-
-	if (CheckHitKey(KEY_INPUT_ESCAPE))
-	{
-		SceneManager::Exit();
-	}
-}
-
-void PlayScene::Draw()
-{
-	Player* player = FindGameObject<Player>();
-
-	//画面中央に文字
-	const char* text = "リトライ Push to[R]";
-	int sw, sh;
-	GetDrawScreenSize(&sw, &sh);
-	int textWidth = GetDrawStringWidth(text, -1);
-	int x = (sw - textWidth) / 2;
-	int y = sh / 2;
-
-	if (state == Playstate::Zanki)
-	{
-		DrawBox(0, 0, 1920, 1080, GetColor(0, 0, 0), TRUE);
-		DrawRotaGraph(x+40, y, 2.0, 0, hImage, TRUE);
-		DrawFormatString(x+150, y-10,GetColor(255, 255, 255),"　残機　 %d", life);
-		DrawString(x,y+70, text, GetColor(255, 255, 255));
-		return;
-	}
-
-	int col = GetColor(255, 255, 255);
-	SetFontSize(32);
-	int h = GetFontSize();
-
-	char buf[128];
-	DrawString(0, 0 + h * 0, "PLAY SCENE", GetColor(255, 255, 255));
-
-	// TIME
-	sprintf_s(buf, "TIME : %.2f", playTime);
-	DrawString(0, 0 + h * 1, buf, col);
-
-	// SCORE
-	sprintf_s(buf, "SCORE : %d", score);
-	DrawString(0, 0 + h * 2, buf, col);
-
-	// PlayerX
-	DrawFormatString(0, 0 + h * 3, GetColor(255, 255, 255), "PlayerX: %.2f", player->GetX());
-
-	//PlayerY
-	DrawFormatString(0, 0 + h * 4, GetColor(255, 255, 255), "PlayerY: %.2f", player->GetY());
-
-	// LIFE
-	sprintf_s(buf, "LIFE : %d", life);
-	DrawString(0, 0 + h * 5, buf, col);
-
-	DrawFormatString(0, 0 + h * 6, GetColor(255,255,255), "%4.1f", 1.0f / Time::DeltaTime());
-}
-
-int PlayScene::GetRetry(int retry)
-{
-	retry = g_deathCount;
-
-	return retry;
-}
 
 
