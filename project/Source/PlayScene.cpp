@@ -9,16 +9,18 @@
 #include "../Library/Trigger.h"
 
 int PlayScene::SelectedStage = -1;
-static int g_Life = 5; // ‰Šúc‹@
-static int g_RetryCount = 0; // €‚ñ‚¾‰ñ”
+static int g_Life = 5; // åˆæœŸæ®‹æ©Ÿ
+static int g_RetryCount = 0; // æ­»ã‚“ã å›æ•°
 float g_ClearTimeSeconds = 0.0f;
 static int g_deathCount = 0;
 
 PlayScene::PlayScene()
 {
+	hImage = LoadGraph("data/image/Atama.png");
+
 	new Background();
 
-	// ƒXƒe[ƒW–¢‘I‘ğ‚È‚ç‹­§“I‚É1‚Ö
+	// ã‚¹ãƒ†ãƒ¼ã‚¸æœªé¸æŠãªã‚‰å¼·åˆ¶çš„ã«1ã¸
 	if (SelectedStage < 0)
 		SelectedStage = 1;
 
@@ -33,7 +35,10 @@ PlayScene::PlayScene()
 
 
 	playTime = 0.0f;
-	score = 10000;  // ‰ŠúƒXƒRƒA
+	score = 10000;  // åˆæœŸã‚¹ã‚³ã‚¢
+
+	state = Playstate::Play;
+	deathTimer = 0;
 }
 
 PlayScene::~PlayScene()
@@ -41,35 +46,60 @@ PlayScene::~PlayScene()
 	InitSoundMem();
 }
 
-
 void PlayScene::Update()
 {
 	playTime += Time::DeltaTime();
-
 	score = 10000 - (int)(playTime) * 10 - retryCount * 500;
-
 	g_ClearTimeSeconds += Time::DeltaTime();
 
 	Player* player = FindGameObject<Player>();
 	Field* field = FindGameObject<Field>();
-	if (!player || !field) { return; }
+	if (!player || !field) return;
 
-	// --- ƒtƒF[ƒhƒCƒ“ƒAƒEƒg ---
 	Fader* fader = FindGameObject<Fader>();
-	if (CheckHitKey(KEY_INPUT_K)) {
-		fader->FadeIn(0.5f);
-	}
-	if (CheckHitKey(KEY_INPUT_L)) {
-		fader->FadeOut(1.0f);
-	}
+	if (!fader) return;
 
-	if (player && player->IsDead())
+	// =========================
+	// æ­»äº¡ä¸­ã®å‡¦ç†
+	// =========================
+	if (state == Playstate::Play) {
+		if (player->IsDead())
+		{
+			// æ¼”å‡ºãŒçµ‚ã‚ã£ã¦ã„ãªã„é–“ã¯ä½•ã‚‚ã•ã›ãªã„ï¼ˆæ“ä½œä¸èƒ½ï¼‰
+			if (!player->IsdeathAnimEnd())
+			{
+				return;
+			}
+
+			state = Playstate::Death;
+
+			// ãƒ©ã‚¤ãƒ•ãŒå°½ããŸã‚‰GAMEOVERã¸
+			if (life <= 0)
+			{
+				SceneManager::ChangeScene("GAMEOVER");
+				return;
+			}
+
+			// æ¼”å‡ºçµ‚äº†å¾Œï¼šRã§ãƒªãƒˆãƒ©ã‚¤ã ã‘è¨±å¯ï¼ˆä»–ã‚­ãƒ¼ã¯ç„¡è¦–ï¼‰
+			if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
+			{
+				fader->FadeOut(0.5f);
+				fader->FadeIn(1.0f);
+				SceneManager::ForceChangeScene("PLAY");
+			}
+
+			return;
+		}
+	}
+	else if (state == Playstate::Death)
 	{
-		life--;
-		retryCount++;
+		// æ¼”å‡ºãŒçµ‚ã‚ã£ãŸç¬é–“ã«1å›ã ã‘ãƒ©ã‚¤ãƒ•æ¸›ç®—ãªã©
+		if (!deathHandled)
+		{
+			deathHandled = true;
 
-		g_Life = life;
-		g_RetryCount = retryCount;
+			life--;
+			retryCount++;
 
 		if (life > 0)
 		{
@@ -81,66 +111,82 @@ void PlayScene::Update()
 			deathCount++;
 			g_deathCount = deathCount;
 		}
-		return;
 	}
 
+	// ç”Ÿå­˜ä¸­ã«æˆ»ã£ãŸã‚‰æ¬¡ã®æ­»äº¡ã«å‚™ãˆã¦è§£é™¤
+	deathHandled = false;
+
+	// =========================
+	// ã‚¯ãƒªã‚¢åˆ¤å®šï¼ˆç”Ÿå­˜ä¸­ã®ã¿ï¼‰
+	// =========================
 	if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
 	{
-		// ƒ{[ƒiƒX•t—^
 		int finalScore = score;
-		if (retryCount == 0) { finalScore += 2000; } // ƒm[ƒ~ƒX
-		if (playTime <= 60.0f) { finalScore += 1000; } // 1•ªˆÈ“à
+		if (retryCount == 0)  finalScore += 2000;
+		if (playTime <= 60.0f) finalScore += 1000;
 
-		// Œ‹‰Ê‚ğƒOƒ[ƒoƒ‹‚É•Û‘¶
 		g_GameResult.score = finalScore;
 		g_GameResult.clearTime = playTime;
 		g_GameResult.retryCount = retryCount;
 
-		// CLEARƒV[ƒ“‚Ö
 		SceneManager::ChangeScene("CLEAR");
 		return;
 	}
 
-	// --- OƒL[‚Åƒ^ƒCƒgƒ‹‰æ–Ê ---
-	if (CheckHitKey(KEY_INPUT_O)) {
+	// =========================
+	// ç”Ÿå­˜ä¸­ã®å…¥åŠ›
+	// =========================
+	if (CheckHitKey(KEY_INPUT_K)) fader->FadeIn(0.5f);
+	if (CheckHitKey(KEY_INPUT_L)) fader->FadeOut(1.0f);
+
+	if (CheckHitKey(KEY_INPUT_O))
+	{
 		SceneManager::ChangeScene("TITLE");
-		
 	}
 
-	// --- RƒL[‚ÅƒŠƒgƒ‰ƒC ---
-	if (CheckHitKey(KEY_INPUT_R)) {
+	if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
+	{
 		fader->FadeOut(0.5f);
-		fader->FadeIn (1.0f);
+		fader->FadeIn(1.0f);
 		SceneManager::ForceChangeScene("PLAY");
 	}
 
-
-	// --- EƒL[‚ÅƒXƒe[ƒW‘I‘ğ‰æ–Ê ---
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_E))
 	{
 		SceneManager::ChangeScene("STAGE");
-		return;
 	}
-
 
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_G))
 	{
 		SceneManager::ChangeScene("GAMEOVER");
-		return;
 	}
 
-	// --- ESCAPEƒL[‚ÅI—¹ ---
-	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
+	if (CheckHitKey(KEY_INPUT_ESCAPE))
+	{
 		SceneManager::Exit();
 	}
-
-	
-
 }
 
 void PlayScene::Draw()
 {
 	Player* player = FindGameObject<Player>();
+
+	//ç”»é¢ä¸­å¤®ã«æ–‡å­—
+	const char* text = "ãƒªãƒˆãƒ©ã‚¤ Push to[R]";
+	int sw, sh;
+	GetDrawScreenSize(&sw, &sh);
+	int textWidth = GetDrawStringWidth(text, -1);
+	int x = (sw - textWidth) / 2;
+	int y = sh / 2;
+
+	if (state == Playstate::Zanki)
+	{
+		DrawBox(0, 0, 1920, 1080, GetColor(0, 0, 0), TRUE);
+		DrawRotaGraph(x+40, y, 2.0, 0, hImage, TRUE);
+		DrawFormatString(x+150, y-10,GetColor(255, 255, 255),"ã€€æ®‹æ©Ÿã€€ %d", life);
+		DrawString(x,y+70, text, GetColor(255, 255, 255));
+		return;
+	}
 
 	int col = GetColor(255, 255, 255);
 	SetFontSize(32);

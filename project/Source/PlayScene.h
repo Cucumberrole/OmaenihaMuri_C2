@@ -4,22 +4,25 @@
 class PlayScene : public SceneBase
 {
 public:
-	PlayScene();        // © ˆø”‚È‚µ
+	PlayScene();        // â† å¼•æ•°ãªã—
 	~PlayScene();
 
-	static int SelectedStage;  // © ƒXƒe[ƒW”Ô†‚ğ•Û
+	static int SelectedStage;  // â† ã‚¹ãƒ†ãƒ¼ã‚¸ç•ªå·ã‚’ä¿æŒ
 
 	void Update() override;
 	void Draw() override;
 	int GetRetry(int retry);
 
+	int hImage;
+
 private:
 	int Ssound;
 	bool sound;
 
-	int   life;        // c‹@ (5ƒXƒ^[ƒg)
-	int   retryCount;  // €‚ñ‚¾‰ñ”
-	float playTime;    // Œo‰ßŠÔ(•b)
-	int   score;   // Œ»İƒXƒRƒA
+	int   life;        // æ®‹æ©Ÿ (5ã‚¹ã‚¿ãƒ¼ãƒˆ)
+	bool deathHandled = false;
+	int   retryCount;  // æ­»ã‚“ã å›æ•°
+	float playTime;    // çµŒéæ™‚é–“(ç§’)
+	int   score;   // ç¾åœ¨ã‚¹ã‚³ã‚¢
 	int deathCount;
 };

@@ -4,6 +4,50 @@
 #include <DxLib.h>
 #include <algorithm>
 
+
+// ===============================
+// Fullscreen Hit Overlay
+// ===============================
+namespace
+{
+	int  gHitOverlayGraph = -1;
+	int  gHitOverlayTimer = 0;
+	constexpr int HIT_OVERLAY_MAX = 30; // 表示フレーム数（好みで調整）
+
+	void InitHitOverlayOnce()
+	{
+		if (gHitOverlayGraph != -1) return;
+		gHitOverlayGraph = LoadGraph("data/image/hit.png"); // 好きな画像に変更OK
+	}
+
+	void TriggerHitOverlay()
+	{
+		InitHitOverlayOnce();
+		gHitOverlayTimer = HIT_OVERLAY_MAX;
+	}
+
+	void UpdateHitOverlay()
+	{
+		if (gHitOverlayTimer > 0) --gHitOverlayTimer;
+	}
+
+	void DrawHitOverlay()
+	{
+		if (gHitOverlayTimer <= 0) return;
+		if (gHitOverlayGraph == -1) return;
+
+		int sw = 0, sh = 0;
+		GetDrawScreenSize(&sw, &sh);
+
+		// フェードアウト（不要なら SetDrawBlendMode 部分を消してOK）
+		int alpha = (255 * gHitOverlayTimer) / HIT_OVERLAY_MAX;
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+		DrawExtendGraph(0, 0, sw, sh, gHitOverlayGraph, TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
+}
+
+
 PatrolEnemy::PatrolEnemy(float sx, float sy, float spd)
 {
 	x = sx;
@@ -11,7 +55,7 @@ PatrolEnemy::PatrolEnemy(float sx, float sy, float spd)
 	speed = spd;
 	vx = -speed;
 
-	hImage = LoadGraph("data/image/Head.png"); // <- prepare any 64x64 image
+	hImage = LoadGraph("data/image/すい1.png"); // <- prepare any 64x64 image
 	SetDrawOrder(40);
 }
 
@@ -85,6 +129,9 @@ void PatrolEnemy::Update()
 	}
 
 	x = nextX;
+
+
+	UpdateHitOverlay();
 }
 
 void PatrolEnemy::Draw()
@@ -113,4 +160,5 @@ void PatrolEnemy::Draw()
 	{
 		DrawBox((int)x, (int)y, (int)x + 64, (int)y + 64, GetColor(255, 0, 0), TRUE);
 	}
+	DrawHitOverlay();
 }

@@ -1,5 +1,5 @@
 ﻿#include "Common.h"
-#include "Fader.h"                 // 使っていなければ消してもOK
+#include "Fader.h"
 #include "PlayScene.h"
 #include "../Library/SceneManager.h"
 #include "../ImGui/imgui.h"

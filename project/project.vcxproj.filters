@@ -135,7 +135,7 @@
     </ClCompile>
     <ClCompile Include="Source\Common.cpp" />
     <ClCompile Include="Source\PatrplEnemy.cpp">
-      <Filter>PlayScene</Filter>
+      <Filter>Trap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -366,7 +366,7 @@
     </ClInclude>
     <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\PatrolEnemy.h">
-      <Filter>PlayScene</Filter>
+      <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

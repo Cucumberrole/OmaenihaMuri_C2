@@ -6,12 +6,48 @@
 #include "VanishingFloor.h"
 #include "MovingWall.h"
 #include "Common.h"
+#include "PatrolEnemy.h"
 #include "../Library/Trigger.h"
 #include <assert.h>
 
 // --- 定数 ---
 static const float Gravity = 0.4f;  // 重力加速度
 static const float V0 = -10.0f;     // ジャンプ初速度（上方向）
+
+// --- Hit Overlay static members ---
+int Player::sHitOverlayGraph = -1;
+int Player::sHitOverlayTimer = 0;
+
+void Player::InitHitOverlay()
+{
+	if (sHitOverlayGraph != -1) return;
+	sHitOverlayGraph = LoadGraph("data/image/hit.png"); // ここを表示したい画像に
+}
+
+void Player::TriggerHitOverlay()
+{
+	InitHitOverlay();
+	sHitOverlayTimer = HIT_OVERLAY_MAX;
+}
+
+void Player::UpdateHitOverlay()
+{
+	if (sHitOverlayTimer > 0) --sHitOverlayTimer;
+}
+
+void Player::DrawHitOverlay()
+{
+	if (sHitOverlayTimer <= 0) return;
+	if (sHitOverlayGraph == -1) return;
+
+	int sw = 0, sh = 0;
+	GetDrawScreenSize(&sw, &sh);
+
+	int alpha = (255 * sHitOverlayTimer) / HIT_OVERLAY_MAX; // 255→0でフェード
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+	DrawExtendGraph(0, 0, sw, sh, sHitOverlayGraph, TRUE);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
 
 //--------------------------------------
 // デフォルトコンストラクタ
@@ -39,6 +75,16 @@ Player::Player()
 
 	// 円当たり判定の半径
 	hitRadius = 22.0f;
+
+	hDeadUpImage = LoadGraph("data/image/Death.png");
+	hDeadFallImage = LoadGraph("data/image/DeathBottom.png");
+	assert(hDeadUpImage != -1);
+	assert(hDeadFallImage != -1);
+
+	deathState = DeathState::None;
+	deathAnimEnd = false;
+
+
 }
 
 //--------------------------------------
@@ -48,6 +94,14 @@ Player::Player(int sx, int sy)
 {
 	hImage = LoadGraph("data/image/OMAEwalk.png");
 	assert(hImage != -1);
+
+	hDeadUpImage = LoadGraph("data/image/Death.png");
+	hDeadFallImage = LoadGraph("data/image/DeathBottom.png");
+	assert(hDeadUpImage != -1);
+	assert(hDeadFallImage != -1);
+
+	deathState = DeathState::None;
+	deathAnimEnd = false;
 
 	x = (float)sx;
 	y = (float)sy;
@@ -76,7 +130,9 @@ Player::Player(int sx, int sy)
 //--------------------------------------
 Player::~Player()
 {
-	DeleteGraph(hImage);
+	if (hImage != -1) DeleteGraph(hImage);
+	if (hDeadUpImage != -1) DeleteGraph(hDeadUpImage);
+	if (hDeadFallImage != -1) DeleteGraph(hDeadFallImage);
 }
 
 //--------------------------------------
@@ -122,13 +178,37 @@ void Player::PushByWall(float dx)
 	}
 }
 
+bool Player::IsdeathAnimEnd() const
+{
+	return deathAnimEnd;
+}
+
+
+
 //--------------------------------------
 // Update()
 //--------------------------------------
 void Player::Update()
 {
-	// --- 死亡していたら完全固定 ---
-	if (isDead) {
+	// --- 死亡演出 ---
+	if (isDead)
+	{
+		y += velocity;
+		velocity += Gravity;
+
+		if (deathState == DeathState::Up && velocity >= 0.0f)
+		{
+			deathState = DeathState::Fall;
+		}
+
+		int sw = 0, sh = 0;
+		GetDrawScreenSize(&sw, &sh);
+
+		if (y > sh + 100)
+		{
+			deathAnimEnd = true;
+		}
+
 		return;
 	}
 
@@ -343,13 +423,30 @@ void Player::Update()
 			}
 		}
 	}
+
+	UpdateHitOverlay();
 }
+
+
 
 //--------------------------------------
 // Draw()
 //--------------------------------------
 void Player::Draw()
 {
+	if (isDead)
+	{
+		if (deathState == DeathState::Up)
+		{
+			DrawGraph((int)x, (int)y, hDeadUpImage, TRUE);
+		}
+		else
+		{
+			DrawGraph((int)x, (int)y, hDeadFallImage, TRUE);
+		}
+		return;
+	}
+
 	// 現在のスプライトシート上での位置
 	int xRect = (animIndex % ATLAS_WIDTH) * CHARACTER_WIDTH;
 	int yRect = (animIndex / ATLAS_WIDTH) * CHARACTER_HEIGHT;
@@ -367,6 +464,8 @@ void Player::Draw()
 	float cx, cy, r;
 	GetHitCircle(cx, cy, r);
 	DrawCircle((int)cx, (int)cy, (int)r, GetColor(0, 255, 0), FALSE);
+
+	DrawHitOverlay();
 }
 
 void Player::ForceDie()
@@ -375,13 +474,15 @@ void Player::ForceDie()
 	{
 		return;
 	}
-	// 画面外へ
-	x = -9999;
-	y = -9999;
 
-	velocity = 0;
+	if (isDead) return;
+
 	onGround = false;
 
-	// ここで確実に固定状態にする
 	isDead = true;
+	deathAnimEnd = false;
+	deathState = DeathState::Up;
+	velocity = V0;
+
+	TriggerHitOverlay();
 }
