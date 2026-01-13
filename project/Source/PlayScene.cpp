@@ -146,6 +146,7 @@ void PlayScene::Update()
 
 	if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
 	{
+		VanishingFloor::ResetAll();
 		fader->FadeOut(0.5f);
 		fader->FadeIn(1.0f);
 		SceneManager::ForceChangeScene("PLAY");
