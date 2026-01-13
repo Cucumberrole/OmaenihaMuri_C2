@@ -18,6 +18,7 @@ GameOver::GameOver()
 	MsgImage7 = LoadGraph("data/font/ゲームオーバー画面文字/君はキャラの気持ちを考えたことはあるかい？.png");//
 	MsgImage8 = LoadGraph("data/font/ゲームオーバー画面文字/止まるんじゃねぇぞ・・・.png");//
 	MsgImage9 = LoadGraph("data/font/ゲームオーバー画面文字/疲れてるんじゃない？.png");//
+
 }
 
 GameOver::~GameOver()
@@ -74,9 +75,12 @@ void GameOver::Update()
 
 void GameOver::Draw()
 {
+
+
 	DrawBox(0, 0, Screen::WIDTH, Screen::HEIGHT,
 		GetColor(0, 0, 0), TRUE);
 	DrawGraph(600, 200, OwariImage, TRUE);
+	
 
 	SetFontSize(25);
 	int h = GetFontSize();
@@ -89,10 +93,12 @@ void GameOver::Draw()
 	DrawFormatString(0, 0 + h * 4, GetColor(255, 255, 255), "FontSize:%d", Rand);
 	SetFontSize(32);
 
-
+	DrawBox(700, 675, 1150, 775, GetColor(255, 163, 30), TRUE);
+	DrawBox(700, 850, 1150, 950, GetColor(255, 163, 30), TRUE);
 	DrawGraph(250, 150, Msg, TRUE);
 	int DrawWidth = GetDrawStringWidth("Push [SHIFT]Key To Play", -1);
-	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2, "Tキーでタイトルに戻る\nRキーでリトライする", GetColor(0, 0, 0));
+	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2+100, "Rキーでリトライ", GetColor(255, 255, 255));
+	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2+275, "Tキーでタイトルに戻る", GetColor(255, 255, 255));
 
 
 }
