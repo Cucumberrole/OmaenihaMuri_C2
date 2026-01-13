@@ -29,6 +29,4 @@ private:
 	SpikeDir dir;
 
 	int hImage = -1; // ‰æ‘œ1–‡‚ÅÏ‚Ü‚¹‚é‚È‚ç‚±‚ê‚¾‚¯
-
-	void loadImage();
 };

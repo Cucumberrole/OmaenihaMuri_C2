@@ -110,14 +110,6 @@ Field::Field(int stage)
 			{
 				new VanishingFloor(xx * 64, yy * 64);
 			}
-			else if (cell == 11)
-			{
-				new SmallTrap(xx * 64 + 24, yy * 64 + 48);
-			}
-			else if (cell == 12)
-			{
-				new SmallTrap2(xx * 64 + 24, yy * 64);
-			}
 			else if (cell == 13)
 			{
 				// 落下針トリガー（1トリガー = 1針）
@@ -213,6 +205,22 @@ Field::Field(int stage)
 			else if (cell == 91)
 			{
 				new Boss(xx * 64, yy * 64 - 192);
+			}
+			else if (cell == 101)
+			{
+				new SmallTrap(xx * 64.0f + 24.0f, yy * 64.0f + 48.0f,SmallSpikeDir::Up);
+			}
+			else if (cell == 102)
+			{
+				new SmallTrap(xx * 64.0f + 24.0f, yy * 64.0f, SmallSpikeDir::Down);
+			}
+			else if (cell == 103)
+			{
+				new SmallTrap(xx * 64.0f + 24.0f, yy * 64.0f+24.0f, SmallSpikeDir::Left);
+			}
+			else if (cell == 104)
+			{
+				new SmallTrap(xx * 64.0f, yy * 64.0f+24.0f, SmallSpikeDir::Right);
 			}
 		}
 	}

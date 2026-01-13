@@ -1,16 +1,30 @@
 #pragma once
 #include "../Library/GameObject.h"
 
+// 針の向き
+enum class SmallSpikeDir
+{
+	Up,
+	Down,
+	Left,
+	Right
+};
+
 class SmallTrap : public GameObject
 {
 public:
-	SmallTrap(int x, int y);
+	SmallTrap(float sx, float sy, SmallSpikeDir dir);
 	~SmallTrap();
 	void Update() override;
 	void Draw() override;
 private:
-	int SImage;    // 小さい針の画像ハンドル
-	float x, y;    // 座標
-	int width;     // 幅（画像サイズ）
-	int height;    // 高さ
+	float x = 0.0f;
+	float y = 0.0f;
+
+	int   width = 64;
+	int   height = 64;
+
+	SmallSpikeDir dir;
+
+	int SImage = -1; // 画像1枚で済ませるならこれだけ
 };
