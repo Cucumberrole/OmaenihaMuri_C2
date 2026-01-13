@@ -11,6 +11,7 @@ public:
 
 	void Update() override;
 	void Draw() override;
+	int GetRetry(int retry);
 
 private:
 	int Ssound;
@@ -19,5 +20,6 @@ private:
 	int   life;        // 残機 (5スタート)
 	int   retryCount;  // 死んだ回数
 	float playTime;    // 経過時間(秒)
-	int   score;       // 現在スコア
+	int   score;   // 現在スコア
+	int deathCount;
 };

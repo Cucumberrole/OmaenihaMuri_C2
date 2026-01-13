@@ -12,6 +12,7 @@ int PlayScene::SelectedStage = -1;
 static int g_Life = 5; // 初期残機
 static int g_RetryCount = 0; // 死んだ回数
 float g_ClearTimeSeconds = 0.0f;
+static int g_deathCount = 0;
 
 PlayScene::PlayScene()
 {
@@ -28,6 +29,8 @@ PlayScene::PlayScene()
 
 	life = g_Life;
 	retryCount = g_RetryCount;
+	deathCount = g_deathCount;
+
 
 	playTime = 0.0f;
 	score = 10000;  // 初期スコア
@@ -70,10 +73,13 @@ void PlayScene::Update()
 
 		if (life > 0)
 		{
-			SceneManager::ChangeScene("PLAY");
+			SceneManager::ChangeScene("STAGE");
 		}
 		else {
+			g_Life = 5;
 			SceneManager::ChangeScene("GAMEOVER");
+			deathCount++;
+			g_deathCount = deathCount;
 		}
 		return;
 	}
@@ -162,6 +168,13 @@ void PlayScene::Draw()
 	DrawString(0, 0 + h * 5, buf, col);
 
 	DrawFormatString(0, 0 + h * 6, GetColor(255,255,255), "%4.1f", 1.0f / Time::DeltaTime());
+}
+
+int PlayScene::GetRetry(int retry)
+{
+	retry = g_deathCount;
+
+	return retry;
 }
 
 
