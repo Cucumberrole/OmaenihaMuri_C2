@@ -87,6 +87,7 @@ void PlayScene::Update()
 			// 演出終了後：Rでリトライだけ許可（他キーは無視）
 			if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
 			{
+				VanishingFloor::ResetAll();
 				fader->FadeOut(0.5f);
 				fader->FadeIn(1.0f);
 				SceneManager::ForceChangeScene("PLAY");
