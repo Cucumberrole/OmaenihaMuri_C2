@@ -171,61 +171,62 @@ void PlayScene::Update()
 			SceneManager::Exit();
 		}
 	}
+}
 
-	void PlayScene::Draw()
+void PlayScene::Draw()
+{
+	Player* player = FindGameObject<Player>();
+
+	//画面中央に文字
+	const char* text = "リトライ Push to[R]";
+	int sw, sh;
+	GetDrawScreenSize(&sw, &sh);
+	int textWidth = GetDrawStringWidth(text, -1);
+	int x = (sw - textWidth) / 2;
+	int y = sh / 2;
+
+	if (state == Playstate::Zanki)
 	{
-		Player* player = FindGameObject<Player>();
-
-		//画面中央に文字
-		const char* text = "リトライ Push to[R]";
-		int sw, sh;
-		GetDrawScreenSize(&sw, &sh);
-		int textWidth = GetDrawStringWidth(text, -1);
-		int x = (sw - textWidth) / 2;
-		int y = sh / 2;
-
-		if (state == Playstate::Zanki)
-		{
-			DrawBox(0, 0, 1920, 1080, GetColor(0, 0, 0), TRUE);
-			DrawRotaGraph(x + 40, y, 2.0, 0, hImage, TRUE);
-			DrawFormatString(x + 150, y - 10, GetColor(255, 255, 255), "　残機　 %d", life);
-			DrawString(x, y + 70, text, GetColor(255, 255, 255));
-			return;
-		}
-
-		int col = GetColor(255, 255, 255);
-		SetFontSize(32);
-		int h = GetFontSize();
-
-		char buf[128];
-		DrawString(0, 0 + h * 0, "PLAY SCENE", GetColor(255, 255, 255));
-
-		// TIME
-		sprintf_s(buf, "TIME : %.2f", playTime);
-		DrawString(0, 0 + h * 1, buf, col);
-
-		// SCORE
-		sprintf_s(buf, "SCORE : %d", score);
-		DrawString(0, 0 + h * 2, buf, col);
-
-		// PlayerX
-		DrawFormatString(0, 0 + h * 3, GetColor(255, 255, 255), "PlayerX: %.2f", player->GetX());
-
-		//PlayerY
-		DrawFormatString(0, 0 + h * 4, GetColor(255, 255, 255), "PlayerY: %.2f", player->GetY());
-
-		// LIFE
-		sprintf_s(buf, "LIFE : %d", life);
-		DrawString(0, 0 + h * 5, buf, col);
-
-		DrawFormatString(0, 0 + h * 6, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
+		DrawBox(0, 0, 1920, 1080, GetColor(0, 0, 0), TRUE);
+		DrawRotaGraph(x + 40, y, 2.0, 0, hImage, TRUE);
+		DrawFormatString(x + 150, y - 10, GetColor(255, 255, 255), "　残機　 %d", life);
+		DrawString(x, y + 70, text, GetColor(255, 255, 255));
+		return;
 	}
 
-	int PlayScene::GetRetry(int retry)
-	{
-		retry = g_deathCount;
+	int col = GetColor(255, 255, 255);
+	SetFontSize(32);
+	int h = GetFontSize();
 
-		return retry;
-	}
+	char buf[128];
+	DrawString(0, 0 + h * 0, "PLAY SCENE", GetColor(255, 255, 255));
+
+	// TIME
+	sprintf_s(buf, "TIME : %.2f", playTime);
+	DrawString(0, 0 + h * 1, buf, col);
+
+	// SCORE
+	sprintf_s(buf, "SCORE : %d", score);
+	DrawString(0, 0 + h * 2, buf, col);
+
+	// PlayerX
+	DrawFormatString(0, 0 + h * 3, GetColor(255, 255, 255), "PlayerX: %.2f", player->GetX());
+
+	//PlayerY
+	DrawFormatString(0, 0 + h * 4, GetColor(255, 255, 255), "PlayerY: %.2f", player->GetY());
+
+	// LIFE
+	sprintf_s(buf, "LIFE : %d", life);
+	DrawString(0, 0 + h * 5, buf, col);
+
+	DrawFormatString(0, 0 + h * 6, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
+}
+
+int PlayScene::GetRetry(int retry)
+{
+	retry = g_deathCount;
+
+	return retry;
+}
 
 
