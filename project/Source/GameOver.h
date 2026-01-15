@@ -12,7 +12,7 @@ public:
 private:
 	int OwariImage;
 	int BackImage;
-	std::string oneLineMsg;
+	int oneLineMsg;
 	int retry;
 	int Msg;
 	int Rand;

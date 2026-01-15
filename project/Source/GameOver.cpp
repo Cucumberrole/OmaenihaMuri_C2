@@ -9,6 +9,7 @@ GameOver::GameOver()
 	srand((unsigned)time(NULL));
 	Rand = rand() % 9 + 1;
 	OwariImage = LoadGraph("data/Font/GAME OVER.png");//画像変えるときここ
+	oneLineMsg = LoadGraph("data/font/ゲームオーバー画面文字/初のゲームオーバー.png");
 	MsgImage1 = LoadGraph("data/font/ゲームオーバー画面文字/この死が君を強くする.png");//
 	MsgImage2 = LoadGraph("data/font/ゲームオーバー画面文字/この死は意味があったのか.png");//
 	MsgImage3 = LoadGraph("data/font/ゲームオーバー画面文字/ドンマイ！元気出して.png");//
@@ -40,7 +41,7 @@ void GameOver::Update()
 		SceneManager::Exit();
 	}
 
-	oneLineMsg = "記念すべき初のゲームオーバーおめでとう！";
+	Msg = oneLineMsg;
 	if (retry > 1)
 	{
 		if (Rand == 1) {
