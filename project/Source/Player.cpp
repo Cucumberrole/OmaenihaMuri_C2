@@ -21,7 +21,7 @@ int Player::sHitOverlayTimer = 0;
 void Player::InitHitOverlay()
 {
 	if (sHitOverlayGraph != -1) return;
-	sHitOverlayGraph = LoadGraph("data/image/hit.png"); // ここを表示したい画像に
+	sHitOverlayGraph = LoadGraph("data/image/hit.png");
 }
 
 void Player::TriggerHitOverlay()

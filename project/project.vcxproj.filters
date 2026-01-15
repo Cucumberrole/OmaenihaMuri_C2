@@ -71,7 +71,7 @@
     <ClCompile Include="Source\Trap.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
-    <ClCompile Include="Source\FlyingSpike.cpp">
+    <ClCompile Include="Source\FlyingSpikeTrap.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
     <ClCompile Include="Source\FallingFloor.cpp">
@@ -287,7 +287,7 @@
     <ClInclude Include="Source\Trap.h">
       <Filter>Trap</Filter>
     </ClInclude>
-    <ClInclude Include="Source\FlyingSpike.h">
+    <ClInclude Include="Source\FlyingSpikeTrap.h">
       <Filter>Trap</Filter>
     </ClInclude>
     <ClInclude Include="Source\FallingFloor.h">

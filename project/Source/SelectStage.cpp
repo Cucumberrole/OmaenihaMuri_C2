@@ -60,7 +60,7 @@ void SelectStage::Update()
 
 	if (deciding)
 	{
-		// 演出用タイマーを進める
+		// 演出用タイマー
 		decideTimer++;
 
 		// 30フレーム（0.5秒くらい）待ってからゲーム画面へ
@@ -99,13 +99,13 @@ void SelectStage::Update()
 	}
 
 	// 左右カーソル
-	if (KeyTrigger::CheckTrigger(KEY_INPUT_LEFT))
+	if (KeyTrigger::CheckTrigger(KEY_INPUT_A))
 	{
 		PlaySoundMem(selectSE, DX_PLAYTYPE_BACK);
 		cursor--;
 		if (cursor < 0) cursor = (int)options.size() - 1;
 	}
-	if (KeyTrigger::CheckTrigger(KEY_INPUT_RIGHT))
+	if (KeyTrigger::CheckTrigger(KEY_INPUT_D))
 	{
 		PlaySoundMem(selectSE, DX_PLAYTYPE_BACK);
 		cursor++;
@@ -199,7 +199,7 @@ void SelectStage::Draw()
 	DrawString(frameL + (insideW - titleW) / 2, titleY, title, titleColor);
 
 	// サブ
-	const char* sub = "挑戦したいステージのキーを押して下さい";
+	const char* sub = "挑戦したいステージのキーを押して下さい(A,Dでカーソル移動)";
 	SetFontSize(max(20, (int)(insideH * 0.035f)));
 	int subColor = GetColor(0, 0, 0);
 	int subW = GetDrawStringWidth(sub, -1);
@@ -297,7 +297,7 @@ void SelectStage::Draw()
 	int msgY = frameB - (int)(insideH * 0.07f);
 	DrawString(frameL + (insideW - msgW) / 2, msgY, msg, subColor);
 
-	// ★ 決定中なら、画面全体を黒くフェードアウト
+	// 決定中なら、画面全体を黒くフェードアウト
 	if (deciding)
 	{
 		int screenW = 0, screenH = 0;

@@ -95,6 +95,7 @@ void PlayScene::Update()
 			// 演出終了後：Rでリトライだけ許可（他キーは無視）
 			if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
 			{
+				VanishingFloor::ResetAll();
 				fader->FadeOut(0.5f);
 				fader->FadeIn(1.0f);
 				SceneManager::ForceChangeScene("PLAY");
@@ -147,6 +148,7 @@ void PlayScene::Update()
 			SceneManager::ChangeScene("CLEAR");
 			return;
 		}
+	}
 
 		// =========================
 		// 生存中の入力
@@ -159,7 +161,7 @@ void PlayScene::Update()
 			SceneManager::ChangeScene("TITLE");
 		}
 
-		if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
+		if (CheckHitKey(KEY_INPUT_R))
 		{
 			VanishingFloor::ResetAll();
 			fader->FadeOut(0.5f);
@@ -167,12 +169,12 @@ void PlayScene::Update()
 			SceneManager::ForceChangeScene("PLAY");
 		}
 
-		if (KeyTrigger::CheckTrigger(KEY_INPUT_E))
+		if (CheckHitKey(KEY_INPUT_E))
 		{
 			SceneManager::ChangeScene("STAGE");
 		}
 
-		if (KeyTrigger::CheckTrigger(KEY_INPUT_G))
+		if (CheckHitKey(KEY_INPUT_G))
 		{
 			SceneManager::ChangeScene("GAMEOVER");
 		}
@@ -181,7 +183,7 @@ void PlayScene::Update()
 		{
 			SceneManager::Exit();
 		}
-	}
+	
 }
 
 void PlayScene::Draw()

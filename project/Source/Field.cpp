@@ -8,7 +8,7 @@
 #include "SmallTrap2.h"
 #include "FallingFloor.h"
 #include "FakeFloor.h"
-#include "FlyingSpike.h"
+#include "FlyingSpikeTrap.h"
 #include "Dokan.h"
 #include "Dokan2.h"
 #include "VanishingFloor.h"
@@ -91,6 +91,16 @@ Field::Field(int stage)
 			else if (cell == 4)
 			{
 				new FallingFloor(xx * 64, yy * 64);
+			}
+			else if (cell == 5)
+			{
+				new FlyingSpikeTrap(
+					xx * 64.0f, yy * 64.0f, 64.0f, 64.0f,
+					TrapDir::Right,
+					12.0f,
+					NAN,              // laneWorld：追従
+					128.0f            // margin
+				);
 			}
 			else if (cell == 6)
 			{
@@ -197,7 +207,7 @@ Field::Field(int stage)
 			else if (cell == 60)
 			{
 				new PatrolEnemy(xx * 64, yy * 64);
-				}
+			}
 			else if (cell == 90)
 			{
 				new EnemyChaser(xx * 64, yy * 64);
@@ -208,7 +218,7 @@ Field::Field(int stage)
 			}
 			else if (cell == 101)
 			{
-				new SmallTrap(xx * 64.0f + 24.0f, yy * 64.0f + 48.0f,SmallSpikeDir::Up);
+				new SmallTrap(xx * 64.0f + 24.0f, yy * 64.0f + 48.0f, SmallSpikeDir::Up);
 			}
 			else if (cell == 102)
 			{
@@ -216,11 +226,11 @@ Field::Field(int stage)
 			}
 			else if (cell == 103)
 			{
-				new SmallTrap(xx * 64.0f + 24.0f, yy * 64.0f+24.0f, SmallSpikeDir::Left);
+				new SmallTrap(xx * 64.0f + 24.0f, yy * 64.0f + 24.0f, SmallSpikeDir::Left);
 			}
 			else if (cell == 104)
 			{
-				new SmallTrap(xx * 64.0f, yy * 64.0f+24.0f, SmallSpikeDir::Right);
+				new SmallTrap(xx * 64.0f, yy * 64.0f + 24.0f, SmallSpikeDir::Right);
 			}
 		}
 	}
@@ -267,7 +277,7 @@ Field::~Field()
 {
 	if (hImage != -1) DeleteGraph(hImage);
 	if (fallingSpikeImage != -1) DeleteGraph(fallingSpikeImage);
-	for (int i = 0;i < GOAL_ANIM_FRAMES;++i)
+	for (int i = 0; i < GOAL_ANIM_FRAMES; ++i)
 	{
 		if (goalImages[i] != 1)
 		{
@@ -435,17 +445,6 @@ void Field::Update()
 			}
 		}
 	}
-
-	//------------------------------------------
-	// その他
-	//------------------------------------------
-	int cell = maps[ty][tx];
-	if (cell == 5)
-	{
-		SpawnFlyingSpike(tx * 64, ty * 64, -1.0f);
-		maps[ty][tx] = 0;
-		return;
-	}
 }
 
 //------------------------------------------------------------
@@ -612,12 +611,6 @@ bool Field::IsBlock(int tx, int ty)
 {
 	int cell = GetCell(tx, ty);
 	return IsSolidCell(cell);
-}
-
-void Field::SpawnFlyingSpike(float x, float y, float direction)
-{
-	float speed = 30.0f * direction;
-	new FlyingSpike(x + 64 * 5, y, speed);
 }
 
 bool Field::IsGoal(int px, int py)
