@@ -35,4 +35,5 @@ private:
 	float playTime;    // 経過時間(秒)
 	int   score;   // 現在スコア
 	int deathCount;
+	int IFSound;
 };

@@ -21,6 +21,7 @@ static int g_deathCount = 0;
 PlayScene::PlayScene()
 {
 	hImage = LoadGraph("data/image/Atama.png");
+	IFSound = LoadSoundMem("data/sound/IF.mp3");
 
 	new Background();
 
@@ -47,11 +48,16 @@ PlayScene::PlayScene()
 
 PlayScene::~PlayScene()
 {
+	DeleteSoundMem(IFSound);
 	InitSoundMem();
 }
 
 void PlayScene::Update()
 {
+	if (KeyTrigger::CheckTrigger(KEY_INPUT_I))
+	{
+		PlaySoundMem(IFSound, DX_PLAYTYPE_BACK);
+	}
 	playTime += Time::DeltaTime();
 	score = 10000 - (int)(playTime) * 10 - retryCount * 500;
 	g_ClearTimeSeconds += Time::DeltaTime();
@@ -72,6 +78,7 @@ void PlayScene::Update()
 			// 演出が終わっていない間は何もさせない（操作不能）
 			if (!player->IsdeathAnimEnd())
 			{
+			
 				return;
 			}
 
@@ -80,6 +87,7 @@ void PlayScene::Update()
 			// ライフが尽きたらGAMEOVERへ
 			if (life <= 0)
 			{
+				
 				SceneManager::ChangeScene("GAMEOVER");
 				return;
 			}
@@ -97,11 +105,12 @@ void PlayScene::Update()
 	}
 	else if (state == Playstate::Death)
 	{
+
 		// 演出が終わった瞬間に1回だけライフ減算など
 		if (!deathHandled)
 		{
 			deathHandled = true;
-
+	
 			life--;
 			retryCount++;
 			g_Life = life;
