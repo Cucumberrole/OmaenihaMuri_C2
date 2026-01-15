@@ -118,9 +118,6 @@
     <ClCompile Include="Source\GameResult.cpp">
       <Filter>ClearScene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\SmallTrap2.cpp">
-      <Filter>Trap</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Collision.cpp">
       <Filter>PlayScene</Filter>
     </ClCompile>
@@ -329,9 +326,6 @@
     <ClInclude Include="Source\FallingFloor.h">
       <Filter>Trap</Filter>
     </ClInclude>
-    <ClInclude Include="Source\FlyingSpike.h">
-      <Filter>Trap</Filter>
-    </ClInclude>
     <ClInclude Include="Source\EnemyChaser.h">
       <Filter>Trap</Filter>
     </ClInclude>
@@ -348,9 +342,6 @@
     <ClInclude Include="Source\Fader.h" />
     <ClInclude Include="Source\GameResult.h">
       <Filter>ClearScene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\SmallTrap2.h">
-      <Filter>Trap</Filter>
     </ClInclude>
     <ClInclude Include="Source\Collision.h">
       <Filter>PlayScene</Filter>
