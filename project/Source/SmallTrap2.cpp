@@ -6,11 +6,7 @@
 
 SmallTrap2::SmallTrap2(int sx, int sy)
 {
-	SImage = LoadGraph("data/image/Smallhari2.png"); // ¬‚³‚¢j‰æ‘œ
-	x = sx;
-	y = sy;
-	width = 16;
-	height = 16;
+	SImage = LoadGraph("data/image/SmallTrap.png"); // ¬‚³‚¢j‰æ‘œ
 }
 
 SmallTrap2::~SmallTrap2()
@@ -49,20 +45,14 @@ void SmallTrap2::Update()
 
 void SmallTrap2::Draw()
 {
-	DrawRectGraph(
-		static_cast<int>(x),
-		static_cast<int>(y),
-		0, 0, width, height,
+	// Šg‘å—¦ 1.0i‚»‚Ì‚Ü‚Ü‚Ì‘å‚«‚³j
+	DrawRotaGraph(
+		static_cast<int>(cx),
+		static_cast<int>(cy),
+		1.0,
+		angle,
 		SImage,
 		TRUE
 	);
-	//DrawBox(
-	//	static_cast<int>(x),
-	//	static_cast<int>(y),
-	//	static_cast<int>(x + width),
-	//	static_cast<int>(y + height),
-	//	GetColor(255, 0, 0), // ÔF
-	//	FALSE                // “h‚è‚Â‚Ô‚µ‚È‚µ
-	//);
 }
 
