@@ -234,7 +234,7 @@ Field::Field(int stage)
 			}
 			else if (cell == 105)
 			{
-				new SmallTrap2(xx * 64.0f, yy * 64.0f + 24.0f);
+				//new SmallTrap2(xx * 64.0f, yy * 64.0f + 24.0f);
 			}
 		}
 	}
