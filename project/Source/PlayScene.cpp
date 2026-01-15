@@ -151,7 +151,7 @@ void PlayScene::Update()
 			SceneManager::ChangeScene("TITLE");
 		}
 
-		if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
+		if (CheckHitKey(KEY_INPUT_R))
 		{
 			VanishingFloor::ResetAll();
 			fader->FadeOut(0.5f);
@@ -159,12 +159,12 @@ void PlayScene::Update()
 			SceneManager::ForceChangeScene("PLAY");
 		}
 
-		if (KeyTrigger::CheckTrigger(KEY_INPUT_E))
+		if (CheckHitKey(KEY_INPUT_E))
 		{
 			SceneManager::ChangeScene("STAGE");
 		}
 
-		if (KeyTrigger::CheckTrigger(KEY_INPUT_G))
+		if (CheckHitKey(KEY_INPUT_G))
 		{
 			SceneManager::ChangeScene("GAMEOVER");
 		}
