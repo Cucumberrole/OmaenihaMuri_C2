@@ -139,6 +139,7 @@ void PlayScene::Update()
 			SceneManager::ChangeScene("CLEAR");
 			return;
 		}
+	}
 
 		// =========================
 		// 生存中の入力
@@ -173,7 +174,7 @@ void PlayScene::Update()
 		{
 			SceneManager::Exit();
 		}
-	}
+	
 }
 
 void PlayScene::Draw()

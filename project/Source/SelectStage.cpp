@@ -60,7 +60,7 @@ void SelectStage::Update()
 
 	if (deciding)
 	{
-		// 演出用タイマーを進める
+		// 演出用タイマー
 		decideTimer++;
 
 		// 30フレーム（0.5秒くらい）待ってからゲーム画面へ
@@ -199,7 +199,7 @@ void SelectStage::Draw()
 	DrawString(frameL + (insideW - titleW) / 2, titleY, title, titleColor);
 
 	// サブ
-	const char* sub = "挑戦したいステージのキーを押して下さい";
+	const char* sub = "挑戦したいステージのキーを押して下さい(A,Dでカーソル移動)";
 	SetFontSize(max(20, (int)(insideH * 0.035f)));
 	int subColor = GetColor(0, 0, 0);
 	int subW = GetDrawStringWidth(sub, -1);
