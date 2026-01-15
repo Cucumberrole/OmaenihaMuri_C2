@@ -232,6 +232,10 @@ Field::Field(int stage)
 			{
 				new SmallTrap(xx * 64.0f, yy * 64.0f + 24.0f, SmallSpikeDir::Right);
 			}
+			else if (cell == 105)
+			{
+				new SmallTrap2(xx * 64.0f, yy * 64.0f + 24.0f);
+			}
 		}
 	}
 

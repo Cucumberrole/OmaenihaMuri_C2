@@ -20,9 +20,8 @@ public:
 private:
 	float x = 0.0f;
 	float y = 0.0f;
-
-	int   width = 64;
-	int   height = 64;
+	int   width = 16;
+	int   height = 16;
 
 	SmallSpikeDir dir;
 
