@@ -5,7 +5,7 @@
 #include "Trap.h"
 #include "Telop.h"
 #include "SmallTrap.h"
-#include "SmallTrap2.h"
+//#include "SmallTrap2.h"
 #include "FallingFloor.h"
 #include "FakeFloor.h"
 #include "FlyingSpikeTrap.h"
