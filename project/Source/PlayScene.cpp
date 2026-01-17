@@ -241,5 +241,3 @@ int PlayScene::GetRetry(int retry)
 
 	return retry;
 }
-
-

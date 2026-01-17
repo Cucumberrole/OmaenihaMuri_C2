@@ -5,6 +5,9 @@ Background::Background()
 {
 	bgImage = LoadGraph("data/image/kabe.png");
 	SetDrawOrder(1000);
+	sw = 0;
+	sh = 0;
+	GetDrawScreenSize(&sw, &sh);
 }
 
 Background::~Background()
@@ -19,5 +22,5 @@ void Background::Update()
 
 void Background::Draw()
 {
-	DrawGraph(0, 0, bgImage, FALSE);
+	DrawExtendGraph(0, 0, sw, sh, bgImage, FALSE);
 }

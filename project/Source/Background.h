@@ -12,4 +12,5 @@ public:
 
 private:
 	int bgImage;
+	int sw, sh;
 };
