@@ -4,10 +4,10 @@
 class PlayScene : public SceneBase
 {
 public:
-	PlayScene();        // ← 引数なし
+	PlayScene();
 	~PlayScene();
 
-	static int SelectedStage;  // ← ステージ番号を保持
+	static int SelectedStage;
 
 	void Update() override;
 	void Draw() override;
@@ -18,22 +18,22 @@ public:
 private:
 	enum class Playstate
 	{
-		Play,
-		Death,
-		Zanki
+		Play,   // 通常プレイ
+		Death,  // 死亡演出中（アニメ終了待ち）
+		Zanki   // 黒画面＋残機表示＋R待ち
 	};
 
 	Playstate state = Playstate::Play;
-	int deathTimer = 0;
 
 	int Ssound;
 	bool sound;
 
-	int   life;        // 残機 (5スタート)
+	int   life;          // 残機
+	int   retryCount;    // リトライ回数（死んだ回数）
+	float playTime;      // 経過時間
+	int   score;         // スコア
+	int   deathCount;    // 死亡回数（保持用）
+
+	// この死亡を処理したか？（残機減算などを一度だけ行う）
 	bool deathHandled = false;
-	int   retryCount;  // 死んだ回数
-	float playTime;    // 経過時間(秒)
-	int   score;   // 現在スコア
-	int deathCount;
-	int IFSound;
 };
