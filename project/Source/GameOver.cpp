@@ -76,30 +76,64 @@ void GameOver::Update()
 
 void GameOver::Draw()
 {
+    int sw, sh;
+    GetDrawScreenSize(&sw, &sh);
+
+    DrawBox(0, 0, sw, sh, GetColor(0, 0, 0), TRUE);
+
+    int titleW = 0, titleH = 0;
+    GetGraphSize(OwariImage, &titleW, &titleH);
+
+    int msgW = 0, msgH = 0;
+    GetGraphSize(Msg, &msgW, &msgH);
+
+    const int marginTop = sh / 12;
+    const int gap1 = sh / 30;
+    const int gap2 = sh / 18;
+
+    int titleX = (sw - titleW) / 2;
+    int titleY = marginTop;
+    DrawGraph(titleX, titleY, OwariImage, TRUE);
+
+    int msgX = (sw - msgW) / 2;
+    int msgY = titleY + titleH + gap1;
+    DrawGraph(msgX, msgY, Msg, TRUE);
+
+    const int buttonW = (sw < 1200) ? (sw * 2 / 3) : 520;
+    const int buttonH = 90;
+    const int buttonGap = 30;
+
+    int buttonX = (sw - buttonW) / 2;
+    int buttonY1 = msgY + msgH + gap2;
+    int buttonY2 = buttonY1 + buttonH + buttonGap;
+
+    int bottom = buttonY2 + buttonH + marginTop / 2;
+    if (bottom > sh)
+    {
+        int pullUp = bottom - sh;
+        buttonY1 -= pullUp;
+        buttonY2 -= pullUp;
+    }
+
+    const int btnColor = GetColor(255, 163, 30);
+    DrawBox(buttonX, buttonY1, buttonX + buttonW, buttonY1 + buttonH, btnColor, TRUE);
+    DrawBox(buttonX, buttonY2, buttonX + buttonW, buttonY2 + buttonH, btnColor, TRUE);
+
+    SetFontSize(32);
+    const int fontH = GetFontSize();
+
+    auto DrawCenteredTextInBox = [&](int x1, int y1, int x2, int y2, const char* text)
+        {
+            int tw = GetDrawStringWidth(text, -1);
+            int tx = x1 + ((x2 - x1) - tw) / 2;
+            int ty = y1 + ((y2 - y1) - fontH) / 2;
+            DrawString(tx, ty, text, GetColor(255, 255, 255));
+        };
 
 
-	DrawBox(0, 0, Screen::WIDTH, Screen::HEIGHT,
-		GetColor(0, 0, 0), TRUE);
-	DrawGraph(600, 200, OwariImage, TRUE);
-	
+    DrawCenteredTextInBox(buttonX, buttonY1, buttonX + buttonW, buttonY1 + buttonH, "Rキーでリトライ");
+    DrawCenteredTextInBox(buttonX, buttonY2, buttonX + buttonW, buttonY2 + buttonH, "Tキーでタイトルへ戻る");
 
-	SetFontSize(25);
-	int h = GetFontSize();
-	extern const char* Version();
-
-	DrawString(0, 0 + h * 0, "GameOver", GetColor(255, 255, 255));
-	DrawString(0, 0 + h * 1, Version(), GetColor(255, 255, 255));
-	DrawFormatString(0, 0 + h * 2, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
-	DrawFormatString(0, 0 + h * 3, GetColor(255, 255, 255), "FontSize:%d", h);
-	DrawFormatString(0, 0 + h * 4, GetColor(255, 255, 255), "FontSize:%d", Rand);
-	SetFontSize(32);
-
-	DrawBox(700, 675, 1150, 775, GetColor(255, 163, 30), TRUE);
-	DrawBox(700, 850, 1150, 950, GetColor(255, 163, 30), TRUE);
-	DrawGraph(250, 150, Msg, TRUE);
-	int DrawWidth = GetDrawStringWidth("Push [SHIFT]Key To Play", -1);
-	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2+100, "Rキーでリトライ", GetColor(255, 255, 255));
-	DrawString((Screen::WIDTH - DrawWidth) / 2, Screen::HEIGHT / 2+275, "Tキーでタイトルに戻る", GetColor(255, 255, 255));
-
-
+    SetFontSize(20);
+    DrawString(20, sh - 40, "ESC : Exit", GetColor(180, 180, 180));
 }

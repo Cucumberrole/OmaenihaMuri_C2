@@ -6,7 +6,7 @@
 
 TitleScene::TitleScene()
 {
-	TitleImage = LoadGraph("data/image/title.png");
+	TitleImage = LoadGraph("data/image/kabe.png");
 	sHandle = LoadSoundMem("data/bgm/002.ogg");
 	PlaySoundMem(sHandle, DX_PLAYTYPE_BACK);
 }
