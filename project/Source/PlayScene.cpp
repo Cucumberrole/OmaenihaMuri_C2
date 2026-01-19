@@ -186,13 +186,13 @@ void PlayScene::Draw()
 		DrawBox(0, 0, sw, sh, GetColor(0, 0, 0), TRUE);
 
 		// 表示文字（中央配置）
-		const char* retryText = "リトライ Push to [R]";
+		const char* retryText = "RETRY push to [R]";
 		int textWidth = GetDrawStringWidth(retryText, -1);
 		int x = (sw - textWidth) / 2;
 		int y = sh / 2;
 
 		DrawRotaGraph(x + 40, y, 2.0, 0, hImage, TRUE);
-		DrawFormatString(x + 150, y - 10, GetColor(255, 255, 255), "　残機　 %d", life);
+		DrawFormatString(x + 150, y - 10, GetColor(255, 255, 255), "LIFE : %d", life);
 		DrawFormatString(x, y + 70, GetColor(255, 255, 255), "%s", retryText);
 		return;
 	}
