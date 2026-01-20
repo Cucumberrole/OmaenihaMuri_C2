@@ -1,6 +1,7 @@
 #include "FallingFloor.h"
 #include "Player.h"
 #include "Field.h"
+#include "Telop.h"
 #include <DxLib.h>
 #include <algorithm>
 
@@ -31,6 +32,8 @@ void FallingFloor::StartFalling()
 
 void FallingFloor::Update()
 {
+	Telop* telop = FindGameObject<Telop>();
+
 	if (isLanded) return;
 
 	Player* player = FindGameObject<Player>();
@@ -112,6 +115,15 @@ void FallingFloor::Update()
 			{
 				player->ForceDie();
 				player->SetDead();
+				if (telop)
+				{
+					if (x >= 1343) {
+						telop->TouchedTrap3 = true;
+					}
+					else if (x <= 1344) {
+						telop->TouchedTrap4 = true;
+					}
+				}
 			}
 		}
 
