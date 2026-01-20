@@ -1,5 +1,6 @@
 #include "VanishingFloor.h"
 #include "Player.h"
+#include "Telop.h"
 #include <DxLib.h>
 #include <algorithm>
 
@@ -31,6 +32,7 @@ VanishingFloor::~VanishingFloor()
 
 void VanishingFloor::Update()
 {
+	Telop* telop = FindGameObject<Telop>();
 	Player* player = FindGameObject<Player>();
 	if (!player) return;
 
@@ -72,7 +74,7 @@ void VanishingFloor::Update()
 		{
 			player->ForceDie();
 			player->SetDead();
-			
+			telop->TouchedTrap5 = true;
 		}
 	}
 }
