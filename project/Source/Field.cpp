@@ -99,7 +99,7 @@ Field::Field(int stage)
 					TrapDir::Right,
 					12.0f,
 					NAN,              // laneWorld：追従
-					128.0f            // margin
+					0.0f            // margin
 				);
 			}
 			else if (cell == 6)
