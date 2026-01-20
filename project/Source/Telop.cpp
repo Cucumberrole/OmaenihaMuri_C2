@@ -18,7 +18,7 @@ void Telop::Update()
 
 void Telop::Draw()
 {
-    if (TouchedTrap1)//SmallTrap2
+    if (TouchedTrap1)
     {
         DrawFormatString(360, 75, GetColor(255, 255, 255), "‚ ‚Á‚—", FALSE);
     }

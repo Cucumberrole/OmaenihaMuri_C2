@@ -5,7 +5,7 @@
 #include "Trap.h"
 #include "Telop.h"
 #include "SmallTrap.h"
-//#include "SmallTrap2.h"
+#include "MovingSmallTrap.h"
 #include "FallingFloor.h"
 #include "FakeFloor.h"
 #include "FlyingSpikeTrap.h"
@@ -234,7 +234,7 @@ Field::Field(int stage)
 			}
 			else if (cell == 105)
 			{
-				//new SmallTrap2(xx * 64.0f, yy * 64.0f + 24.0f);
+				new MovingSmallTrap(xx * 64.0f + 24.0f, yy * 64.0f + 48.0f);
 			}
 		}
 	}
