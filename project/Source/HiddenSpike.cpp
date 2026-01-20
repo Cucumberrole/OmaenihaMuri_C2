@@ -1,5 +1,6 @@
 #include "HiddenSpike.h"
 #include "Player.h"
+#include "Telop.h"
 #include "Collision.h"
 #include <DxLib.h>
 

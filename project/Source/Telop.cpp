@@ -40,7 +40,7 @@ void Telop::Draw()
             TouchedTrap3 = false;
             displayTimer = 3.0f;
         }
-        DrawFormatString(1000, 500, GetColor(255, 255, 255), "â≥Çó", FALSE);
+        DrawFormatString(1280, 576, GetColor(255, 255, 255), "â≥Çó", FALSE);
     }
     if (TouchedTrap4)//FallingFloor
     {
@@ -50,11 +50,17 @@ void Telop::Draw()
             TouchedTrap3 = false;
             displayTimer = 3.0f;
         }
-        DrawFormatString(1000, 500, GetColor(255, 255, 255), "ÇÊÇÌÇó", FALSE);
+        DrawFormatString(1088, 256, GetColor(255, 255, 255), "ÇÊÇÌÇó", FALSE);
     }
-    if (TouchedTrap5)
+    if (TouchedTrap5)//VanishingFloor
     {
-        DrawFormatString(360, 75, GetColor(255, 255, 255), "èI", FALSE);
+        displayTimer -= 1.0f / 60.0f;
+        if (displayTimer <= 0.0f)
+        {
+            TouchedTrap3 = false;
+            displayTimer = 3.0f;
+        }
+        DrawFormatString(1152, 704, GetColor(255, 255, 255), "èI", FALSE);
     }
     
 }
