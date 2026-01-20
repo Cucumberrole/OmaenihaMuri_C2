@@ -79,7 +79,7 @@ void PlayScene::Update()
 				deathHandled = true;
 
 				life--;
-				retryCount++;
+				
 				deathCount++;
 
 				g_Life = life;
@@ -138,6 +138,7 @@ void PlayScene::Update()
 		// 死亡演出が終わるまで待機（入力不可）
 		if (!player->IsdeathAnimEnd())
 		{
+			retryCount++;
 			return;
 		}
 
@@ -172,6 +173,7 @@ void PlayScene::Update()
 	}
 	}
 }
+
 
 void PlayScene::Draw()
 {
@@ -227,8 +229,10 @@ void PlayScene::Draw()
 	DrawFormatString(0, 0 + h * 6, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
 }
 
+
 int PlayScene::GetRetry(int retry)
 {
-	retry = g_deathCount;
+	retry = g_deathCount; 
 	return retry;
 }
+
