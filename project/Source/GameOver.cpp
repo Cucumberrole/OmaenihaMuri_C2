@@ -42,7 +42,7 @@ void GameOver::Update()
 	}
 
 	Msg = oneLineMsg;
-	if (retry > 1)
+	if (retry >= 6)
 	{
 		if (Rand == 1) {
 			Msg = MsgImage1;
