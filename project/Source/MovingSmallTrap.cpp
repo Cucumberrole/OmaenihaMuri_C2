@@ -1,5 +1,6 @@
 #include "MovingSmallTrap.h"
 #include "Player.h"
+#include "Telop.h"
 #include "Collision.h"
 
 MovingSmallTrap::MovingSmallTrap(float sx, float sy)
@@ -16,31 +17,32 @@ MovingSmallTrap::~MovingSmallTrap()
 void MovingSmallTrap::Update() 
 {
 	Player* player = FindGameObject<Player>();
+	Telop* telop = FindGameObject<Telop>();
 	if (!player) return;
 
 	float cx, cy, cr;
 	player->GetHitCircle(cx, cy, cr);
 	VECTOR center = VGet(cx, cy, 0.0f);
 
-	// 中心座標
-	float trapCx = x + width * 0.5f;
-	float playerCx = cx;
+	int trapTileX = static_cast<int>((x + width * 0.5f) / tile);
+	int trapTileY = static_cast<int>((y + height * 0.5f) / tile);
+	int playerTileX = static_cast<int>(cx / tile);
+	int playerTileY = static_cast<int>(cy / tile);
 
-	if (!moved) 
+	if (!moved && playerTileY == trapTileY) // 上下のマスじゃないときだけ
 	{
-		// 左に1マス来た
-		if (playerCx < trapCx - tile && playerCx > trapCx - tile * 1.5f)
+		if (playerTileX == trapTileX - 1)
 		{
 			x -= tile;
 			moved = true;
 		}
-		// 右に1マス来た
-		else if (playerCx > trapCx + tile && playerCx < trapCx + tile * 1.5f)
+		else if (playerTileX == trapTileX + 1)
 		{
 			x += tile;
 			moved = true;
 		}
 	}
+
 
 
 	// トラップの当たり判定(三角)
@@ -55,6 +57,7 @@ void MovingSmallTrap::Update()
 	{
 		player->ForceDie();
 		player->SetDead();
+		telop->TouchedTrap1=true;
 	}
 
 	

@@ -72,6 +72,7 @@ void VanishingFloor::Update()
 		{
 			player->ForceDie();
 			player->SetDead();
+			
 		}
 	}
 }

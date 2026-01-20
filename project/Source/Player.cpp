@@ -2,6 +2,7 @@
 #include "Field.h"
 #include "FallingFloor.h"
 #include "Trap.h"
+#include "Telop.h"
 #include "GameOver.h"
 #include "VanishingFloor.h"
 #include "MovingWall.h"
@@ -190,6 +191,7 @@ bool Player::IsdeathAnimEnd() const
 //--------------------------------------
 void Player::Update()
 {
+	Telop* telop = FindGameObject<Telop>();
 	// --- 死亡演出 ---
 	if (isDead)
 	{
@@ -418,6 +420,12 @@ void Player::Update()
 					POINT out = field->pipesOut[i % field->pipesOut.size()];
 					x = (float)out.x;
 					y = (float)out.y + ph;
+					
+					if (telop && !telop->TouchedTrap2)
+					{
+						telop->TouchedTrap2 = true; // 1回だけ立てる
+						telop->displayTimer = 1.0f;
+					}
 				}
 				return;
 			}

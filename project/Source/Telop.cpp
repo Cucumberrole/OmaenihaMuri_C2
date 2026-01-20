@@ -18,27 +18,52 @@ void Telop::Update()
 
 void Telop::Draw()
 {
-    if (TouchedTrap1)
+    if (TouchedTrap1)//MovingSmallTrap
     {
-        DrawFormatString(360, 75, GetColor(255, 255, 255), "あっｗ", FALSE);
+        DrawFormatString(360, 240, GetColor(255, 255, 255), "死んじゃったw", FALSE);
     }
-    if (TouchedTrap2)
+    if (TouchedTrap2)//Dokan
     {
-        DrawFormatString(360, 75, GetColor(255, 255, 255), "やっほー", FALSE);
+        displayTimer -= 1.0f / 60.0f;
+        if (displayTimer <= 0.0f)
+        {
+            TouchedTrap2 = false;
+            displayTimer = 3.0f;
+        }
+        DrawFormatString(1700, 200, GetColor(255, 255, 255), "やっほー", FALSE);
     }
-    if (TouchedTrap3)
+    if (TouchedTrap3)//FallingFloor
     {
-        DrawFormatString(360, 75, GetColor(255, 255, 255), "乙ｗ", FALSE);
+        displayTimer -= 1.0f / 60.0f; 
+        if (displayTimer <= 0.0f)
+        {
+            TouchedTrap3 = false;
+            displayTimer = 3.0f;
+        }
+        DrawFormatString(1000, 500, GetColor(255, 255, 255), "乙ｗ", FALSE);
     }
-    if (TouchedTrap4)
+    if (TouchedTrap4)//FallingFloor
     {
-        DrawFormatString(360, 75, GetColor(255, 255, 255), "よわｗ", FALSE);
+        displayTimer -= 1.0f / 60.0f;
+        if (displayTimer <= 0.0f)
+        {
+            TouchedTrap3 = false;
+            displayTimer = 3.0f;
+        }
+        DrawFormatString(1000, 500, GetColor(255, 255, 255), "よわｗ", FALSE);
     }
     if (TouchedTrap5)
     {
         DrawFormatString(360, 75, GetColor(255, 255, 255), "終", FALSE);
     }
     
+}
+
+void Telop::ShowTrap3Message(float duration)
+{
+    if (TouchedTrap3) return; // すでに表示済みなら無視
+    TouchedTrap3 = true;
+    displayTimer = duration;
 }
 
 
