@@ -650,3 +650,16 @@ int Field::GetCell(int tx, int ty)
 	if (tx < 0 || tx >= (int)maps[ty].size()) return -1;
 	return maps[ty][tx];
 }
+
+bool Field::IsBallBlock(int tx, int ty)
+{
+	int cell = GetCell(tx, ty);
+
+	if (IsSolidCell(cell))
+		return true;
+
+	if (cell == 6) // FakeFloor はブロック扱いしない(ボール判定あり)
+		return true;
+
+	return false;
+}
