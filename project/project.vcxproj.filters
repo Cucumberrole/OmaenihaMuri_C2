@@ -138,9 +138,11 @@
     <ClCompile Include="Source\Fader.cpp">
       <Filter>Fader</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Field.cpp" />
     <ClCompile Include="Source\BouncingAnimatedTrap.cpp">
       <Filter>Trap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Field.cpp">
+      <Filter>PlayScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -15,6 +15,10 @@ public:
 	float GetX() const { return x; }
 	float GetY() const { return y; }
 
+	float GetW() const { return 64.0f; }
+	float GetH() const { return 64.0f; }
+
+
 	// 絶対座標セット
 	//void SetX(float nx) { x = nx; }
 	//void SetY(float ny) { y = ny; }
@@ -72,7 +76,7 @@ private:
 	DeathState deathState;
 	int hDeadUpImage;    // 左の画像
 	int hDeadFallImage;  // 右の画像
-	
+
 	bool deathAnimEnd;
 
 	// --- Hit Overlay ---

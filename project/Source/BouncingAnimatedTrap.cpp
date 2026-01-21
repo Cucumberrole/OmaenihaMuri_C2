@@ -1,9 +1,6 @@
-﻿#include "BouncingAnimatedTrap.h"
+#include "BouncingAnimatedTrap.h"
 #include "Player.h"
 #include "Field.h"
-
-int BouncingAnimatedTrap::sImage = -1;
-int BouncingAnimatedTrap::sRefCount = 0;
 
 namespace
 {
@@ -13,20 +10,29 @@ namespace
 	{
 		outVx = 0.0f;
 		outVy = 0.0f;
+
 		switch (dir)
 		{
-		case BouncingAnimatedTrap::Dir::Right:     outVx = +speed; break;
-		case BouncingAnimatedTrap::Dir::Left:      outVx = -speed; break;
-		case BouncingAnimatedTrap::Dir::Down:      outVy = +speed; break;
-		case BouncingAnimatedTrap::Dir::Up:        outVy = -speed; break;
+		case BouncingAnimatedTrap::Dir::Right:     outVx = +speed; outVy = 0.0f; break;
+		case BouncingAnimatedTrap::Dir::Left:      outVx = -speed; outVy = 0.0f; break;
+		case BouncingAnimatedTrap::Dir::Down:      outVx = 0.0f;   outVy = +speed; break;
+		case BouncingAnimatedTrap::Dir::Up:        outVx = 0.0f;   outVy = -speed; break;
 		case BouncingAnimatedTrap::Dir::DownRight: outVx = +speed; outVy = +speed; break;
 		case BouncingAnimatedTrap::Dir::DownLeft:  outVx = -speed; outVy = +speed; break;
 		case BouncingAnimatedTrap::Dir::UpRight:   outVx = +speed; outVy = -speed; break;
 		case BouncingAnimatedTrap::Dir::UpLeft:    outVx = -speed; outVy = -speed; break;
-		default: outVx = +speed; break;
 		}
 	}
+
+	static inline int ClampTile(int v)
+	{
+		return v < 0 ? 0 : v;
+	}
 }
+
+int BouncingAnimatedTrap::sSheetImage = -1;
+int BouncingAnimatedTrap::sFrameImages[2] = { -1, -1 };
+int BouncingAnimatedTrap::sRefCount = 0;
 
 BouncingAnimatedTrap::BouncingAnimatedTrap(float x, float y, Dir dir, float speed)
 {
@@ -35,47 +41,87 @@ BouncingAnimatedTrap::BouncingAnimatedTrap(float x, float y, Dir dir, float spee
 
 	SetVelocityFromDir(dir, speed, vx, vy);
 
-	EnsureSharedImageLoaded();
+	EnsureSharedImagesLoaded();
 }
 
 BouncingAnimatedTrap::~BouncingAnimatedTrap()
 {
-	ReleaseSharedImage();
+	ReleaseSharedImages();
 }
 
-void BouncingAnimatedTrap::EnsureSharedImageLoaded()
+void BouncingAnimatedTrap::EnsureSharedImagesLoaded()
 {
-	if (sImage == -1)
+	// Reference-counted: load once, free when last instance is destroyed.
+	if (sRefCount == 0)
 	{
-		sImage = LoadGraph(kImagePath);
+		// Preferred: split into 2 frame handles (each 640x640)
+		int tmp[2] = { -1, -1 };
+		const int ok = LoadDivGraph(kImagePath, 2, 2, 1, kFrameW, kFrameH, tmp);
+
+		if (ok != 0)
+		{
+			// If LoadDivGraph fails, fall back to LoadGraph + DerivationGraph (or DrawRectExtendGraph)
+			sSheetImage = LoadGraph(kImagePath);
+			if (sSheetImage != -1)
+			{
+				// Derive 2 frames from the sheet (safer than rect-drawing in some setups)
+				sFrameImages[0] = DerivationGraph(0, 0, kFrameW, kFrameH, sSheetImage);
+				sFrameImages[1] = DerivationGraph(kFrameW, 0, kFrameW, kFrameH, sSheetImage);
+			}
+		}
+		else
+		{
+			// Success
+			sFrameImages[0] = tmp[0];
+			sFrameImages[1] = tmp[1];
+			sSheetImage = -1; // not used
+		}
+
+#ifdef _DEBUG
+		if (sFrameImages[0] == -1 || sFrameImages[1] == -1)
+		{
+			// ASCII only (avoid mojibake)
+			printfDx("BouncingAnimatedTrap: Image load failed: %s\n", kImagePath);
+		}
+#endif
 	}
+
 	sRefCount++;
 }
 
-void BouncingAnimatedTrap::ReleaseSharedImage()
+void BouncingAnimatedTrap::ReleaseSharedImages()
 {
 	sRefCount--;
-	if (sRefCount <= 0)
+	if (sRefCount > 0) return;
+
+	// Free frames first
+	for (int i = 0; i < 2; ++i)
 	{
-		if (sImage != -1)
+		if (sFrameImages[i] != -1)
 		{
-			DeleteGraph(sImage);
-			sImage = -1;
+			DeleteGraph(sFrameImages[i]);
+			sFrameImages[i] = -1;
 		}
-		sRefCount = 0;
 	}
+
+	// Free fallback sheet
+	if (sSheetImage != -1)
+	{
+		DeleteGraph(sSheetImage);
+		sSheetImage = -1;
+	}
+
+	sRefCount = 0;
 }
 
 bool BouncingAnimatedTrap::HitPlayer(Player* player) const
 {
 	if (!player) return false;
 
-	// Player is assumed 64x64 (same as other code)
-	const float pw = 64.0f;
-	const float ph = 64.0f;
-
-	float px = player->GetX();
-	float py = player->GetY();
+	const float px = player->GetX();
+	const float py = player->GetY();
+	const float pw = player->GetW();
+	const float ph = player->GetH();
 
 	// AABB vs AABB
 	return !(x + w <= px || px + pw <= x || y + h <= py || py + ph <= y);
@@ -84,42 +130,37 @@ bool BouncingAnimatedTrap::HitPlayer(Player* player) const
 void BouncingAnimatedTrap::AdvanceAnimation()
 {
 	animFrame++;
-	if (animFrame >= ANIM_FRAME_INTERVAL)
+	if (animFrame >= kAnimInterval)
 	{
 		animFrame = 0;
 		animIndex = (animIndex + 1) % 2;
 	}
 }
 
-
-
 void BouncingAnimatedTrap::ResolveTileBounceX(Field* field)
 {
 	if (!field) return;
 
-	// Check 2 points on moving edge
 	if (vx > 0.0f)
 	{
-		int tileX = int(x + w - 1) / 64;
-		int tileY1 = int(y + 1) / 64;
-		int tileY2 = int(y + h - 2) / 64;
+		const int tileX = ClampTile(int(x + w - 1) / 64);
+		const int tileY1 = ClampTile(int(y + 1) / 64);
+		const int tileY2 = ClampTile(int(y + h - 2) / 64);
 
 		if (field->IsBlock(tileX, tileY1) || field->IsBlock(tileX, tileY2))
 		{
-			// Snap to left of the blocking tile
 			x = float(tileX * 64 - int(w));
 			vx = -vx;
 		}
 	}
 	else if (vx < 0.0f)
 	{
-		int tileX = int(x) / 64;
-		int tileY1 = int(y + 1) / 64;
-		int tileY2 = int(y + h - 2) / 64;
+		const int tileX = ClampTile(int(x) / 64);
+		const int tileY1 = ClampTile(int(y + 1) / 64);
+		const int tileY2 = ClampTile(int(y + h - 2) / 64);
 
 		if (field->IsBlock(tileX, tileY1) || field->IsBlock(tileX, tileY2))
 		{
-			// Snap to right of the blocking tile
 			x = float((tileX + 1) * 64);
 			vx = -vx;
 		}
@@ -132,9 +173,9 @@ void BouncingAnimatedTrap::ResolveTileBounceY(Field* field)
 
 	if (vy > 0.0f)
 	{
-		int tileY = int(y + h - 1) / 64;
-		int tileX1 = int(x + 1) / 64;
-		int tileX2 = int(x + w - 2) / 64;
+		const int tileY = ClampTile(int(y + h - 1) / 64);
+		const int tileX1 = ClampTile(int(x + 1) / 64);
+		const int tileX2 = ClampTile(int(x + w - 2) / 64);
 
 		if (field->IsBlock(tileX1, tileY) || field->IsBlock(tileX2, tileY))
 		{
@@ -144,9 +185,9 @@ void BouncingAnimatedTrap::ResolveTileBounceY(Field* field)
 	}
 	else if (vy < 0.0f)
 	{
-		int tileY = int(y) / 64;
-		int tileX1 = int(x + 1) / 64;
-		int tileX2 = int(x + w - 2) / 64;
+		const int tileY = ClampTile(int(y) / 64);
+		const int tileX1 = ClampTile(int(x + 1) / 64);
+		const int tileX2 = ClampTile(int(x + w - 2) / 64);
 
 		if (field->IsBlock(tileX1, tileY) || field->IsBlock(tileX2, tileY))
 		{
@@ -170,7 +211,6 @@ void BouncingAnimatedTrap::Update()
 
 	AdvanceAnimation();
 
-	// Player hit => kill (no other collision)
 	if (player && HitPlayer(player))
 	{
 		player->ForceDie();
@@ -180,17 +220,23 @@ void BouncingAnimatedTrap::Update()
 
 void BouncingAnimatedTrap::Draw()
 {
-	if (sImage == -1) return;
+	// If image not available, draw a debug placeholder in _DEBUG.
+	if (sFrameImages[0] == -1 || sFrameImages[1] == -1)
+	{
+#ifdef _DEBUG
+		DrawBox((int)x, (int)y, (int)(x + w), (int)(y + h), GetColor(255, 0, 0), FALSE);
+		DrawString((int)x, (int)y, "IMG?", GetColor(255, 0, 0));
+#endif
+		return;
+	}
 
-	int srcX = animIndex * FRAME_W;
-	int srcY = 0;
+	const int handle = sFrameImages[animIndex];
 
-	DrawRectExtendGraph(
+	// Alternative display method: draw the frame handle directly, scaled to 64x64.
+	DrawExtendGraph(
 		(int)x, (int)y,
-		(int)x + 64, (int)y + 64,
-		srcX, srcY,
-		FRAME_W, FRAME_H,
-		sImage,
+		(int)x + kDrawW, (int)y + kDrawH,
+		handle,
 		TRUE
 	);
 
