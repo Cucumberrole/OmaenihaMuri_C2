@@ -46,7 +46,7 @@ void Telop::Draw()
     }
     if (TouchedTrap6)//VanishingFloor
     {
-        DrawFormatString(1152, 704, GetColor(255, 255, 255), "èIÅ_(ÅOoÅO)Å^", FALSE);
+        DrawFormatString(1152, 640, GetColor(255, 255, 255), "èIÅ_(ÅOoÅO)Å^", FALSE);
     }
     
 }

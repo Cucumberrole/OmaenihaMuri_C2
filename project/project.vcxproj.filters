@@ -110,11 +110,9 @@
     <ClCompile Include="Source\CsvReader.cpp">
       <Filter>Library</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Telop.cpp" />
     <ClCompile Include="Source\MovingWall.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Fader.cpp" />
     <ClCompile Include="Source\GameResult.cpp">
       <Filter>ClearScene</Filter>
     </ClCompile>
@@ -136,6 +134,12 @@
     </ClCompile>
     <ClCompile Include="Source\MovingSmallTrap.cpp">
       <Filter>Trap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Telop.cpp">
+      <Filter>Telop</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Fader.cpp">
+      <Filter>Fader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -338,11 +342,9 @@
     <ClInclude Include="Source\CsvReader.h">
       <Filter>Library</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Telop.h" />
     <ClInclude Include="Source\MovingWall.h">
       <Filter>Trap</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Fader.h" />
     <ClInclude Include="Source\GameResult.h">
       <Filter>ClearScene</Filter>
     </ClInclude>
@@ -364,6 +366,12 @@
     </ClInclude>
     <ClInclude Include="Source\MovingSmallTrap.h">
       <Filter>Trap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Telop.h">
+      <Filter>Telop</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Fader.h">
+      <Filter>Fader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -398,6 +406,12 @@
     </Filter>
     <Filter Include="Debug">
       <UniqueIdentifier>{0c8fc6b0-a4c9-47b0-bdb6-6bcfdc7fd4c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Telop">
+      <UniqueIdentifier>{46b0110a-45be-418c-aa6d-95ba90dab9e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fader">
+      <UniqueIdentifier>{f43482be-1665-429d-961e-3defde9eb671}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
