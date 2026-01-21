@@ -115,7 +115,7 @@ void PlayScene::Update()
 		if (CheckHitKey(KEY_INPUT_K)) fader->FadeIn(0.5f);
 		if (CheckHitKey(KEY_INPUT_L)) fader->FadeOut(1.0f);
 
-		if (CheckHitKey(KEY_INPUT_O)) SceneManager::ChangeScene("TITLE");
+		if (CheckHitKey(KEY_INPUT_O) || CheckHitKey(KEY_INPUT_T)) SceneManager::ChangeScene("TITLE");
 		if (CheckHitKey(KEY_INPUT_E)) SceneManager::ChangeScene("STAGE");
 		if (CheckHitKey(KEY_INPUT_G)) SceneManager::ChangeScene("GAMEOVER");
 
