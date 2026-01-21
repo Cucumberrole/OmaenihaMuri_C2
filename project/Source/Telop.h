@@ -14,6 +14,7 @@ public:
 	bool TouchedTrap3 = false;
 	bool TouchedTrap4 = false;
 	bool TouchedTrap5 = false;
+	bool TouchedTrap6 = false;
 	float displayTimer = 0.0f;
 private:
 	
