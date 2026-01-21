@@ -57,7 +57,9 @@ void MovingSmallTrap::Update()
 	{
 		player->ForceDie();
 		player->SetDead();
-		telop->TouchedTrap1=true;
+		if (y < 384) {
+			telop->TouchedTrap1 = true;
+		}
 	}
 
 	

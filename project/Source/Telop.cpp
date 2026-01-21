@@ -32,35 +32,21 @@ void Telop::Draw()
         }
         DrawFormatString(1700, 200, GetColor(255, 255, 255), "やっほー", FALSE);
     }
-    if (TouchedTrap3)//FallingFloor
+    if (TouchedTrap3)//FallingFloor右下
     {
-        displayTimer -= 1.0f / 60.0f; 
-        if (displayTimer <= 0.0f)
-        {
-            TouchedTrap3 = false;
-            displayTimer = 3.0f;
-        }
         DrawFormatString(1280, 576, GetColor(255, 255, 255), "乙ｗ", FALSE);
     }
-    if (TouchedTrap4)//FallingFloor
+    if (TouchedTrap4)//FallingFloor右上
     {
-        displayTimer -= 1.0f / 60.0f;
-        if (displayTimer <= 0.0f)
-        {
-            TouchedTrap3 = false;
-            displayTimer = 3.0f;
-        }
-        DrawFormatString(1088, 256, GetColor(255, 255, 255), "よわｗ", FALSE);
+        DrawFormatString(1088, 256, GetColor(255, 255, 255), "ｗｗｗｗｗ", FALSE);
     }
-    if (TouchedTrap5)//VanishingFloor
+	if (TouchedTrap5)//FallingFloor左上
     {
-        displayTimer -= 1.0f / 60.0f;
-        if (displayTimer <= 0.0f)
-        {
-            TouchedTrap3 = false;
-            displayTimer = 3.0f;
-        }
-        DrawFormatString(1152, 704, GetColor(255, 255, 255), "終", FALSE);
+        DrawFormatString(128, 256, GetColor(255, 255, 255), "おしい！！！！", FALSE);
+    }
+    if (TouchedTrap6)//VanishingFloor
+    {
+        DrawFormatString(1152, 704, GetColor(255, 255, 255), "終＼(＾o＾)／", FALSE);
     }
     
 }

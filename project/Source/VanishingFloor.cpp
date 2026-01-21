@@ -74,7 +74,7 @@ void VanishingFloor::Update()
 		{
 			player->ForceDie();
 			player->SetDead();
-			telop->TouchedTrap5 = true;
+			telop->TouchedTrap6 = true;
 		}
 	}
 }
