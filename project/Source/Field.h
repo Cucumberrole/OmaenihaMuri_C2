@@ -22,7 +22,9 @@ public:
 	// マップのセル取得（範囲外は -1）
 	int GetCell(int tx, int ty);
 
-	// 土管
+	// ボールブロック判定
+	bool IsBallBlock(int tx, int ty);
+
 	std::vector<POINT> pipesIn;
 	std::vector<POINT> pipesOut;
 

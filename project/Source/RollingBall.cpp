@@ -55,7 +55,7 @@ void RollingBall::Update()
 	int tx = static_cast<int>((x + size / 2) / 64);
 	int ty = static_cast<int>((y + size) / 64);
 
-	if (!field->IsBlock(tx, ty))
+	if (!field->IsBallBlock(tx, ty))
 	{
 		// 落下継続
 	}

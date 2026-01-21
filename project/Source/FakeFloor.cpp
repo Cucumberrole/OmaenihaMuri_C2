@@ -2,6 +2,12 @@
 #include "Player.h"
 #include <DxLib.h>
 
+bool FakeFloor::CheckHitBall(float px, float py, float pw, float ph)
+{
+	if (px + pw <= x  && px >= x + width && py + ph <= y && py >= y + height) 
+		return true;
+}
+
 FakeFloor::FakeFloor(int sx, int sy)
 {
 	hImage = LoadGraph("data/image/NewBlock.png");
