@@ -4,7 +4,7 @@
 
 EnemyChaser::EnemyChaser(float sx, float sy)
 {
-	hImage = LoadGraph("data/image/Ç∑Ç¢.png"); // 1280Å~640
+	hImage = LoadGraph("data/image/sui.png"); // 1280Å~640
 
 	x = sx;
 	y = sy;

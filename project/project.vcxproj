@@ -155,6 +155,7 @@
     <ClInclude Include="Library\Trigger.h" />
     <ClInclude Include="Source\Background.h" />
     <ClInclude Include="Source\Boss.h" />
+    <ClInclude Include="Source\BouncingAnimatedTrap.h" />
     <ClInclude Include="Source\Collision.h" />
     <ClInclude Include="Source\Common.h" />
     <ClInclude Include="Source\DirectionalSpike.h" />
@@ -206,12 +207,14 @@
     <ClCompile Include="Library\Trigger.cpp" />
     <ClCompile Include="Source\Background.cpp" />
     <ClCompile Include="Source\Boss.cpp" />
+    <ClCompile Include="Source\BouncingAnimatedTrap.cpp" />
     <ClCompile Include="Source\Collision.cpp" />
     <ClCompile Include="Source\Common.cpp" />
     <ClCompile Include="Source\DirectionalSpike.cpp" />
     <ClCompile Include="Source\EnemyChaser.cpp" />
     <ClCompile Include="Source\Fader.cpp" />
     <ClCompile Include="Source\FallingSpike.cpp" />
+    <ClCompile Include="Source\Field.cpp" />
     <ClCompile Include="Source\GameResult.cpp" />
     <ClCompile Include="Source\HiddenSpike.cpp" />
     <ClCompile Include="Source\LaserTurret.cpp" />
@@ -226,7 +229,6 @@
     <ClCompile Include="Source\Dokan2.cpp" />
     <ClCompile Include="Source\FakeFloor.cpp" />
     <ClCompile Include="Source\FallingFloor.cpp" />
-    <ClCompile Include="Source\Field.cpp" />
     <ClCompile Include="Source\FlyingSpikeTrap.cpp" />
     <ClCompile Include="Source\GameOver.cpp" />
     <ClCompile Include="Source\Player.cpp" />

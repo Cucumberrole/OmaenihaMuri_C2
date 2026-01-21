@@ -21,7 +21,7 @@ VanishingFloor::VanishingFloor(int sx, int sy)
 	y = static_cast<float>(sy);
 
 	isActive = true; // Å‰‚Í°‚Ì‰æ‘œ
-	vanishRange = 64.0f + 32.0f; //°‚ªÁ‚¦‚é”ÍˆÍ
+	vanishRange = 64.0f + 2.0f; //°‚ªÁ‚¦‚é”ÍˆÍ
 }
 
 VanishingFloor::~VanishingFloor()

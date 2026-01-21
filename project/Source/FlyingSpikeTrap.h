@@ -6,9 +6,9 @@
 
 #include "Player.h"
 #include "Field.h"
-#include "Collision.h" // HitCheck_Circle_Triangle ‚ğg‚¤
+#include "Collision.h" // HitCheck_Circle_Triangle ï¿½ï¿½ï¿½gï¿½ï¿½
 
-// ¦ SpikeDir ‚ÆÕ“Ë‚µ‚È‚¢–¼‘O
+// ï¿½ï¿½ SpikeDir ï¿½ÆÕ“Ë‚ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½O
 enum class TrapDir
 {
 	Left,
@@ -17,22 +17,23 @@ enum class TrapDir
 	Down
 };
 
-// ƒgƒŠƒK[ + ”­Ë + j‚Ì”òãÄ + “–‚½‚è”»’è + •`‰æ ‚ğ‘S•”‚Ü‚Æ‚ß‚½ƒNƒ‰ƒX
-// d—lFƒvƒŒƒCƒ„[‚ª”ÍˆÍ‚Éu“ü‚Á‚½uŠÔv1‰ñ‚¾‚¯”­ËBˆÈŒã‚Í“ñ“x‚Æ”­Ë‚µ‚È‚¢B
+// ï¿½gï¿½ï¿½ï¿½Kï¿½[ + ï¿½ï¿½ï¿½ï¿½ + ï¿½jï¿½Ì”ï¿½ï¿½ï¿½ + ï¿½ï¿½ï¿½ï¿½ï¿½è”»ï¿½ï¿½ + ï¿½`ï¿½ï¿½ ï¿½ï¿½Sï¿½ï¿½ï¿½Ü‚Æ‚ß‚ï¿½ï¿½Nï¿½ï¿½ï¿½X
+// ï¿½dï¿½lï¿½Fï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ÍˆÍ‚Éuï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½uï¿½Ôv1ï¿½ñ‚¾‚ï¿½ï¿½ï¿½ï¿½ËBï¿½ÈŒï¿½Í“ï¿½xï¿½Æ”ï¿½ï¿½Ë‚ï¿½ï¿½È‚ï¿½ï¿½B
 class FlyingSpikeTrap : public GameObject
 {
 public:
-	// rectFƒgƒŠƒK[”ÍˆÍiƒ[ƒ‹ƒhÀ•W‚Ì‹éŒ`j
-	// fromDirF‚Ç‚±‘¤i‰æ–ÊŠOj‚©‚çoŒ»‚·‚é‚©iRight‚È‚ç‰E‰æ–ÊŠO¨¶‚Ö”ò‚Ôj
-	// speedF‘¬“xi‚±‚Ìƒgƒ‰ƒbƒvŒÅ—Lj
-	// laneWorldFNAN‚È‚çƒvƒŒƒCƒ„[ˆÊ’u‚É‡‚í‚¹‚éB’l‚ ‚è‚È‚çƒŒ[ƒ“ŒÅ’èi¶‰E”­Ë‚È‚çYŒÅ’èAã‰º”­Ë‚È‚çXŒÅ’èj
-	// spawnMarginF‰æ–ÊŠOƒXƒ|[ƒ“‚Ì—]”’
+	// rectï¿½Fï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½ÍˆÍiï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½Wï¿½Ì‹ï¿½`ï¿½j
+	// fromDirï¿½Fï¿½Ç‚ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ÊŠOï¿½jï¿½ï¿½ï¿½ï¿½oï¿½ï¿½ï¿½ï¿½ï¿½é‚©ï¿½iRightï¿½È‚ï¿½Eï¿½ï¿½ÊŠOï¿½ï¿½ï¿½ï¿½ï¿½Ö”ï¿½Ôj
+	// speedï¿½Fï¿½ï¿½ï¿½xï¿½iï¿½ï¿½ï¿½Ìƒgï¿½ï¿½ï¿½bï¿½vï¿½Å—Lï¿½j
+	// laneWorldï¿½FNANï¿½È‚ï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Ê’uï¿½Éï¿½ï¿½í‚¹ï¿½ï¿½Bï¿½lï¿½ï¿½ï¿½ï¿½È‚çƒŒï¿½[ï¿½ï¿½ï¿½Å’ï¿½iï¿½ï¿½ï¿½Eï¿½ï¿½ï¿½Ë‚È‚ï¿½Yï¿½Å’ï¿½Aï¿½ã‰ºï¿½ï¿½ï¿½Ë‚È‚ï¿½Xï¿½Å’ï¿½j
+	// spawnMarginï¿½Fï¿½ï¿½ÊŠOï¿½Xï¿½|ï¿½[ï¿½ï¿½ï¿½Ì—]ï¿½ï¿½
 	FlyingSpikeTrap(
 		float rectX, float rectY, float rectW, float rectH,
 		TrapDir fromDir,
 		float speed,
 		float laneWorld = NAN,
-		float spawnMargin = 64.0f
+		float spawnMargin = 64.0f,
+		int startOffsetBlocks = 0
 	);
 
 	~FlyingSpikeTrap();
@@ -43,18 +44,18 @@ public:
 private:
 	struct SpikeShot
 	{
-		float x, y;      // ¶ã
-		float vx, vy;    // ‘¬“x
-		TrapDir dir;     // is•ûŒü
-		float speed;     // ‘¬“x‚Ì‘å‚«‚³
+		float x, y;      // ï¿½ï¿½ï¿½ï¿½
+		float vx, vy;    // ï¿½ï¿½ï¿½x
+		TrapDir dir;     // ï¿½iï¿½sï¿½ï¿½ï¿½ï¿½
+		float speed;     // ï¿½ï¿½ï¿½xï¿½Ì‘å‚«ï¿½ï¿½
 		bool alive;
 	};
 
 private:
-	// --- ƒgƒŠƒK[ ---
+	// --- ï¿½gï¿½ï¿½ï¿½Kï¿½[ ---
 	bool IsPlayerInside(Player* player) const;
 
-	// --- ”­Ë ---
+	// --- ï¿½ï¿½ï¿½ï¿½ ---
 	void Fire(Player* player);
 	void CalcSpawnParams(
 		const VECTOR& targetCenter,
@@ -63,33 +64,36 @@ private:
 		TrapDir& outFlyDir
 	) const;
 
-	// --- ’eijjXV ---
+	// --- ï¿½eï¿½iï¿½jï¿½jï¿½Xï¿½V ---
 	void UpdateShots(Player* player, Field* field);
 	void BuildTriangleVertices(const SpikeShot& s, VECTOR& t1, VECTOR& t2, VECTOR& t3) const;
 
-	// --- ‰æ‘œ‹¤—L ---
+	// --- ï¿½æ‘œï¿½ï¿½ï¿½L ---
 	void EnsureSharedImageLoaded();
 	static int sImage;
 	static int sRefCount;
 
 private:
-	// ƒgƒŠƒK[”ÍˆÍ
+	// ï¿½gï¿½ï¿½ï¿½Kï¿½[ï¿½Íˆï¿½
 	float x, y, w, h;
 
-	// ”­Ëİ’è
+	// ï¿½ï¿½ï¿½Ëİ’ï¿½
 	TrapDir fromDir;
 	float speed;
 	float laneWorld;
 	float spawnMargin;
 
-	// “à•”ó‘Ôi1‰ñ”­“®‚Ì‚İj
+	// èµ·å‹•æ™‚ã®é–‹å§‹ä½ç½®ã‚ªãƒ•ã‚»ãƒƒãƒˆï¼ˆã‚¿ã‚¤ãƒ«æ•°ï¼‰ã€‚0=å¾“æ¥ï¼ˆç”»é¢å¤–ã‹ã‚‰ï¼‰ã€‚1=1ãƒ–ãƒ­ãƒƒã‚¯(64px)â€¦
+	int startOffsetBlocks;
+
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ôi1ï¿½ñ”­“ï¿½ï¿½Ì‚İj
 	bool wasInside;
 	bool triggered;
 
-	// ’eŠÇ—
+	// ï¿½eï¿½Ç—ï¿½
 	std::vector<SpikeShot> shots;
 
-	// ‰æ‘œƒTƒCƒYihariLeft.png ‚ğ‰ñ“]‚µ‚Ä•`‰æj
+	// ï¿½æ‘œï¿½Tï¿½Cï¿½Yï¿½ihariLeft.png ï¿½ï¿½ï¿½ï¿½]ï¿½ï¿½ï¿½Ä•`ï¿½ï¿½j
 	float spikeW;
 	float spikeH;
 };

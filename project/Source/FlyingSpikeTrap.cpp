@@ -51,7 +51,8 @@ FlyingSpikeTrap::FlyingSpikeTrap(
 	TrapDir fromDir,
 	float speed,
 	float laneWorld,
-	float spawnMargin
+	float spawnMargin,
+	int startOffsetBlocks
 )
 {
 	x = rectX; y = rectY; w = rectW; h = rectH;
@@ -61,6 +62,7 @@ FlyingSpikeTrap::FlyingSpikeTrap(
 	this->laneWorld = laneWorld;
 	this->spawnMargin = spawnMargin;
 
+	this->startOffsetBlocks = startOffsetBlocks;
 	wasInside = false;
 	triggered = false;
 
@@ -122,46 +124,97 @@ void FlyingSpikeTrap::CalcSpawnParams(
 	TrapDir& outFlyDir
 ) const
 {
-	int sw = 0, sh = 0;
-	GetDrawScreenSize(&sw, &sh);
-	if (sw <= 0) sw = 1280;
-	if (sh <= 0) sh = 720;
-
-	const float halfW = sw * 0.5f;
-	const float halfH = sh * 0.5f;
-
 	const bool hasLane = !std::isnan(laneWorld);
 
-	float spawnCx = targetCenter.x;
-	float spawnCy = targetCenter.y;
-
-	// fromDir は「どこから出るか」、flyDir は「どっちへ飛ぶか（逆）」
-	TrapDir flyDir = OppositeDir(fromDir);
-
+	// flyDir は「fromDir の逆」
+	TrapDir flyDir = TrapDir::Left;
 	switch (fromDir)
 	{
-	case TrapDir::Left:
-		spawnCx = targetCenter.x - halfW - spawnMargin - spikeW;
-		spawnCy = hasLane ? laneWorld : targetCenter.y;
-		break;
+	case TrapDir::Left:  flyDir = TrapDir::Right; break;
+	case TrapDir::Right: flyDir = TrapDir::Left;  break;
+	case TrapDir::Up:    flyDir = TrapDir::Down;  break;
+	case TrapDir::Down:  flyDir = TrapDir::Up;    break;
+	default: break;
+	}
 
-	case TrapDir::Right:
-		spawnCx = targetCenter.x + halfW + spawnMargin + spikeW;
-		spawnCy = hasLane ? laneWorld : targetCenter.y;
-		break;
+	float spawnCx = 0.0f;
+	float spawnCy = 0.0f;
 
-	case TrapDir::Up:
-		spawnCx = hasLane ? laneWorld : targetCenter.x;
-		spawnCy = targetCenter.y - halfH - spawnMargin - spikeH;
-		break;
+	// 起動時の開始位置指定（タイル 64x64 前提）
+	// startOffsetBlocks > 0 のとき：トラップ中心から「指定ブロック数」だけ fromDir 方向にずらした位置から発射
+	// startOffsetBlocks == 0 のとき：従来通り「画面外（プレイヤー中心基準）」から発射
+	constexpr float kTileSize = 64.0f;
 
-	case TrapDir::Down:
-		spawnCx = hasLane ? laneWorld : targetCenter.x;
-		spawnCy = targetCenter.y + halfH + spawnMargin + spikeH;
-		break;
+	if (startOffsetBlocks > 0)
+	{
+		const float rectCx = x + w * 0.5f;
+		const float rectCy = y + h * 0.5f;
+		const float offset = static_cast<float>(startOffsetBlocks) * kTileSize;
 
-	default:
-		break;
+		switch (fromDir)
+		{
+		case TrapDir::Left:
+			spawnCx = rectCx - offset;
+			spawnCy = hasLane ? laneWorld : targetCenter.y;
+			break;
+
+		case TrapDir::Right:
+			spawnCx = rectCx + offset;
+			spawnCy = hasLane ? laneWorld : targetCenter.y;
+			break;
+
+		case TrapDir::Up:
+			spawnCx = hasLane ? laneWorld : targetCenter.x;
+			spawnCy = rectCy - offset;
+			break;
+
+		case TrapDir::Down:
+			spawnCx = hasLane ? laneWorld : targetCenter.x;
+			spawnCy = rectCy + offset;
+			break;
+
+		default:
+			spawnCx = rectCx;
+			spawnCy = rectCy;
+			break;
+		}
+	}
+	else
+	{
+		// --- 従来の挙動：プレイヤー中心から見た画面外にスポーン ---
+		int sw = 0, sh = 0;
+		GetDrawScreenSize(&sw, &sh);
+		if (sw <= 0) sw = 1280;
+		if (sh <= 0) sh = 720;
+
+		const float halfW = sw * 0.5f;
+		const float halfH = sh * 0.5f;
+
+		switch (fromDir)
+		{
+		case TrapDir::Left:
+			spawnCx = targetCenter.x - halfW - spawnMargin - spikeW;
+			spawnCy = hasLane ? laneWorld : targetCenter.y;
+			break;
+
+		case TrapDir::Right:
+			spawnCx = targetCenter.x + halfW + spawnMargin + spikeW;
+			spawnCy = hasLane ? laneWorld : targetCenter.y;
+			break;
+
+		case TrapDir::Up:
+			spawnCx = hasLane ? laneWorld : targetCenter.x;
+			spawnCy = targetCenter.y - halfH - spawnMargin - spikeH;
+			break;
+
+		case TrapDir::Down:
+			spawnCx = hasLane ? laneWorld : targetCenter.x;
+			spawnCy = targetCenter.y + halfH + spawnMargin + spikeH;
+			break;
+
+		default:
+			break;
+		}
 	}
 
 	outFlyDir = flyDir;

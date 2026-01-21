@@ -21,16 +21,17 @@
 #include "DirectionalSpike.h"
 #include "LaserTurret.h"
 #include "PatrolEnemy.h"
+#include "BouncingAnimatedTrap.h"
 #include <DxLib.h>
 
-// ãƒ–ãƒ­ãƒƒã‚¯æ‰±ã„ï¼ˆæŠ¼ã—æˆ»ã—/åºŠ/å£ã¨ã—ã¦å›ºã„ã‚»ãƒ«ï¼‰
+// ƒuƒƒbƒNˆµ‚¢i‰Ÿ‚µ–ß‚µ/°/•Ç‚Æ‚µ‚ÄŒÅ‚¢ƒZƒ‹j
 static bool IsSolidCell(int cell)
 {
 	return (cell == 1 || cell == 7 || cell == 8);
 }
 
 //------------------------------------------------------------
-// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 //------------------------------------------------------------
 Field::Field(int stage)
 {
@@ -39,7 +40,7 @@ Field::Field(int stage)
 	char filename[60];
 	sprintf_s<60>(filename, "data/stage%02d.csv", stage);
 
-	// CSV èª­ã¿è¾¼ã¿
+	// CSV “Ç‚İ‚İ
 	{
 		CsvReader* csv = new CsvReader(filename);
 		int lines = csv->GetLines();
@@ -56,7 +57,7 @@ Field::Field(int stage)
 		delete csv;
 	}
 
-	// ç”»åƒ
+	// ‰æ‘œ
 	SetDrawOrder(50);
 	hImage = LoadGraph("data/image/NewBlock.png");
 	fallingSpikeImage = LoadGraph("data/image/hariBottom.png");
@@ -73,7 +74,7 @@ Field::Field(int stage)
 	y = 0;
 	scrollX = 0;
 
-	// ãƒãƒƒãƒ—èµ°æŸ»ã—ã¦é…ç½®
+	// ƒ}ƒbƒv‘–¸‚µ‚Ä”z’u
 	for (int yy = 0; yy < (int)maps.size(); yy++)
 	{
 		for (int xx = 0; xx < (int)maps[yy].size(); xx++)
@@ -98,8 +99,9 @@ Field::Field(int stage)
 					xx * 64.0f, yy * 64.0f, 64.0f, 64.0f,
 					TrapDir::Right,
 					12.0f,
-					NAN,              // laneWorldï¼šè¿½å¾“
-					0.0f            // margin
+					NAN,              // laneWorldF’Ç]
+					0.0f,            // margin
+					4               // startOffsetBlocksi1=1ƒuƒƒbƒNj
 				);
 			}
 			else if (cell == 6)
@@ -122,7 +124,7 @@ Field::Field(int stage)
 			}
 			else if (cell == 13)
 			{
-				// è½ä¸‹é‡ãƒˆãƒªã‚¬ãƒ¼ï¼ˆ1ãƒˆãƒªã‚¬ãƒ¼ = 1é‡ï¼‰
+				// —‰ºjƒgƒŠƒK[i1ƒgƒŠƒK[ = 1jj
 				FallingSpikeTrigger trig;
 				trig.triggerPos = { xx * 64, yy * 64 };
 				trig.activated = false;
@@ -132,17 +134,17 @@ Field::Field(int stage)
 			}
 			else if (cell == 14 || cell == 15)
 			{
-				// ä¸Šã‹ã‚‰è½ã¡ã¦ãã‚‹é‡æœ¬ä½“
+				// ã‚©‚ç—‚¿‚Ä‚­‚éj–{‘Ì
 				FallingSpikeInfo info;
 				info.pos = { xx * 64, yy * 64 };
 				info.alive = true;
-				info.chaser = (cell == 15); // 15ã¯è¿½å°¾ã™ã‚‹é‡
+				info.chaser = (cell == 15); // 15‚Í’Ç”ö‚·‚éj
 
 				fallingSpikes.push_back(info);
 			}
 			else if (cell == 16)
 			{
-				// è¿‘ã¥ã„ãŸã‚‰å§¿ã‚’è¦‹ã›ã‚‹éš ã—ãƒˆã‚²
+				// ‹ß‚Ã‚¢‚½‚çp‚ğŒ©‚¹‚é‰B‚µƒgƒQ
 				new HiddenSpike(xx * 64.0f, yy * 64.0f, 90.0f);
 			}
 			else if (cell == 20)
@@ -157,22 +159,22 @@ Field::Field(int stage)
 			}
 			else if (cell == 30)
 			{
-				// ä¸Šå‘ãé‡
+				// ãŒü‚«j
 				new DirectionalSpike(xx * 64.0f, yy * 64.0f, SpikeDir::Up);
 			}
 			else if (cell == 31)
 			{
-				// ä¸‹å‘ãé‡
+				// ‰ºŒü‚«j
 				new DirectionalSpike(xx * 64.0f, yy * 64.0f, SpikeDir::Down);
 			}
 			else if (cell == 32)
 			{
-				// å·¦å‘ãé‡
+				// ¶Œü‚«j
 				new DirectionalSpike(xx * 64.0f, yy * 64.0f, SpikeDir::Left);
 			}
 			else if (cell == 33)
 			{
-				// å³å‘ãé‡
+				// ‰EŒü‚«j
 				new DirectionalSpike(xx * 64.0f, yy * 64.0f, SpikeDir::Right);
 			}
 			else if (cell == 40)
@@ -186,22 +188,22 @@ Field::Field(int stage)
 			}
 			else if (cell == 51)
 			{
-				// å³å‘ããƒ¬ãƒ¼ã‚¶ãƒ¼ç ²å°
+				// ‰EŒü‚«ƒŒ[ƒU[–C‘ä
 				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Right);
 			}
 			else if (cell == 52)
 			{
-				// å·¦å‘ã
+				// ¶Œü‚«
 				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Left);
 			}
 			else if (cell == 53)
 			{
-				// ä¸Šå‘ã
+				// ãŒü‚«
 				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Up);
 			}
 			else if (cell == 54)
 			{
-				// ä¸‹å‘ã
+				// ‰ºŒü‚«
 				new LaserTurret(xx * 64.0f, yy * 64.0f, LaserTurret::Dir::Down);
 			}
 			else if (cell == 60)
@@ -236,10 +238,29 @@ Field::Field(int stage)
 			{
 				new MovingSmallTrap(xx * 64.0f + 24.0f, yy * 64.0f + 48.0f);
 			}
+			else if (cell >= 110 && cell <= 117)
+			{
+				// BouncingAnimatedTrap
+				// 110:Right, 111:Left, 112:Down, 113:Up, 114:DownRight, 115:DownLeft, 116:UpRight, 117:UpLeft
+				BouncingAnimatedTrap::Dir dir = BouncingAnimatedTrap::Dir::Right;
+				switch (cell)
+				{
+				case 110: dir = BouncingAnimatedTrap::Dir::Right; break;
+				case 111: dir = BouncingAnimatedTrap::Dir::Left; break;
+				case 112: dir = BouncingAnimatedTrap::Dir::Down; break;
+				case 113: dir = BouncingAnimatedTrap::Dir::Up; break;
+				case 114: dir = BouncingAnimatedTrap::Dir::DownRight; break;
+				case 115: dir = BouncingAnimatedTrap::Dir::DownLeft; break;
+				case 116: dir = BouncingAnimatedTrap::Dir::UpRight; break;
+				case 117: dir = BouncingAnimatedTrap::Dir::UpLeft; break;
+				default: break;
+				}
+				new BouncingAnimatedTrap(xx * 64.0f, yy * 64.0f, dir, 6.0f);
+			}
 		}
 	}
 
-	// ãã‚Œãã‚Œã®ãƒˆãƒªã‚¬ãƒ¼ã«ã€ŒçœŸä¸Šã«ã‚ã‚‹é‡ã€ã‚’å¯¾å¿œä»˜ã‘ã‚‹
+	// ‚»‚ê‚¼‚ê‚ÌƒgƒŠƒK[‚Éu^ã‚É‚ ‚éjv‚ğ‘Î‰•t‚¯‚é
 	for (auto& trig : fallingSpikeTriggers)
 	{
 		int trigX = trig.triggerPos.x;
@@ -248,18 +269,18 @@ Field::Field(int stage)
 		int bestIndex = -1;
 		int bestDy = 100000000;
 
-		// ã™ã¹ã¦ã®è½ä¸‹é‡å€™è£œã‚’ãƒã‚§ãƒƒã‚¯
+		// ‚·‚×‚Ä‚Ì—‰ºjŒó•â‚ğƒ`ƒFƒbƒN
 		for (int i = 0; i < (int)fallingSpikes.size(); ++i)
 		{
 			auto& info = fallingSpikes[i];
 
-			// åŒã˜åˆ—ï¼ˆXåº§æ¨™ãŒåŒã˜ï¼‰ã®é‡ã ã‘ã‚’è¦‹ã‚‹
+			// “¯‚¶—ñiXÀ•W‚ª“¯‚¶j‚Ìj‚¾‚¯‚ğŒ©‚é
 			if (info.pos.x != trigX) continue;
 
-			// ãƒˆãƒªã‚¬ãƒ¼ã‚ˆã‚Šä¸Šã«ã‚ã‚‹é‡ã ã‘å¯¾è±¡
+			// ƒgƒŠƒK[‚æ‚èã‚É‚ ‚éj‚¾‚¯‘ÎÛ
 			if (info.pos.y >= trigY) continue;
 
-			int dy = trigY - info.pos.y;  // ç¸¦æ–¹å‘ã®è·é›¢ï¼ˆå°ã•ã„ã»ã©è¿‘ã„ï¼‰
+			int dy = trigY - info.pos.y;  // c•ûŒü‚Ì‹——£i¬‚³‚¢‚Ù‚Ç‹ß‚¢j
 
 			if (dy < bestDy)
 			{
@@ -268,14 +289,14 @@ Field::Field(int stage)
 			}
 		}
 
-		// è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸå ´åˆã¯ -1 ã®ã¾ã¾(ãªã«ã‚‚è½ã¡ãªã„)
+		// Œ©‚Â‚©‚ç‚È‚©‚Á‚½ê‡‚Í -1 ‚Ì‚Ü‚Ü(‚È‚É‚à—‚¿‚È‚¢)
 		trig.spikeIndex = bestIndex;
 	}
 
 }
 
 //------------------------------------------------------------
-// ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
+// ƒfƒXƒgƒ‰ƒNƒ^
 //------------------------------------------------------------
 Field::~Field()
 {
@@ -319,34 +340,34 @@ void Field::Update()
 	}
 
 	//------------------------------------------
-	// å¾…æ©ŸçŠ¶æ…‹ã®è½ä¸‹é‡ã¨ã®å½“ãŸã‚Šåˆ¤å®š
+	// ‘Ò‹@ó‘Ô‚Ì—‰ºj‚Æ‚Ì“–‚½‚è”»’è
 	//------------------------------------------
 	{
 		VECTOR center = VGet(px + 32.0f, py + 32.0f, 0.0f);
-		float  radius = player->GetRadius();  // Player ã«åˆã‚ã›ã¦
+		float  radius = player->GetRadius();  // Player ‚É‡‚í‚¹‚Ä
 
 		for (auto& s : fallingSpikes)
 		{
-			if (!s.alive) continue; // ã‚‚ã†è½ä¸‹é–‹å§‹ã—ãŸé‡ã¯ç„¡è¦–
+			if (!s.alive) continue; // ‚à‚¤—‰ºŠJn‚µ‚½j‚Í–³‹
 
 			float sx = (float)s.pos.x;
 			float sy = (float)s.pos.y;
 
-			VECTOR t1 = VGet(sx, sy, 0.0f);                     // å·¦ä¸Š
-			VECTOR t2 = VGet(sx + fallingSpikeWidth, sy, 0.0f);                     // å³ä¸Š
-			VECTOR t3 = VGet(sx + fallingSpikeWidth / 2.0f, sy + fallingSpikeHeight, 0.0f);// ä¸‹ã®å…ˆç«¯
+			VECTOR t1 = VGet(sx, sy, 0.0f);                     // ¶ã
+			VECTOR t2 = VGet(sx + fallingSpikeWidth, sy, 0.0f);                     // ‰Eã
+			VECTOR t3 = VGet(sx + fallingSpikeWidth / 2.0f, sy + fallingSpikeHeight, 0.0f);// ‰º‚Ìæ’[
 
 			if (HitCheck_Circle_Triangle(center, radius, t1, t2, t3))
 			{
 				player->ForceDie();
 				player->SetDead();
-				return; // æ­»ã‚“ã ã‚‰ä»–ã®å‡¦ç†ã¯ã‚¹ã‚­ãƒƒãƒ—
+				return; // €‚ñ‚¾‚ç‘¼‚Ìˆ—‚ÍƒXƒLƒbƒv
 			}
 		}
 	}
 
 	//------------------------------------------
-	// è»¢ãŒã£ã¦ãã‚‹çƒ
+	// “]‚ª‚Á‚Ä‚­‚é‹…
 	//------------------------------------------
 	for (int i = 0; i < (int)ballTriggers.size(); i++)
 	{
@@ -383,18 +404,18 @@ void Field::Update()
 	}
 
 	//------------------------------------------------------
-	// ä¸Šã‹ã‚‰è½ä¸‹ã—ã¦ãã‚‹é‡ï¼ˆãƒˆãƒªã‚¬ãƒ¼ã”ã¨ï¼‰
+	// ã‚©‚ç—‰º‚µ‚Ä‚­‚éjiƒgƒŠƒK[‚²‚Æj
 	//------------------------------------------------------
 	for (auto& trig : fallingSpikeTriggers)
 	{
 		int tX = trig.triggerPos.x / 64;
 		int tY = trig.triggerPos.y / 64;
 
-		// ã¾ã èµ·å‹•ã—ã¦ã„ãªãã¦ã€ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒãƒˆãƒªã‚¬ãƒ¼ãƒã‚¹ã«ä¹—ã£ãŸã‚‰èµ·å‹•
+		// ‚Ü‚¾‹N“®‚µ‚Ä‚¢‚È‚­‚ÄAƒvƒŒƒCƒ„[‚ªƒgƒŠƒK[ƒ}ƒX‚Éæ‚Á‚½‚ç‹N“®
 		if (!trig.activated && tx == tX && ty == tY)
 		{
 			trig.activated = true;
-			trig.timer = 20;  // è½ã¡ã‚‹ã¾ã§ã®å¾…ã¡ãƒ•ãƒ¬ãƒ¼ãƒ ï¼ˆå¥½ã¿ã§èª¿æ•´ï¼‰
+			trig.timer = 20;  // —‚¿‚é‚Ü‚Å‚Ì‘Ò‚¿ƒtƒŒ[ƒ€iD‚İ‚Å’²®j
 		}
 
 		if (!trig.activated)
@@ -402,32 +423,32 @@ void Field::Update()
 			continue;
 		}
 
-		// ã‚¿ã‚¤ãƒãƒ¼å¾…ã¡
+		// ƒ^ƒCƒ}[‘Ò‚¿
 		if (trig.timer > 0)
 		{
 			trig.timer--;
 			continue;
 		}
 
-		// ã“ã“ã«æ¥ãŸã‚‰ã€Œè½ã¨ã™ã‚¿ã‚¤ãƒŸãƒ³ã‚°ã€
+		// ‚±‚±‚É—ˆ‚½‚çu—‚Æ‚·ƒ^ƒCƒ~ƒ“ƒOv
 		if (trig.spikeIndex >= 0 && trig.spikeIndex < (int)fallingSpikes.size())
 		{
 			auto& info = fallingSpikes[trig.spikeIndex];
 
 			if (info.alive)
 			{
-				// chaser ãŒ true ã®ã‚‚ã®ã¯ã€FallingSpike å´ã§è¿½å°¾ãƒ¢ãƒ¼ãƒ‰ã«ãªã‚‹
+				// chaser ‚ª true ‚Ì‚à‚Ì‚ÍAFallingSpike ‘¤‚Å’Ç”öƒ‚[ƒh‚É‚È‚é
 				new FallingSpike(info.pos.x, info.pos.y, info.chaser);
 				info.alive = false;
 			}
 		}
 
-		// ä¸€åº¦è½ã¨ã—ãŸã‚‰ã€ã“ã®ãƒˆãƒªã‚¬ãƒ¼ã¯ç”¨æ¸ˆã¿
+		// ˆê“x—‚Æ‚µ‚½‚çA‚±‚ÌƒgƒŠƒK[‚Í—pÏ‚İ
 		trig.activated = false;
 	}
 
 	//------------------------------------------------------
-	// å‹•ãå£ãƒˆãƒ©ãƒƒãƒ—
+	// “®‚­•Çƒgƒ‰ƒbƒv
 	//------------------------------------------------------
 	for (int i = 0; i < (int)wallTriggers.size(); ++i)
 	{
@@ -456,41 +477,41 @@ void Field::Update()
 //------------------------------------------------------------
 void Field::Draw()
 {
-	// ãƒ–ãƒ­ãƒƒã‚¯ï¼†ã‚´ãƒ¼ãƒ«æç”»
+	// ƒuƒƒbƒN•ƒS[ƒ‹•`‰æ
 	for (int yy = 0; yy < (int)maps.size(); yy++)
 	{
 		for (int xx = 0; xx < (int)maps[yy].size(); xx++)
 		{
 			int cell = maps[yy][xx];
 
-			// é€šå¸¸ãƒ–ãƒ­ãƒƒã‚¯
+			// ’ÊíƒuƒƒbƒN
 			if (cell == 1)
 			{
 				DrawRectGraph(xx * 64, yy * 64, 0, 0, 64, 64, hImage, TRUE);
 			}
 
-			// ã‚´ãƒ¼ãƒ«ãƒã‚¹ï¼ˆ9 / 99ï¼‰ã«ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³æç”»
+			// ƒS[ƒ‹ƒ}ƒXi9 / 99j‚ÉƒAƒjƒ[ƒVƒ‡ƒ“•`‰æ
 			if (cell == 9 || cell == 99)
 			{
 				const float GOAL_SCALE = 2.1f;
 
 				int gw, gh;
-				GetGraphSize(goalImages[goalAnimFrame], &gw, &gh); // ã“ã“ã§ã¯ 64x64 ã®ã¯ãš
+				GetGraphSize(goalImages[goalAnimFrame], &gw, &gh); // ‚±‚±‚Å‚Í 64x64 ‚Ì‚Í‚¸
 
 				int drawW = int(gw * GOAL_SCALE);
 				int drawH = int(gh * GOAL_SCALE);
 
-				// ãƒã‚¹ã®ä¸­å¿ƒåº§æ¨™ï¼ˆ1ãƒã‚¹ãŒ 64x64 å‰æï¼‰
+				// ƒ}ƒX‚Ì’†SÀ•Wi1ƒ}ƒX‚ª 64x64 ‘O’ñj
 				int cx = xx * 64 + 32;
 				int cy = yy * 64 + 32;
 
-				// ä¸­å¿ƒåˆã‚ã›ã§æ‹¡å¤§æç”»
+				// ’†S‡‚í‚¹‚ÅŠg‘å•`‰æ
 				DrawExtendGraph(cx - drawW / 2, cy - drawH / 2, cx + drawW / 2, cy + drawH / 2, goalImages[goalAnimFrame], TRUE);
 			}
 		}
 	}
 
-	// å¾…æ©ŸçŠ¶æ…‹ã®é‡ï¼ˆ13/14/15ï¼‰
+	// ‘Ò‹@ó‘Ô‚Ìji13/14/15j
 	for (auto& s : fallingSpikes)
 	{
 		if (!s.alive) continue;
@@ -500,7 +521,7 @@ void Field::Draw()
 
 
 //------------------------------------------------------------
-// å½“ãŸã‚Šåˆ¤å®šï¼ˆæŠ¼ã—æˆ»ã—ï¼‰
+// “–‚½‚è”»’èi‰Ÿ‚µ–ß‚µj
 //------------------------------------------------------------
 int Field::HitCheckRight(int px, int py)
 {
@@ -508,7 +529,7 @@ int Field::HitCheckRight(int px, int py)
 
 	int hit = 0;
 
-	// --- ã¾ãšé€šå¸¸ãƒ–ãƒ­ãƒƒã‚¯ï¼ˆãƒãƒƒãƒ—ï¼‰ ---
+	// --- ‚Ü‚¸’ÊíƒuƒƒbƒNiƒ}ƒbƒvj ---
 	int x = px / 64;
 	int y = py / 64;
 
@@ -519,7 +540,7 @@ int Field::HitCheckRight(int px, int py)
 		hit = px % 64 + 1;
 	}
 
-	// --- ç§»å‹•å£ã‚‚è¦‹ã‚‹ ---
+	// --- ˆÚ“®•Ç‚àŒ©‚é ---
 	if (auto wall = FindGameObject<MovingWall>())
 	{
 		int w = wall->HitCheckRight(px, py);
@@ -535,7 +556,7 @@ int Field::HitCheckLeft(int px, int py)
 
 	int hit = 0;
 
-	// é€šå¸¸ãƒ–ãƒ­ãƒƒã‚¯
+	// ’ÊíƒuƒƒbƒN
 	int x = px / 64;
 	int y = py / 64;
 
@@ -546,7 +567,7 @@ int Field::HitCheckLeft(int px, int py)
 		hit = 64 - (px % 64);
 	}
 
-	// ç§»å‹•å£
+	// ˆÚ“®•Ç
 	if (auto wall = FindGameObject<MovingWall>())
 	{
 		int w = wall->HitCheckLeft(px, py);
@@ -562,7 +583,7 @@ int Field::HitCheckUp(int px, int py)
 
 	int hit = 0;
 
-	// é€šå¸¸ãƒ–ãƒ­ãƒƒã‚¯
+	// ’ÊíƒuƒƒbƒN
 	int x = px / 64;
 	int y = py / 64;
 
@@ -573,7 +594,7 @@ int Field::HitCheckUp(int px, int py)
 		hit = 64 - (py % 64);
 	}
 
-	// ç§»å‹•å£
+	// ˆÚ“®•Ç
 	if (auto wall = FindGameObject<MovingWall>())
 	{
 		int w = wall->HitCheckUp(px, py);
@@ -590,7 +611,7 @@ int Field::HitCheckDown(int px, int py)
 
 	int hit = 0;
 
-	// é€šå¸¸ãƒ–ãƒ­ãƒƒã‚¯
+	// ’ÊíƒuƒƒbƒN
 	int x = px / 64;
 	int y = py / 64;
 
@@ -601,7 +622,7 @@ int Field::HitCheckDown(int px, int py)
 		hit = (py % 64) + 1;
 	}
 
-	// ç§»å‹•å£
+	// ˆÚ“®•Ç
 	if (auto wall = FindGameObject<MovingWall>())
 	{
 		int w = wall->HitCheckDown(px, py);
