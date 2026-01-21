@@ -2,10 +2,14 @@
 #include "../Library/GameObject.h"
 #include <DxLib.h>
 
-// Forward declarations
 class Player;
 class Field;
 
+// BouncingAnimatedTrap
+// - Constant velocity movement
+// - Bounces off solid tiles (Field::IsBlock)
+// - Collides only with Player (kills player on touch)
+// - Sprite sheet: 1280x640 (2 frames side-by-side, each 640x640), drawn as 64x64
 class BouncingAnimatedTrap : public GameObject
 {
 public:
@@ -28,8 +32,8 @@ public:
 	void Draw() override;
 
 private:
-	static void EnsureSharedImageLoaded();
-	static void ReleaseSharedImage();
+	static void EnsureSharedImagesLoaded();
+	static void ReleaseSharedImages();
 
 	void AdvanceAnimation();
 	void ResolveTileBounceX(Field* field);
@@ -37,43 +41,32 @@ private:
 	bool HitPlayer(Player* player) const;
 
 private:
-	static int sImage;
+	// Shared resources
+	static int sSheetImage;      // fallback sheet handle (LoadGraph)
+	static int sFrameImages[2];  // preferred frame handles (LoadDivGraph or DerivationGraph)
 	static int sRefCount;
 
-	// 640x640
-	static constexpr int FRAME_W = 640;
-	static constexpr int FRAME_H = 640;
-
-	// 初期値
+	// World position (top-left)
 	float x = 0.0f;
 	float y = 0.0f;
 
-	// 画像サイズ
+	// Size (always 64x64)
 	float w = 64.0f;
 	float h = 64.0f;
 
-	// ヴェロシティ
+	// Velocity
 	float vx = 0.0f;
 	float vy = 0.0f;
 
-	// アニメーション
-	int frame = 0;
-	int animTimer = 0;
-	int animInterval = 4;
+	// Animation
+	int animIndex = 0;   // 0 or 1
+	int animFrame = 0;
 
-	// 画像
-	static constexpr int kFrameW = 64;
-	static constexpr int kFrameH = 64;
-	static constexpr int kSheetW = 1280;
-	static constexpr int kSheetH = 640;
-	static constexpr int kCols = kSheetW / kFrameW; // 20
-	static constexpr int kRows = kSheetH / kFrameH; // 10
-	static constexpr int kTotalFrames = kCols * kRows; // 200
+	static constexpr int kDrawW = 64;
+	static constexpr int kDrawH = 64;
 
-	// アニメーション
-	int animIndex;        // 現在のコマ番号（0 or 1）
-	int animFrame;        // フレームカウンタ
-	static const int CHARACTER_WIDTH = 640;   // 1コマの横幅
-	static const int CHARACTER_HEIGHT = 640;  // 1コマの縦幅
-	static const int ANIM_FRAME_INTERVAL = 4; // コマ切替速度
+	static constexpr int kFrameW = 640;
+	static constexpr int kFrameH = 640;
+
+	static constexpr int kAnimInterval = 4;
 };
