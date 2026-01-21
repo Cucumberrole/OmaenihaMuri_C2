@@ -138,6 +138,10 @@
     <ClCompile Include="Source\Fader.cpp">
       <Filter>Fader</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Field.cpp" />
+    <ClCompile Include="Source\BouncingAnimatedTrap.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -369,6 +373,9 @@
     </ClInclude>
     <ClInclude Include="Source\Fader.h">
       <Filter>Fader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BouncingAnimatedTrap.h">
+      <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
