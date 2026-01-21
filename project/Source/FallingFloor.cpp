@@ -120,8 +120,11 @@ void FallingFloor::Update()
 					if (x >= 1343) {
 						telop->TouchedTrap3 = true;
 					}
-					else if (x <= 1344) {
+					else if (x >= 1010 && x <= 1344) {
 						telop->TouchedTrap4 = true;
+					}
+					else if(x <= 1000){
+						telop->TouchedTrap5 = true;
 					}
 				}
 			}
