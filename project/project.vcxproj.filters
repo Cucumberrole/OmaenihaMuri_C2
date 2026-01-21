@@ -47,9 +47,6 @@
     <ClCompile Include="Library\Time.cpp">
       <Filter>Library</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Field.cpp">
-      <Filter>PlayScene</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Player.cpp">
       <Filter>PlayScene</Filter>
     </ClCompile>
@@ -135,6 +132,12 @@
       <Filter>Trap</Filter>
     </ClCompile>
     <ClCompile Include="Source\MovingSmallTrap.cpp">
+      <Filter>Trap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Field.cpp">
+      <Filter>PlayScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\BouncingAnimatedTrap.cpp">
       <Filter>Trap</Filter>
     </ClCompile>
   </ItemGroup>
@@ -363,6 +366,9 @@
       <Filter>Trap</Filter>
     </ClInclude>
     <ClInclude Include="Source\MovingSmallTrap.h">
+      <Filter>Trap</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BouncingAnimatedTrap.h">
       <Filter>Trap</Filter>
     </ClInclude>
   </ItemGroup>
