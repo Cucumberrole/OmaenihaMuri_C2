@@ -1,8 +1,7 @@
 #pragma once
 #include "../Library/SceneBase.h"
-#include <vector>
-#include <tchar.h>
 
+// Stage selection scene (2 stages).
 class SelectStage final : public SceneBase
 {
 public:
@@ -13,44 +12,24 @@ public:
     void Draw() override;
 
 private:
-    struct Option
-    {
-        const TCHAR* title = nullptr;
-        const TCHAR* sub1 = nullptr;
-        const TCHAR* sub2 = nullptr;
-
-        int stageId = 0;
-        int lives = 0;
-        int hotKey = 0;
-
-        int boxR = 200;
-        int boxG = 60;
-        int boxB = 40;
-    };
+    void DecideStage(int stageId);
 
 private:
-    void StartDecide(int index);
+    int selectedIndex_ = 0; // 0: stage1, 1: stage2
+    int frame_ = 0;
 
-    void DrawOutlinedText(int x, int y, const TCHAR* text, int colorText, int colorOutline, int font) const;
-    void DrawCenteredOutlinedText(int centerX, int y, const TCHAR* text, int colorText, int colorOutline, int font) const;
-
-private:
-    std::vector<Option> options_;
-    int selectedIndex_ = 0;
-
-    int bgmHandle_ = -1;
-    int selectSE_ = -1;
-    int decideSE_ = -1;
-
-    bool deciding_ = false;
-    int decideTimer_ = 0;
-    int decideStageId_ = 0;
-
-    float cursorBlinkFrame_ = 0.0f;
-    float subTextAnimFrame_ = 0.0f;
-
+    // Fonts
     int fontTitle_ = -1;
     int fontCardTitle_ = -1;
     int fontCardSub_ = -1;
     int fontHint_ = -1;
+
+    // Sounds (optional; safe if missing)
+    int bgmHandle_ = -1;
+    int cursorSe_ = -1;
+    int decideSe_ = -1;
+
+    // Cached screen size
+    mutable int sw_ = 1280;
+    mutable int sh_ = 720;
 };
