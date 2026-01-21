@@ -118,6 +118,7 @@ void PlayScene::Update()
 		if (CheckHitKey(KEY_INPUT_O)) SceneManager::ChangeScene("TITLE");
 		if (CheckHitKey(KEY_INPUT_E)) SceneManager::ChangeScene("STAGE");
 		if (CheckHitKey(KEY_INPUT_G)) SceneManager::ChangeScene("GAMEOVER");
+		if (CheckHitKey(KEY_INPUT_C)) SceneManager::ChangeScene("CLEAR");
 
 		// 生存中Rリトライ
 		if (CheckHitKey(KEY_INPUT_R))
