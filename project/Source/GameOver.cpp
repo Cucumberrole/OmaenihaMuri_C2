@@ -76,64 +76,64 @@ void GameOver::Update()
 
 void GameOver::Draw()
 {
-    int sw, sh;
-    GetDrawScreenSize(&sw, &sh);
+	int sw, sh;
+	GetDrawScreenSize(&sw, &sh);
 
-    DrawBox(0, 0, sw, sh, GetColor(0, 0, 0), TRUE);
+	DrawBox(0, 0, sw, sh, GetColor(0, 0, 0), TRUE);
 
-    int titleW = 0, titleH = 0;
-    GetGraphSize(OwariImage, &titleW, &titleH);
+	int titleW = 0, titleH = 0;
+	GetGraphSize(OwariImage, &titleW, &titleH);
 
-    int msgW = 0, msgH = 0;
-    GetGraphSize(Msg, &msgW, &msgH);
+	int msgW = 0, msgH = 0;
+	GetGraphSize(Msg, &msgW, &msgH);
 
-    const int marginTop = sh / 12;
-    const int gap1 = sh / 30;
-    const int gap2 = sh / 18;
+	const int marginTop = sh / 12;
+	const int gap1 = sh / 30;
+	const int gap2 = sh / 18;
 
-    int titleX = (sw - titleW) / 2;
-    int titleY = marginTop;
-    DrawGraph(titleX, titleY, OwariImage, TRUE);
+	int titleX = (sw - titleW) / 2;
+	int titleY = marginTop;
+	DrawGraph(titleX, titleY, OwariImage, TRUE);
 
-    int msgX = (sw - msgW) / 2;
-    int msgY = titleY + titleH + gap1;
-    DrawGraph(msgX, msgY, Msg, TRUE);
+	int msgX = (sw - msgW) / 2;
+	int msgY = titleY + titleH + gap1;
+	DrawGraph(msgX, msgY, Msg, TRUE);
 
-    const int buttonW = (sw < 1200) ? (sw * 2 / 3) : 520;
-    const int buttonH = 90;
-    const int buttonGap = 30;
+	const int buttonW = (sw < 1200) ? (sw * 2 / 3) : 520;
+	const int buttonH = 90;
+	const int buttonGap = 30;
 
-    int buttonX = (sw - buttonW) / 2;
-    int buttonY1 = msgY + msgH + gap2;
-    int buttonY2 = buttonY1 + buttonH + buttonGap;
+	int buttonX = (sw - buttonW) / 2;
+	int buttonY1 = msgY + msgH + gap2;
+	int buttonY2 = buttonY1 + buttonH + buttonGap;
 
-    int bottom = buttonY2 + buttonH + marginTop / 2;
-    if (bottom > sh)
-    {
-        int pullUp = bottom - sh;
-        buttonY1 -= pullUp;
-        buttonY2 -= pullUp;
-    }
+	int bottom = buttonY2 + buttonH + marginTop / 2;
+	if (bottom > sh)
+	{
+		int pullUp = bottom - sh;
+		buttonY1 -= pullUp;
+		buttonY2 -= pullUp;
+	}
 
-    const int btnColor = GetColor(255, 163, 30);
-    DrawBox(buttonX, buttonY1, buttonX + buttonW, buttonY1 + buttonH, btnColor, TRUE);
-    DrawBox(buttonX, buttonY2, buttonX + buttonW, buttonY2 + buttonH, btnColor, TRUE);
+	const int btnColor = GetColor(255, 163, 30);
+	DrawBox(buttonX, buttonY1, buttonX + buttonW, buttonY1 + buttonH, btnColor, TRUE);
+	DrawBox(buttonX, buttonY2, buttonX + buttonW, buttonY2 + buttonH, btnColor, TRUE);
 
-    SetFontSize(32);
-    const int fontH = GetFontSize();
+	SetFontSize(32);
+	const int fontH = GetFontSize();
 
-    auto DrawCenteredTextInBox = [&](int x1, int y1, int x2, int y2, const char* text)
-        {
-            int tw = GetDrawStringWidth(text, -1);
-            int tx = x1 + ((x2 - x1) - tw) / 2;
-            int ty = y1 + ((y2 - y1) - fontH) / 2;
-            DrawString(tx, ty, text, GetColor(255, 255, 255));
-        };
+	auto DrawCenteredTextInBox = [&](int x1, int y1, int x2, int y2, const char* text)
+		{
+			int tw = GetDrawStringWidth(text, -1);
+			int tx = x1 + ((x2 - x1) - tw) / 2;
+			int ty = y1 + ((y2 - y1) - fontH) / 2;
+			DrawString(tx, ty, text, GetColor(255, 255, 255));
+		};
 
 
-    DrawCenteredTextInBox(buttonX, buttonY1, buttonX + buttonW, buttonY1 + buttonH, "Rキーでリトライ");
-    DrawCenteredTextInBox(buttonX, buttonY2, buttonX + buttonW, buttonY2 + buttonH, "Tキーでタイトルへ戻る");
+	DrawCenteredTextInBox(buttonX, buttonY1, buttonX + buttonW, buttonY1 + buttonH, "Rキーでリトライ");
+	DrawCenteredTextInBox(buttonX, buttonY2, buttonX + buttonW, buttonY2 + buttonH, "Tキーでタイトルへ戻る");
 
-    SetFontSize(20);
-    DrawString(20, sh - 40, "ESC : Exit", GetColor(180, 180, 180));
+	SetFontSize(20);
+	DrawString(20, sh - 40, "ESC : Exit", GetColor(180, 180, 180));
 }

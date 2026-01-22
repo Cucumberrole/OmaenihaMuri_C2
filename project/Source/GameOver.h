@@ -2,7 +2,7 @@
 #include "../Library/SceneBase.h"
 #include "../Library/GameObject.h"
 
-class GameOver:public SceneBase
+class GameOver :public SceneBase
 {
 public:
 	GameOver();
@@ -26,8 +26,4 @@ private:
 	int MsgImage7;
 	int MsgImage8;
 	int MsgImage9;
-
-
-
 };
-
