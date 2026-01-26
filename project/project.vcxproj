@@ -162,6 +162,7 @@
     <ClInclude Include="Source\EnemyChaser.h" />
     <ClInclude Include="Source\Fader.h" />
     <ClInclude Include="Source\FallingSpike.h" />
+    <ClInclude Include="Source\GameConfig.h" />
     <ClInclude Include="Source\GameResult.h" />
     <ClInclude Include="Source\HiddenSpike.h" />
     <ClInclude Include="Source\LaserTurret.h" />

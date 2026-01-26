@@ -257,7 +257,7 @@ Field::Field(int stage)
 		}
 	}
 
-	// それぞれのトリガーに「真上にある針」を対応付ける
+	// 真上にある針をトリガーに対応付け
 	for (auto& trig : fallingSpikeTriggers)
 	{
 		int trigX = trig.triggerPos.x;
@@ -266,12 +266,12 @@ Field::Field(int stage)
 		int bestIndex = -1;
 		int bestDy = 100000000;
 
-		// すべての落下針候補をチェック
+		// すべての針候補をチェック
 		for (int i = 0; i < (int)fallingSpikes.size(); ++i)
 		{
 			auto& info = fallingSpikes[i];
 
-			// 同じ列（X座標が同じ）の針だけを見る
+			// 同じ列の針だけを見る
 			if (info.pos.x != trigX) continue;
 
 			// トリガーより上にある針だけ対象
@@ -397,7 +397,7 @@ void Field::Update()
 			new RollingBall(spawn.x, spawn.y, -1.0f);
 		}
 
-		ballTimer[i] = 95;
+		ballTimer[i] = 100;
 	}
 
 	//------------------------------------------------------

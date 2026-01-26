@@ -20,12 +20,16 @@ static int s_imgTitleThanks = -1;
 
 ClearScene::ClearScene()
 {
-	// Copy result computed in PlayScene.
-	clearTime = g_GameResult.clearTime;
-	retryCount = g_GameResult.retryCount;
-	finalScore = g_GameResult.score;
+	// 結果を確定
+	GR_FixOnGoalOnce();
 
-	// Decide rank and messages.
+	// GameResult から「確定済みの値」をコピー
+	clearTime = (float)g_GameResult.elapsedMs / 1000.0f;   // 秒
+	retryCount = g_GameResult.deathCount;            // 1回死ぬごとに
+	finalScore = g_GameResult.score;
+	rankChar = g_GameResult.rank;
+
+	// 表示用テキスト・色・一言メッセージだけ決める
 	CalcScoreAndRank();
 
 	// Load title images (shared).
@@ -221,21 +225,13 @@ void ClearScene::Draw()
 
 void ClearScene::CalcScoreAndRank()
 {
-	// Simple heuristic. Adjust thresholds as needed.
-	// Prefer fewer retries and faster clears.
-	const float timePenalty = clearTime * 8.0f;     // per-second penalty
-	const float retryPenalty = (float)retryCount * 200.0f;
-
-	const float effective = (float)finalScore - timePenalty - retryPenalty;
-
-	if (effective >= 2500.0f) rankChar = 'S';
-	else if (effective >= 1800.0f) rankChar = 'A';
-	else if (effective >= 1200.0f) rankChar = 'B';
-	else if (effective >= 700.0f)  rankChar = 'C';
-	else rankChar = 'D';
+	// 重要：スコア/ランクは GameResult 側で確定済み。
+	// ここではUI表現（文字/色/メッセージ）だけ作る。
 
 	rankText.clear();
-	rankText.push_back(rankChar);
+	rankText.push_back(rankChar);     // 既存UIに合わせて1文字表示のまま
+	// もし "S RANK" 表示にしたいなら：
+	// rankText = std::string(1, rankChar) + " RANK";
 
 	if (rankChar == 'S') rankColor = GetColor(255, 240, 100);
 	else if (rankChar == 'A') rankColor = GetColor(255, 210, 120);
@@ -243,7 +239,7 @@ void ClearScene::CalcScoreAndRank()
 	else if (rankChar == 'C') rankColor = GetColor(210, 210, 210);
 	else rankColor = GetColor(255, 160, 160);
 
-	// One-line messages (encoded with \u escapes to avoid mojibake).
+	// 一言メッセージの選択（既存テーブルをそのまま使用）
 	static const char* const S_MSGS[] = {
 		"\u7121\u7406\u3068\u304B\u8A00\u3063\u3066\u3059\u307F\u307E\u305B\u3093\u3067\u3057\u305F\u2026\u3042\u306A\u305F\u306F\u5929\u624D\u3067\u3059\u3002",
 		"\u30A8\u30E9\u30FC\u3002\u4F5C\u8005\u306E\u60F3\u5B9A\u3092\u8D85\u3048\u307E\u3057\u305F\u3002",
@@ -287,15 +283,8 @@ void ClearScene::CalcScoreAndRank()
 	default:  table = D_MSGS; count = (int)(sizeof(D_MSGS) / sizeof(D_MSGS[0])); break;
 	}
 
-	if (table && count > 0)
-	{
-		const int idx = GetRand(count - 1);
-		oneLineMsg = table[idx];
-	}
-	else
-	{
-		oneLineMsg.clear();
-	}
+	if (table && count > 0) oneLineMsg = table[GetRand(count - 1)];
+	else oneLineMsg.clear();
 }
 
 void ClearScene::InitConfetti()

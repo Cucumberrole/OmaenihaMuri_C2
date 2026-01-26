@@ -1,190 +1,330 @@
 #include "SelectStage.h"
 
-#include <DxLib.h>
-#include <tchar.h>
 #include <algorithm>
+using std::max;
+using std::min;
 
-#include "PlayScene.h"
+#include <cmath>
+#include <cstdlib>
+
 #include "../Library/SceneManager.h"
+#include "PlayScene.h"
 
-// Assets (adjust if your folders differ)
-static const TCHAR* kBgmPath      = TEXT("data/bgm/002.ogg");
-static const TCHAR* kCursorSePath = TEXT("data/bgm/cursor.mp3");
-static const TCHAR* kDecideSePath = TEXT("data/bgm/decision.mp3");
+static const TCHAR* kWallPath = TEXT("data/image/kabe.png");
 
-static const TCHAR* kTitleText = TEXT("STAGE SELECT");
-static const TCHAR* kHintText  = TEXT("UP/DOWN or W/S : Select   Enter/Space : OK   T : Title   ESC : Exit");
-static const TCHAR* kHintText2 = TEXT("E : Stage1   H : Stage2");
-
-static const TCHAR* kStage1Title = TEXT("STAGE 1");
-static const TCHAR* kStage2Title = TEXT("STAGE 2");
-
-static const TCHAR* kStage1Sub = TEXT("For beginners");
-static const TCHAR* kStage2Sub = TEXT("For challengers");
-
-static inline bool IsTriggerKey(int key)
+static int CreateJPFont(const TCHAR* name, int size, int thick)
 {
-    return DxLib::CheckHitKey(key) != 0;
+	int h = DxLib::CreateFontToHandle(name, size, thick, DX_FONTTYPE_ANTIALIASING_8X8);
+	return h;
 }
 
 SelectStage::SelectStage()
 {
-    DxLib::GetDrawScreenSize(&sw_, &sh_);
+	wallImg_ = DxLib::LoadGraph(kWallPath);
 
-    // Fonts (bigger layout)
-    fontTitle_     = DxLib::CreateFontToHandle(TEXT("Arial Black"), 84, 3, DX_FONTTYPE_ANTIALIASING_8X8);
-    fontCardTitle_ = DxLib::CreateFontToHandle(TEXT("Arial Black"), 46, 2, DX_FONTTYPE_ANTIALIASING_8X8);
-    fontCardSub_   = DxLib::CreateFontToHandle(TEXT("Arial"), 32, 2, DX_FONTTYPE_ANTIALIASING_8X8);
-    fontHint_      = DxLib::CreateFontToHandle(TEXT("Arial"), 28, 1, DX_FONTTYPE_ANTIALIASING_8X8);
+	// Japanese text may show as □ if font doesn't support it; try JP fonts in order.
+	fontTitle_ = CreateJPFont(TEXT("メイリオ"), 84, 4);
+	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("Meiryo UI"), 84, 4);
+	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("MS ゴシック"), 84, 3);
+	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("Arial Black"), 84, 4);
 
-    if (fontTitle_ < 0)     fontTitle_     = DxLib::CreateFontToHandle(TEXT("Arial"), 84, 3, DX_FONTTYPE_ANTIALIASING_8X8);
-    if (fontCardTitle_ < 0) fontCardTitle_ = DxLib::CreateFontToHandle(TEXT("Arial"), 46, 2, DX_FONTTYPE_ANTIALIASING_8X8);
-    if (fontCardSub_ < 0)   fontCardSub_   = DxLib::CreateFontToHandle(TEXT("Arial"), 32, 2, DX_FONTTYPE_ANTIALIASING_8X8);
-    if (fontHint_ < 0)      fontHint_      = DxLib::CreateFontToHandle(TEXT("Arial"), 28, 1, DX_FONTTYPE_ANTIALIASING_8X8);
+	fontSub_ = CreateJPFont(TEXT("メイリオ"), 34, 2);
+	if (fontSub_ < 0) fontSub_ = CreateJPFont(TEXT("Meiryo UI"), 34, 2);
+	if (fontSub_ < 0) fontSub_ = CreateJPFont(TEXT("MS ゴシック"), 34, 2);
+	if (fontSub_ < 0) fontSub_ = CreateJPFont(TEXT("Arial"), 34, 2);
 
-    // Sounds are optional: if missing, handle stays -1
-    bgmHandle_ = DxLib::LoadSoundMem(kBgmPath);
-    cursorSe_  = DxLib::LoadSoundMem(kCursorSePath);
-    decideSe_  = DxLib::LoadSoundMem(kDecideSePath);
+	fontCard_ = CreateJPFont(TEXT("メイリオ"), 34, 2);
+	if (fontCard_ < 0) fontCard_ = CreateJPFont(TEXT("Meiryo UI"), 34, 2);
+	if (fontCard_ < 0) fontCard_ = CreateJPFont(TEXT("MS ゴシック"), 34, 2);
+	if (fontCard_ < 0) fontCard_ = CreateJPFont(TEXT("Arial Black"), 34, 2);
 
-    if (bgmHandle_ >= 0)
-    {
-        DxLib::ChangeVolumeSoundMem(170, bgmHandle_);
-        DxLib::PlaySoundMem(bgmHandle_, DX_PLAYTYPE_LOOP, TRUE);
-    }
+	fontHint_ = CreateJPFont(TEXT("メイリオ"), 28, 2);
+	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("Meiryo UI"), 28, 2);
+	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("MS ゴシック"), 28, 2);
+	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("Arial"), 28, 2);
+
+	// Sparkles init
+	int sw = 1280, sh = 720;
+	DxLib::GetDrawScreenSize(&sw, &sh);
+	for (int i = 0; i < kSparkleCount; ++i)
+	{
+		sp_[i].x = (float)(DxLib::GetRand(sw));
+		sp_[i].y = (float)(DxLib::GetRand(sh));
+		sp_[i].v = 0.3f + (float)DxLib::GetRand(100) / 200.0f;  // 0.3..0.8
+		sp_[i].s = 2.0f + (float)DxLib::GetRand(18);           // 2..20
+		sp_[i].kind = DxLib::GetRand(2);                       // 0..2
+	}
 }
 
 SelectStage::~SelectStage()
 {
-    if (bgmHandle_ >= 0) { DxLib::StopSoundMem(bgmHandle_); DxLib::DeleteSoundMem(bgmHandle_); bgmHandle_ = -1; }
-    if (cursorSe_ >= 0)  { DxLib::DeleteSoundMem(cursorSe_); cursorSe_ = -1; }
-    if (decideSe_ >= 0)  { DxLib::DeleteSoundMem(decideSe_); decideSe_ = -1; }
-
-    if (fontTitle_ >= 0)     { DxLib::DeleteFontToHandle(fontTitle_); fontTitle_ = -1; }
-    if (fontCardTitle_ >= 0) { DxLib::DeleteFontToHandle(fontCardTitle_); fontCardTitle_ = -1; }
-    if (fontCardSub_ >= 0)   { DxLib::DeleteFontToHandle(fontCardSub_); fontCardSub_ = -1; }
-    if (fontHint_ >= 0)      { DxLib::DeleteFontToHandle(fontHint_); fontHint_ = -1; }
+	if (wallImg_ >= 0) DxLib::DeleteGraph(wallImg_);
+	if (fontTitle_ >= 0) DxLib::DeleteFontToHandle(fontTitle_);
+	if (fontSub_ >= 0) DxLib::DeleteFontToHandle(fontSub_);
+	if (fontCard_ >= 0) DxLib::DeleteFontToHandle(fontCard_);
+	if (fontHint_ >= 0) DxLib::DeleteFontToHandle(fontHint_);
 }
 
-void SelectStage::DecideStage(int stageId)
+void SelectStage::Decide(int stageId)
 {
-    if (decideSe_ >= 0) DxLib::PlaySoundMem(decideSe_, DX_PLAYTYPE_BACK, TRUE);
-
-    // Your project already used this pattern before.
-    PlayScene::SelectedStage = stageId;
-    SceneManager::ChangeScene("PLAY");
+	PlayScene::SelectedStage = stageId; // 1=Easy, 2=Hard
+	deciding_ = true;
+	fade_ = 0.0f;
 }
 
 void SelectStage::Update()
 {
-    ++frame_;
+	++blink_;
 
-    // Exit
-    if (IsTriggerKey(KEY_INPUT_ESCAPE))
-    {
-        DxLib::DxLib_End();
-        return;
-    }
+	// Background slow scroll
+	wallScroll_ += 0.6f;
+	if (wallScroll_ > 100000.0f) wallScroll_ = 0.0f;
 
-    // Title
-    if (IsTriggerKey(KEY_INPUT_T))
-    {
-        SceneManager::ChangeScene("TITLE");
-        return;
-    }
+	// Return title
+	if (DxLib::CheckHitKey(KEY_INPUT_SPACE) || DxLib::CheckHitKey(KEY_INPUT_T))
+	{
+		SceneManager::ChangeScene("TITLE");
+		return;
+	}
 
-    // Direct select
-    if (IsTriggerKey(KEY_INPUT_E))
-    {
-        DecideStage(1);
-        return;
-    }
-    if (IsTriggerKey(KEY_INPUT_H))
-    {
-        DecideStage(2);
-        return;
-    }
+	if (!deciding_)
+	{
+		// Direct pick like the design (E / D)
+		if (DxLib::CheckHitKey(KEY_INPUT_E)) { selected_ = 0; Decide(1); return; }
+		if (DxLib::CheckHitKey(KEY_INPUT_D)) { selected_ = 1; Decide(2); return; }
 
-    // Selection move (Up/Down or W/S)
-    const bool up   = IsTriggerKey(KEY_INPUT_UP) || IsTriggerKey(KEY_INPUT_W);
-    const bool down = IsTriggerKey(KEY_INPUT_DOWN) || IsTriggerKey(KEY_INPUT_S);
-    if (up)
-    {
-        selectedIndex_ = 0;
-        if (cursorSe_ >= 0) DxLib::PlaySoundMem(cursorSe_, DX_PLAYTYPE_BACK, TRUE);
-    }
-    else if (down)
-    {
-        selectedIndex_ = 1;
-        if (cursorSe_ >= 0) DxLib::PlaySoundMem(cursorSe_, DX_PLAYTYPE_BACK, TRUE);
-    }
+		// Move selection
+		if (DxLib::CheckHitKey(KEY_INPUT_LEFT) || DxLib::CheckHitKey(KEY_INPUT_A)) selected_ = 0;
+		if (DxLib::CheckHitKey(KEY_INPUT_RIGHT) || DxLib::CheckHitKey(KEY_INPUT_F)) selected_ = 1;
 
-    // Decide
-    if (IsTriggerKey(KEY_INPUT_RETURN) || IsTriggerKey(KEY_INPUT_SPACE))
-    {
-        DecideStage(selectedIndex_ + 1);
-        return;
-    }
+		// Confirm
+		if (DxLib::CheckHitKey(KEY_INPUT_RETURN) || DxLib::CheckHitKey(KEY_INPUT_Z))
+		{
+			Decide(selected_ == 0 ? 1 : 2);
+			return;
+		}
+	}
+	else
+	{
+		fade_ += 1.0f / 30.0f; // ~0.5s
+		if (fade_ >= 1.0f)
+		{
+			SceneManager::ChangeScene("PLAY");
+			return;
+		}
+	}
+}
+
+void SelectStage::DrawTiledWall(int sw, int sh) const
+{
+	if (wallImg_ < 0)
+	{
+		DxLib::DrawBox(0, 0, sw, sh, DxLib::GetColor(12, 12, 16), TRUE);
+		return;
+	}
+
+	int iw = 0, ih = 0;
+	DxLib::GetGraphSize(wallImg_, &iw, &ih);
+	if (iw <= 0 || ih <= 0)
+	{
+		DxLib::DrawBox(0, 0, sw, sh, DxLib::GetColor(12, 12, 16), TRUE);
+		return;
+	}
+
+	const int offX = (int)wallScroll_ % iw;
+
+	for (int y = 0; y < sh; y += ih)
+	{
+		for (int x = -iw; x < sw + iw; x += iw)
+		{
+			DxLib::DrawGraph(x - offX, y, wallImg_, TRUE);
+		}
+	}
+
+	// Darken a bit for readability
+	DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, 90);
+	DxLib::DrawBox(0, 0, sw, sh, DxLib::GetColor(0, 0, 0), TRUE);
+	DxLib::SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+void SelectStage::DrawVignette(int sw, int sh) const
+{
+	// Simple vignette using alpha boxes
+	DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, 80);
+	DxLib::DrawBox(0, 0, sw, 60, DxLib::GetColor(0, 0, 0), TRUE);
+	DxLib::DrawBox(0, sh - 60, sw, sh, DxLib::GetColor(0, 0, 0), TRUE);
+	DxLib::DrawBox(0, 0, 60, sh, DxLib::GetColor(0, 0, 0), TRUE);
+	DxLib::DrawBox(sw - 60, 0, sw, sh, DxLib::GetColor(0, 0, 0), TRUE);
+	DxLib::SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+}
+
+void SelectStage::DrawSparkles(int sw, int sh) const
+{
+	DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, 180);
+	const int c1 = DxLib::GetColor(255, 220, 120);
+	const int c2 = DxLib::GetColor(255, 255, 255);
+
+	for (int i = 0; i < kSparkleCount; ++i)
+	{
+		float t = (float)((blink_ + i * 7) % 120) / 120.0f;
+		int a = 60 + (int)(120.0f * std::fabs(std::sin(t * 3.14159f * 2.0f)));
+		a = min(220, max(40, a));
+		DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, a);
+
+		int x = (int)sp_[i].x;
+		int y = (int)sp_[i].y;
+		int s = (int)sp_[i].s;
+
+		if (sp_[i].kind == 0)
+		{
+			DxLib::DrawLine(x - s, y, x + s, y, c1);
+			DxLib::DrawLine(x, y - s, x, y + s, c1);
+		}
+		else if (sp_[i].kind == 1)
+		{
+			DxLib::DrawCircle(x, y, max(1, s / 3), c2, TRUE);
+		}
+		else
+		{
+			DxLib::DrawTriangle(x, y - s, x - s, y + s, x + s, y + s, c1, TRUE);
+		}
+	}
+
+	DxLib::SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void SelectStage::Draw()
 {
-    DxLib::GetDrawScreenSize(&sw_, &sh_);
+	int sw = 0, sh = 0;
+	DxLib::GetDrawScreenSize(&sw, &sh);
 
-    // Background
-    DxLib::DrawBox(0, 0, sw_, sh_, DxLib::GetColor(30, 18, 40), TRUE);
-    DxLib::DrawBox(0, 0, sw_, sh_ / 3, DxLib::GetColor(60, 30, 70), TRUE);
+	DrawTiledWall(sw, sh);
 
-    // Title
-    const int titleW = DxLib::GetDrawStringWidthToHandle(kTitleText, (int)_tcslen(kTitleText), fontTitle_);
-    DxLib::DrawStringToHandle((sw_ - titleW) / 2, (int)(sh_ * 0.08f), kTitleText, DxLib::GetColor(255, 240, 200), fontTitle_);
+	// Base layout frame (same as your current baseline)
+	const int marginX = max(60, sw / 16);
+	const int marginY = max(50, sh / 14);
+	const int frameX = marginX;
+	const int frameY = marginY;
+	const int frameW = sw - marginX * 2;
+	const int frameH = sh - marginY * 2;
 
-    // Card layout (bigger)
-    const int cardW = (int)(sw_ * 0.72f);
-    const int cardH = 170;
-    const int gapY  = 34;
+	// Drop shadow for the whole panel
+	DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, 120);
+	DxLib::DrawBox(frameX + 10, frameY + 14, frameX + frameW + 10, frameY + frameH + 14, DxLib::GetColor(0, 0, 0), TRUE);
+	DxLib::SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-    const int groupH = cardH * 2 + gapY;
-    const int groupY = (sh_ - groupH) / 2 + 20;
-    const int cardX  = (sw_ - cardW) / 2;
+	const int frameLine = DxLib::GetColor(80, 130, 240);
+	const int frameFill = DxLib::GetColor(245, 245, 245);
 
-    auto drawCard = [&](int index, int x, int y, const TCHAR* title, const TCHAR* sub)
-    {
-        const bool sel = (selectedIndex_ == index);
-        const int outer = sel ? DxLib::GetColor(255, 210, 120) : DxLib::GetColor(120, 120, 140);
-        const int inner = sel ? DxLib::GetColor(80, 40, 120)   : DxLib::GetColor(50, 35, 65);
-        const int edge  = DxLib::GetColor(10, 10, 18);
+	//DxLib::DrawBox(frameX, frameY, frameX + frameW, frameY + frameH, frameFill, TRUE);
+	DxLib::DrawBox(frameX, frameY, frameX + frameW, frameY + frameH, frameLine, FALSE);
 
-        // frame
-        DxLib::DrawBox(x, y, x + cardW, y + cardH, edge, TRUE);
-        DxLib::DrawBox(x + 6, y + 6, x + cardW - 6, y + cardH - 6, outer, TRUE);
-        DxLib::DrawBox(x + 16, y + 16, x + cardW - 16, y + cardH - 16, inner, TRUE);
+	// Header ribbon decoration
+	//DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, 220);
+	//DxLib::DrawBox(frameX, frameY, frameX + frameW, frameY + 170, DxLib::GetColor(255, 255, 255), TRUE);
+	//DxLib::SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-        // text
-        const int tx = x + 44;
-        const int ty = y + 34;
+	// Sparkles on top area
+	DrawSparkles(sw, sh);
 
-        DxLib::DrawStringToHandle(tx, ty, title, DxLib::GetColor(255, 255, 255), fontCardTitle_);
-        DxLib::DrawStringToHandle(tx, ty + 64, sub, DxLib::GetColor(230, 220, 255), fontCardSub_);
+	// Title
+	const TCHAR* title = TEXT("ステージ選択");
+	int tw = DxLib::GetDrawStringWidthToHandle(title, (int)_tcslen(title), fontTitle_);
+	DxLib::DrawStringToHandle(frameX + frameW / 2 - tw / 2, frameY + 30, title, DxLib::GetColor(255, 180, 0), fontTitle_);
 
-        // cursor triangle
-        if (sel)
-        {
-            const int blink = (frame_ / 10) % 2;
-            if (blink == 0)
-            {
-                const int cx = x - 34;
-                const int cy = y + cardH / 2;
-                DxLib::DrawTriangle(cx, cy, cx + 26, cy - 18, cx + 26, cy + 18, DxLib::GetColor(255, 240, 180), TRUE);
-            }
-        }
-    };
+	// Subtitle
+	const TCHAR* sub = TEXT("挑戦したいステージのキーを押して下さい");
+	int subw = DxLib::GetDrawStringWidthToHandle(sub, (int)_tcslen(sub), fontSub_);
+	DxLib::DrawStringToHandle(frameX + frameW / 2 - subw / 2, frameY + 130, sub, DxLib::GetColor(30, 30, 30), fontSub_);
 
-    drawCard(0, cardX, groupY + 0 * (cardH + gapY), kStage1Title, kStage1Sub);
-    drawCard(1, cardX, groupY + 1 * (cardH + gapY), kStage2Title, kStage2Sub);
+	// Cards placement (two cards, centered)
+	const int innerTop = frameY + 220;
+	const int innerBottom = frameY + frameH - 140;
 
-    // Hints
-    const int hintY = (int)(sh_ * 0.88f);
-    DxLib::DrawStringToHandle((int)(sw_ * 0.08f), hintY, kHintText, DxLib::GetColor(255, 240, 200), fontHint_);
-    DxLib::DrawStringToHandle((int)(sw_ * 0.08f), hintY + 34, kHintText2, DxLib::GetColor(255, 240, 200), fontHint_);
+	const int gap = max(70, frameW / 9);
+	const int cardW = min(560, (frameW - gap * 3) / 2);
+	const int cardH = min(420, innerBottom - innerTop);
+
+	const int leftX = frameX + (frameW - (cardW * 2 + gap)) / 2;
+	const int rightX = leftX + cardW + gap;
+	const int cardY = innerTop + (innerBottom - innerTop - cardH) / 2;
+
+	const int easyFill = DxLib::GetColor(110, 170, 70);
+	const int hardFill = DxLib::GetColor(220, 40, 40);
+	const int cardBorder = DxLib::GetColor(30, 80, 160);
+
+	// Card shadow
+	DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, 110);
+	DxLib::DrawBox(leftX + 10, cardY + 12, leftX + cardW + 10, cardY + cardH + 12, DxLib::GetColor(0, 0, 0), TRUE);
+	DxLib::DrawBox(rightX + 10, cardY + 12, rightX + cardW + 10, cardY + cardH + 12, DxLib::GetColor(0, 0, 0), TRUE);
+	DxLib::SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+	DxLib::DrawBox(leftX, cardY, leftX + cardW, cardY + cardH, easyFill, TRUE);
+	DxLib::DrawBox(leftX, cardY, leftX + cardW, cardY + cardH, cardBorder, FALSE);
+
+	DxLib::DrawBox(rightX, cardY, rightX + cardW, cardY + cardH, hardFill, TRUE);
+	DxLib::DrawBox(rightX, cardY, rightX + cardW, cardY + cardH, cardBorder, FALSE);
+
+	// Selected highlight (glow + shine)
+	const bool blinkOn = ((blink_ / 18) % 2) == 0;
+	const int hiCol = DxLib::GetColor(255, 235, 150);
+
+	if (blinkOn)
+	{
+		int bx = (selected_ == 0) ? leftX : rightX;
+		for (int i = 0; i < 8; ++i)
+		{
+			DxLib::DrawBox(bx - i, cardY - i, bx + cardW + i, cardY + cardH + i, hiCol, FALSE);
+		}
+
+		// Shine stripe
+		DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, 90);
+		DxLib::DrawBox(bx + 18, cardY + 18, bx + cardW - 18, cardY + 54, DxLib::GetColor(255, 255, 255), TRUE);
+		DxLib::SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
+
+	auto drawCenterLines = [&](int cx, int topY, const TCHAR* const* lines, int n, int lineGap)
+		{
+			int y = topY;
+			for (int i = 0; i < n; ++i)
+			{
+				const TCHAR* s = lines[i];
+				int w = DxLib::GetDrawStringWidthToHandle(s, (int)_tcslen(s), fontCard_);
+				DxLib::DrawStringToHandle(cx - w / 2, y, s, DxLib::GetColor(255, 255, 255), fontCard_);
+				y += lineGap;
+			}
+		};
+
+	const TCHAR* easyLines[] = {
+		TEXT("易しいチュートリアル"),
+		TEXT("すぐイライラしちゃう人に"),
+		TEXT("おすすめ"),
+		TEXT("残機数 5"),
+		TEXT("Push to [E]")
+	};
+	const TCHAR* hardLines[] = {
+		TEXT("難しい"),
+		TEXT("たくさん死にたい人におすすめ"),
+		TEXT("残機数 3"),
+		TEXT("Push to [D]")
+	};
+
+	drawCenterLines(leftX + cardW / 2, cardY + 90, easyLines, 5, 46);
+	drawCenterLines(rightX + cardW / 2, cardY + 110, hardLines, 4, 50);
+
+	// Bottom hint
+	const TCHAR* bottom = TEXT("タイトルへ戻る  Push to [Space]");
+	int bw = DxLib::GetDrawStringWidthToHandle(bottom, (int)_tcslen(bottom), fontHint_);
+	DxLib::DrawStringToHandle(frameX + frameW / 2 - bw / 2, frameY + frameH - 80, bottom, DxLib::GetColor(30, 30, 30), fontHint_);
+
+	DrawVignette(sw, sh);
+
+	// Fade after decide
+	if (deciding_)
+	{
+		int a = (int)(255.0f * min(1.0f, max(0.0f, fade_)));
+		DxLib::SetDrawBlendMode(DX_BLENDMODE_ALPHA, a);
+		DxLib::DrawBox(0, 0, sw, sh, DxLib::GetColor(0, 0, 0), TRUE);
+		DxLib::SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
 }
