@@ -1,35 +1,41 @@
 #pragma once
+#include <DxLib.h>
+#include <tchar.h>
 #include "../Library/SceneBase.h"
 
-// Stage selection scene (2 stages).
 class SelectStage final : public SceneBase
 {
 public:
-    SelectStage();
-    ~SelectStage() override;
+	SelectStage();
+	~SelectStage() override;
 
-    void Update() override;
-    void Draw() override;
-
-private:
-    void DecideStage(int stageId);
+	void Update() override;
+	void Draw() override;
 
 private:
-    int selectedIndex_ = 0; // 0: stage1, 1: stage2
-    int frame_ = 0;
+	void Decide(int stageId);
+	void DrawTiledWall(int sw, int sh) const;
+	void DrawVignette(int sw, int sh) const;
+	void DrawSparkles(int sw, int sh) const;
 
-    // Fonts
-    int fontTitle_ = -1;
-    int fontCardTitle_ = -1;
-    int fontCardSub_ = -1;
-    int fontHint_ = -1;
+private:
+	int selected_ = 0;        // 0: Easy, 1: Hard
+	bool deciding_ = false;
+	float fade_ = 0.0f;       // 0..1
+	int blink_ = 0;
 
-    // Sounds (optional; safe if missing)
-    int bgmHandle_ = -1;
-    int cursorSe_ = -1;
-    int decideSe_ = -1;
+	// Background
+	int wallImg_ = -1;
+	float wallScroll_ = 0.0f;
 
-    // Cached screen size
-    mutable int sw_ = 1280;
-    mutable int sh_ = 720;
+	// Fonts (Japanese-friendly)
+	int fontTitle_ = -1;
+	int fontSub_ = -1;
+	int fontCard_ = -1;
+	int fontHint_ = -1;
+
+	// Sparkles
+	struct Sparkle { float x, y, v, s; int kind; };
+	static const int kSparkleCount = 70;
+	Sparkle sp_[kSparkleCount]{};
 };

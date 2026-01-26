@@ -17,6 +17,7 @@ static int g_Life = 5;          // 初期残機
 static int g_RetryCount = 0;    // 死んだ回数
 float g_ClearTimeSeconds = 0.0f;
 static int g_deathCount = 0;
+static bool g_IsRetry = false;
 
 PlayScene::PlayScene()
 {
@@ -42,6 +43,11 @@ PlayScene::PlayScene()
 
 	state = Playstate::Play;
 	deathHandled = false;
+
+	if (!g_IsRetry) {
+		g_ClearTimeSeconds = 0.0f;
+	}
+	g_IsRetry = false;
 }
 
 PlayScene::~PlayScene()
@@ -79,7 +85,7 @@ void PlayScene::Update()
 				deathHandled = true;
 
 				life--;
-				
+				retryCount++;
 				deathCount++;
 
 				g_Life = life;
@@ -97,13 +103,11 @@ void PlayScene::Update()
 		// =========================
 		if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
 		{
-			int finalScore = score;
-			if (retryCount == 0)   finalScore += 2000;
-			if (playTime <= 60.0f) finalScore += 1000;
+			// クリアタイムは「全体時間」を採用
+			const float clearTime = g_ClearTimeSeconds;
 
-			g_GameResult.score = finalScore;
-			g_GameResult.clearTime = playTime;
-			g_GameResult.retryCount = retryCount;
+			// （あなたが新GameResult方式なら）
+			GR_FixOnGoalOnce_Manual((int)clearTime, retryCount);
 
 			SceneManager::ChangeScene("CLEAR");
 			return;
@@ -124,8 +128,11 @@ void PlayScene::Update()
 		if (CheckHitKey(KEY_INPUT_R))
 		{
 			VanishingFloor::ResetAll();
+
 			fader->FadeOut(0.5f);
 			fader->FadeIn(1.0f);
+
+			g_IsRetry = true;
 			SceneManager::ForceChangeScene("PLAY");
 		}
 
@@ -139,7 +146,6 @@ void PlayScene::Update()
 		// 死亡演出が終わるまで待機（入力不可）
 		if (!player->IsdeathAnimEnd())
 		{
-			retryCount++;
 			return;
 		}
 
@@ -168,6 +174,7 @@ void PlayScene::Update()
 			fader->FadeIn(1.0f);
 
 			// リトライ
+			g_IsRetry = true;
 			SceneManager::ForceChangeScene("PLAY");
 		}
 		return;
@@ -209,7 +216,7 @@ void PlayScene::Draw()
 	DrawString(0, 0 + h * 0, "PLAY SCENE", GetColor(255, 255, 255));
 
 	// TIME
-	sprintf_s(buf, "TIME : %.2f", playTime);
+	sprintf_s(buf, "TIME : %.2f", g_ClearTimeSeconds);
 	DrawString(0, 0 + h * 1, buf, col);
 
 	// SCORE
@@ -233,7 +240,7 @@ void PlayScene::Draw()
 
 int PlayScene::GetRetry(int retry)
 {
-	retry = g_deathCount; 
+	retry = g_deathCount;
 	return retry;
 }
 

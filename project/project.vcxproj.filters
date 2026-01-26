@@ -379,6 +379,9 @@
     <ClInclude Include="Source\BouncingAnimatedTrap.h">
       <Filter>Trap</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GameConfig.h">
+      <Filter>StageSelect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">
