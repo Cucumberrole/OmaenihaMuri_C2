@@ -21,20 +21,28 @@ private:
 private:
 	int selected_ = 0;        // 0: Easy, 1: Hard
 	bool deciding_ = false;
-	float fade_ = 0.0f;       // 0..1
+	float fade_ = 0.0f;       // 0～1
 	int blink_ = 0;
+
+	// あにめーしょん！
+	int   introStartMs_ = 0;   // 登場開始時刻
+	float introT_ = 0.0f;      // 0.0～1.0
+	bool  introDone_ = false;  // 完了フラグ
+
+	// カード表示アニメーション
+	float introElapsedSec_ = 0.0f;
 
 	// Background
 	int wallImg_ = -1;
 	float wallScroll_ = 0.0f;
 
-	// Fonts (Japanese-friendly)
+	// Fonts
 	int fontTitle_ = -1;
 	int fontSub_ = -1;
 	int fontCard_ = -1;
 	int fontHint_ = -1;
 
-	// Sparkles
+	// パーティクル
 	struct Sparkle { float x, y, v, s; int kind; };
 	static const int kSparkleCount = 70;
 	Sparkle sp_[kSparkleCount]{};

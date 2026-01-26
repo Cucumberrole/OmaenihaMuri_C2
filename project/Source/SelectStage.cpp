@@ -1,8 +1,6 @@
 #include "SelectStage.h"
 
 #include <algorithm>
-using std::max;
-using std::min;
 
 #include <cmath>
 #include <cstdlib>
@@ -22,7 +20,7 @@ SelectStage::SelectStage()
 {
 	wallImg_ = LoadGraph(kWallPath);
 
-	fontTitle_ = CreateJPFont(TEXT("HGS創英角ﾎﾟｯﾌﾟ体"), 84, 4);
+	fontTitle_ = CreateJPFont(TEXT("HGS創英角ﾎﾟｯﾌﾟ体"), 130, 4);
 	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("Meiryo UI"), 84, 4);
 	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("MS ゴシック"), 84, 3);
 	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("Arial Black"), 84, 4);
@@ -53,6 +51,10 @@ SelectStage::SelectStage()
 		sp_[i].s = 2.0f + (float)GetRand(18);           // 2..20
 		sp_[i].kind = GetRand(2);                       // 0..2
 	}
+
+	introStartMs_ = GetNowCount();
+	introT_ = 0.0f;
+	introDone_ = false;
 }
 
 SelectStage::~SelectStage()
@@ -73,13 +75,33 @@ void SelectStage::Decide(int stageId)
 
 void SelectStage::Update()
 {
+	// == 遷移アニメーション ==
+	{
+		const float introDurationSec = 0.25f;
+		const int now = GetNowCount();
+		const float elapsedSec = (now - introStartMs_) / 1000.0f;
+
+		introElapsedSec_ = elapsedSec;  // カードの順番表示
+
+		introT_ = (introDurationSec <= 0.0f) ? 1.0f : (elapsedSec / introDurationSec);
+		if (introT_ >= 1.0f) { introT_ = 1.0f; introDone_ = true; }
+
+		// 入力停止
+		if (!introDone_)
+		{
+			blink_++;
+			return;
+		}
+	}
+
+
 	++blink_;
 
-	// Background slow scroll
+	// 背景のスクロール
 	wallScroll_ += 0.6f;
 	if (wallScroll_ > 100000.0f) wallScroll_ = 0.0f;
 
-	// Return title
+	// 戻る
 	if (CheckHitKey(KEY_INPUT_SPACE) || CheckHitKey(KEY_INPUT_T))
 	{
 		SceneManager::ChangeScene("TITLE");
@@ -88,15 +110,15 @@ void SelectStage::Update()
 
 	if (!deciding_)
 	{
-		// Direct pick like the design (E / D)
+		// E、Hキーでステージ選択
 		if (CheckHitKey(KEY_INPUT_E)) { selected_ = 0; Decide(1); return; }
 		if (CheckHitKey(KEY_INPUT_H)) { selected_ = 1; Decide(2); return; }
 
-		// Move selection
+		// 左右キーでも選べるよ
 		if (CheckHitKey(KEY_INPUT_LEFT) || CheckHitKey(KEY_INPUT_A)) selected_ = 0;
 		if (CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_F)) selected_ = 1;
 
-		// Confirm
+		// 決定
 		if (CheckHitKey(KEY_INPUT_RETURN) || CheckHitKey(KEY_INPUT_Z))
 		{
 			Decide(selected_ == 0 ? 1 : 2);
@@ -142,7 +164,7 @@ void SelectStage::DrawTiledWall(int sw, int sh) const
 		}
 	}
 
-	// Darken a bit for readability
+	// 背景、黒い四角形
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 90);
 	DrawBox(0, 0, sw, sh, GetColor(0, 0, 0), TRUE);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
@@ -150,7 +172,7 @@ void SelectStage::DrawTiledWall(int sw, int sh) const
 
 void SelectStage::DrawVignette(int sw, int sh) const
 {
-	// Simple vignette using alpha boxes
+	// 簡易ビネット、ただの四角形４つ
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 80);
 	DrawBox(0, 0, sw, 60, GetColor(0, 0, 0), TRUE);
 	DrawBox(0, sh - 60, sw, sh, GetColor(0, 0, 0), TRUE);
@@ -199,13 +221,32 @@ void SelectStage::Draw()
 	int sw = 0, sh = 0;
 	GetDrawScreenSize(&sw, &sh);
 
+
+	// == 遷移アニメーション（フェード） ==
+	auto clamp01 = [](float t) {
+		if (t < 0.0f) return 0.0f;
+		if (t > 1.0f) return 1.0f;
+		return t;
+		};
+
+	auto easeOutCubic = [&](float t) {
+		t = clamp01(t);
+		float u = 1.0f - t;
+		return 1.0f - u * u * u;
+		};
+
+
+	const float e = easeOutCubic(introT_);
+	const int enterOffsetY = (int)((1.0f - e) * 50.0f); // 最初は下に50px → 0
+	const int introFadeA = (int)((1.0f - e) * 255.0f); // 最初は黒255 → 0
+
 	DrawTiledWall(sw, sh);
 
-	// Base layout frame (same as your current baseline)
+	// アウトフレーム
 	const int marginX = max(60, sw / 16);
 	const int marginY = max(50, sh / 14);
 	const int frameX = marginX;
-	const int frameY = marginY;
+	const int frameY = marginY + enterOffsetY;  // 登場アニメぶんずらす
 	const int frameW = sw - marginX * 2;
 	const int frameH = sh - marginY * 2;
 
@@ -220,24 +261,17 @@ void SelectStage::Draw()
 	//DrawBox(frameX, frameY, frameX + frameW, frameY + frameH, frameFill, TRUE);
 	DrawBox(frameX, frameY, frameX + frameW, frameY + frameH, frameLine, FALSE);
 
-	// Header ribbon decoration
-	//SetDrawBlendMode(DX_BLENDMODE_ALPHA, 220);
-	//DrawBox(frameX, frameY, frameX + frameW, frameY + 170, GetColor(255, 255, 255), TRUE);
-	//SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-
-	// Sparkles on top area
 	DrawSparkles(sw, sh);
 
-	// Title
+	// タイトル
 	const TCHAR* title = TEXT("ステージ選択");
 	int tw = GetDrawStringWidthToHandle(title, (int)_tcslen(title), fontTitle_);
 	DrawStringToHandle(frameX + frameW / 2 - tw / 2, frameY + 30, title, GetColor(255, 180, 0), fontTitle_);
 
-	// Subtitle
+	// サブタイトル
 	const TCHAR* sub = TEXT("挑戦したいステージのキーを押して下さい");
 	int subw = GetDrawStringWidthToHandle(sub, (int)_tcslen(sub), fontSub_);
-	DrawStringToHandle(frameX + frameW / 2 - subw / 2, frameY + 130, sub, GetColor(200, 200, 200), fontSub_);
-
+	DrawStringToHandle(frameX + frameW / 2 - subw / 2, frameY + 180, sub, GetColor(188, 188, 188), fontSub_);
 
 	const int innerTop = frameY + 220;
 	const int innerBottom = frameY + frameH - 140;
@@ -249,6 +283,25 @@ void SelectStage::Draw()
 	const int leftX = frameX + (frameW - (cardW * 2 + gap)) / 2;
 	const int rightX = leftX + cardW + gap;
 	const int cardY = innerTop + (innerBottom - innerTop - cardH) / 2;
+
+	// == カード順番出現 ==
+	const float cardDur = 0.22f; // 1枚が出る時間
+	const float cardDelay = 0.10f; // 2枚目の遅延
+
+	const float tL = easeOutCubic(introElapsedSec_ / cardDur);
+	const float tR = easeOutCubic((introElapsedSec_ - cardDelay) / cardDur);
+
+	// 出現度に応じて「スライド量」と「透明度」を作る
+	auto makeCardAnim = [&](float t, bool fromLeft) {
+		const int a = (int)(255.0f * t);                // 0→255
+		const int ox = (int)((1.0f - t) * (fromLeft ? -30.0f : 30.0f)); // 左は左から/右は右から
+		const int oy = (int)((1.0f - t) * 30.0f);       // 少し下から
+		return std::tuple<int, int, int>(a, ox, oy);      // alpha, offsetX, offsetY
+		};
+
+	auto [aL, oxL, oyL] = makeCardAnim(tL, true);
+	auto [aR, oxR, oyR] = makeCardAnim(tR, false);
+
 
 	const int easyFill = GetColor(110, 170, 70);
 	const int hardFill = GetColor(220, 40, 40);
@@ -264,26 +317,47 @@ void SelectStage::Draw()
 			DrawRoundRect(x, y, x + w, y + h, radius, radius, cardBorder, FALSE);
 		};
 
-	// Card shadow（影も角丸に）
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 110);
-	DrawRoundRect(leftX + 10, cardY + 12, leftX + cardW + 10, cardY + cardH + 12, radius, radius, GetColor(0, 0, 0), TRUE);
-	DrawRoundRect(rightX + 10, cardY + 12, rightX + cardW + 10, cardY + cardH + 12, radius, radius, GetColor(0, 0, 0), TRUE);
-	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	// ===== Card shadow（影もカードごとにフェード）=====
+	if (aL > 0)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, (int)(110.0f * (aL / 255.0f)));
+		DrawRoundRect(leftX + oxL + 10, cardY + oyL + 12,
+			leftX + oxL + cardW + 10, cardY + oyL + cardH + 12,
+			radius, radius, GetColor(0, 0, 0), TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
+	if (aR > 0)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, (int)(110.0f * (aR / 255.0f)));
+		DrawRoundRect(rightX + oxR + 10, cardY + oyR + 12,
+			rightX + oxR + cardW + 10, cardY + oyR + cardH + 12,
+			radius, radius, GetColor(0, 0, 0), TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
 
-	// Card body
-	drawRoundCard(leftX, cardY, cardW, cardH, easyFill);
-	drawRoundCard(rightX, cardY, cardW, cardH, hardFill);
+	// ===== Card body（カード本体もフェード）=====
+	if (aL > 0)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, aL);
+		drawRoundCard(leftX + oxL, cardY + oyL, cardW, cardH, easyFill);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
+	if (aR > 0)
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, aR);
+		drawRoundCard(rightX + oxR, cardY + oyR, cardW, cardH, hardFill);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
 
-	// Selected highlight
+	// ===== Selected highlight（カードが出切った後だけ光らせる）=====
 	const bool blinkOn = ((blink_ / 18) % 2) == 0;
 	const int hiCol = GetColor(255, 235, 150);
 
-	if (blinkOn)
+	if (introDone_ && blinkOn)
 	{
 		const int bx = (selected_ == 0) ? leftX : rightX;
 		for (int i = 0; i < 8; ++i)
 		{
-			// 枠を外側に広げるぶん、角丸半径も少しだけ増やす
 			DrawRoundRect(bx - i, cardY - i, bx + cardW + i, cardY + cardH + i,
 				radius + i, radius + i, hiCol, FALSE);
 		}
@@ -294,17 +368,13 @@ void SelectStage::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 
-
-	auto drawCenterBlock = [&](int cx, int cardTopY, int cardH,
-		const TCHAR* const* lines, int n,
-		int fontHandle, int lineGap,
-		int offsetY)
+	auto drawCenterLines = [&](int cx, int topY, const TCHAR* const* lines, int n, int lineGap,
+		int fontHandle, int alpha)
 		{
-			// 文字ブロック全体の高さ
-			const int blockH = (n - 1) * lineGap + GetFontSizeToHandle(fontHandle);
+			if (alpha <= 0) return;
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
 
-			int y = cardTopY + (cardH - blockH) / 2 + offsetY;
-
+			int y = topY;
 			for (int i = 0; i < n; ++i)
 			{
 				const TCHAR* s = lines[i];
@@ -312,8 +382,9 @@ void SelectStage::Draw()
 				DrawStringToHandle(cx - w / 2, y, s, GetColor(255, 255, 255), fontHandle);
 				y += lineGap;
 			}
-		};
 
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		};
 
 	const TCHAR* easyLines[] = {
 		TEXT("易しいチュートリアル"),
@@ -326,11 +397,11 @@ void SelectStage::Draw()
 		TEXT("難しい"),
 		TEXT("たくさん死にたい人におすすめ"),
 		TEXT("残機数 3"),
-		TEXT("Push to [H]")
+		TEXT("Push to [D]")
 	};
 
-	drawCenterBlock(leftX + cardW / 2, cardY, cardH, easyLines, 5, fontCard_, 46, -10);
-	drawCenterBlock(rightX + cardW / 2, cardY, cardH, hardLines, 4, fontCard_, 50, 10);
+	drawCenterLines(leftX + oxL + cardW / 2, (cardY + oyL) + 90, easyLines, 5, 46, fontCard_, aL);
+	drawCenterLines(rightX + oxR + cardW / 2, (cardY + oyR) + 110, hardLines, 4, 50, fontCard_, aR);
 
 	// Bottom hint
 	const TCHAR* bottom = TEXT("タイトルへ戻る  Push to [Space]");
@@ -338,6 +409,14 @@ void SelectStage::Draw()
 	DrawStringToHandle(frameX + frameW / 2 - bw / 2, frameY + frameH - 80, bottom, GetColor(188, 188, 188), fontHint_);
 
 	DrawVignette(sw, sh);
+
+	// 登場フェード
+	if (introFadeA > 0 && !deciding_) // deciding_中は決定フェードを優先したいので
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, introFadeA);
+		DrawBox(0, 0, sw, sh, GetColor(0, 0, 0), TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
 
 	// Fade after decide
 	if (deciding_)
