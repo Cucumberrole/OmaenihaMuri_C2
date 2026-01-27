@@ -19,9 +19,12 @@ void Telop::StartDeathTelop(Player* p)
     ShowDeathTelop = true;
 
     const char* messages[] = {
-        "うんこ",
-        "死んじゃった",
-        "プログラムがんばろう",
+        "うんこだな",
+        "痛いよ",
+        "プログラムがんばろう ",
+        "人の心とかないんか",
+        "（´・ω・｀）",
+        "(´;ω;｀)"
     };
 
     int count = sizeof(messages) / sizeof(messages[0]);
