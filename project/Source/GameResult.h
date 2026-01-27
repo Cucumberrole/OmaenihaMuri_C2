@@ -1,20 +1,20 @@
 #pragma once
 
-// コース難易度（スコア計算の減点値・ランク閾値が変わる）
+// コース難易度
 enum class CourseType
 {
 	Easy,
 	Hard
 };
 
-// クリア時に表示する結果（タイム・スコア・ランク）をまとめたデータ
+// クリア時に表示する結果
 struct GameResult
 {
-	// ===== プレイ中に更新する値（ゴール確定前） =====
+	// ===== プレイ中に更新する値 =====
 
 	CourseType course = CourseType::Easy; // 現在のコース難易度（Easy/Hard）
 
-	int startTimeMs = 0;  // 計測開始時刻（GetNowCount()）
+	int startTimeMs = 0;  // 計測開始時刻
 	int elapsedMs = 0;  // 経過時間（ミリ秒）※プレイ中に更新
 
 	int deathCount = 0;  // 死亡回数（= リトライ回数として使う想定）
@@ -27,7 +27,7 @@ struct GameResult
 	int  score = 0; // 最終スコア        ※ゴール時に確定
 	char rank = 'D'; // 最終ランク（S/A/B/C/D）※ゴール時に確定
 
-	// ===== スコア計算の設定（好みで調整） =====
+	// ===== スコア計算の設定 =====
 
 	int initialScore = 10000; // 初期スコア（ここから減点/加点する）
 	int timePenaltyPerSec = 10;    // 1秒あたりの減点（例：-10点/秒）
@@ -38,10 +38,9 @@ struct GameResult
 	int under60sBonus = 1000;  // 60秒以内クリアボーナス
 };
 
-// どのシーンからでも参照できる結果データ（グローバル）
+// どこからでも参照できる用結果データ
 extern GameResult g_GameResult;
 
-// ===== API（シーン側から呼ぶ関数）=====
 
 // 新しくプレイを開始する時に呼ぶ
 void GR_ResetRun(CourseType course);
