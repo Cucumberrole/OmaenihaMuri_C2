@@ -629,6 +629,40 @@ int Field::HitCheckDown(int px, int py)
 	return hit;
 }
 
+int Field::HitCheckRightMapOnly(int px, int py)
+{
+	if (py < 0) return 0;
+
+	int hit = 0;
+	int x = px / 64;
+	int y = py / 64;
+
+	if (y >= 0 && y < (int)maps.size() &&
+		x >= 0 && x < (int)maps[y].size() &&
+		IsSolidCell(maps[y][x]))
+	{
+		hit = px % 64 + 1;
+	}
+	return hit;
+}
+
+int Field::HitCheckLeftMapOnly(int px, int py)
+{
+	if (py < 0) return 0;
+
+	int hit = 0;
+	int x = px / 64;
+	int y = py / 64;
+
+	if (y >= 0 && y < (int)maps.size() &&
+		x >= 0 && x < (int)maps[y].size() &&
+		IsSolidCell(maps[y][x]))
+	{
+		hit = 64 - (px % 64);
+	}
+	return hit;
+}
+
 bool Field::IsBlock(int tx, int ty)
 {
 	int cell = GetCell(tx, ty);
