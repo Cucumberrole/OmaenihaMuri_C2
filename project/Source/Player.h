@@ -36,6 +36,8 @@ public:
 	// void DrawHitCircleDebug() const;
 	bool IsdeathAnimEnd() const;
 
+	bool deathTelopStarted = false;
+
 private:
 	// --- 基本パラメータ ---
 	int hImage;

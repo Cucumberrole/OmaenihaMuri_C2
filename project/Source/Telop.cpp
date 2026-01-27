@@ -6,14 +6,40 @@
 
 Telop::Telop()
 {
+    
 }
 
 Telop::~Telop()
 {
 }
 
+void Telop::StartDeathTelop(Player* p)
+{
+    player = p;
+    ShowDeathTelop = true;
+
+    const char* messages[] = {
+        "Ç§ÇÒÇ±",
+        "éÄÇÒÇ∂Ç·Ç¡ÇΩ",
+        "ÉvÉçÉOÉâÉÄÇ™ÇÒÇŒÇÎÇ§",
+    };
+
+    int count = sizeof(messages) / sizeof(messages[0]);
+    int index = rand() % count;
+
+    deathText = messages[index];
+    displayTimer = 3.0f;
+}
+
 void Telop::Update()
 {
+    if (!ShowDeathTelop) return;
+
+    displayTimer -= 1.0f / 60.0f;
+    if (displayTimer <= 0.0f)
+    {
+        ShowDeathTelop = false;
+    }
 }
 
 void Telop::Draw()
@@ -48,7 +74,19 @@ void Telop::Draw()
     {
         DrawFormatString(1152, 640, GetColor(255, 255, 255), "èIÅ_(ÅOoÅO)Å^", FALSE);
     }
-    
+    if (ShowDeathTelop && player)
+    {
+        float drawX = player->GetX() + offsetX;
+        float drawY = player->GetY() + offsetY;
+
+        DrawFormatString(
+            (int)drawX,
+            (int)drawY,
+            GetColor(255, 255, 255),
+            deathText.c_str(),
+            FALSE
+        );
+    }
 }
 
 void Telop::ShowTrap3Message(float duration)
@@ -57,5 +95,7 @@ void Telop::ShowTrap3Message(float duration)
     TouchedTrap3 = true;
     displayTimer = duration;
 }
+
+
 
 
