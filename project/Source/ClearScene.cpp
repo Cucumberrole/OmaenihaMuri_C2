@@ -152,14 +152,18 @@ void ClearScene::Draw()
 	// Panels + character are centered as one block.
 
 	const int panelW = 720;
-	const int panelH = 110;
-	const int gapY = 28;
+
+	// Make RANK panel bigger (like the reference image)
+	const int rankPanelH = 170;
+	const int infoPanelH = 95;
+	const int gapY = 26;
+
 	const int charScale = 6; // 64x64 -> 384x384
 	const int charW = 64 * charScale;
 	const int charH = 64 * charScale;
 	const int gapX = 60;
 
-	const int totalPanelH = panelH * 3 + gapY * 2;
+	const int totalPanelH = rankPanelH + infoPanelH * 2 + gapY * 2;
 	int topY = (H - totalPanelH) / 2 + 90;
 	if (topY < msgBottomY + 70) topY = msgBottomY + 70;
 
@@ -167,36 +171,52 @@ void ClearScene::Draw()
 	const int panelX = (W - totalW) / 2;
 	const int charX = panelX + panelW + gapX;
 
-	// Panel 1: RANK
-	DrawPanel(panelX, topY + 0 * (panelH + gapY), panelW, panelH);
-	SetFontSize(40);
-	DrawOutlinedText(panelX + 30, topY + 0 * (panelH + gapY) + 28, "RANK",
+	const int rankY = topY;
+	const int timeY = rankY + rankPanelH + gapY;
+	const int scoreY = timeY + infoPanelH + gapY;
+
+	// Panel 1: RANK (big panel)
+	DrawPanel(panelX, rankY, panelW, rankPanelH);
+
+	// "RANK" LEFT-ALIGNED (not centered)
+	SetFontSize(82);
+	const char* rankLabel = "RANK";
+	const int rankLabelX = panelX + 30;     // left padding
+	const int rankLabelY = rankY + 16;
+	DrawOutlinedText(rankLabelX, rankLabelY, rankLabel,
 		GetColor(255, 235, 140), GetColor(60, 10, 0));
-	SetFontSize(54);
-	DrawOutlinedText(panelX + panelW - 150, topY + 0 * (panelH + gapY) + 18,
-		rankText.c_str(), rankColor, GetColor(60, 10, 0));
+
+	// Rank value stays centered under it (same as before)
+	SetFontSize(118);
+	const int rankValueW = GetDrawStringWidth(rankText.c_str(), -1);
+	const int rankValueX = panelX + (panelW - rankValueW) / 2;
+	const int rankValueY = rankY + rankPanelH - 118 - 14;
+	DrawOutlinedText(rankValueX, rankValueY, rankText.c_str(),
+		rankColor, GetColor(60, 10, 0));
+
 
 	// Panel 2: CLEAR TIME
-	DrawPanel(panelX, topY + 1 * (panelH + gapY), panelW, panelH);
+	DrawPanel(panelX, timeY, panelW, infoPanelH);
 	SetFontSize(40);
-	DrawOutlinedText(panelX + 30, topY + 1 * (panelH + gapY) + 28, "CLEAR TIME",
+	DrawOutlinedText(panelX + 30, timeY + 24, "CLEAR TIME",
 		GetColor(255, 235, 140), GetColor(60, 10, 0));
 	char timeBuf[32] = {};
 	FormatTime(timeBuf);
 	SetFontSize(40);
-	DrawOutlinedText(panelX + panelW - 270, topY + 1 * (panelH + gapY) + 30,
+	DrawOutlinedText(panelX + panelW - 270, timeY + 26,
 		timeBuf, GetColor(255, 255, 255), GetColor(60, 10, 0));
 
 	// Panel 3: SCORE
-	DrawPanel(panelX, topY + 2 * (panelH + gapY), panelW, panelH);
+	DrawPanel(panelX, scoreY, panelW, infoPanelH);
 	SetFontSize(40);
-	DrawOutlinedText(panelX + 30, topY + 2 * (panelH + gapY) + 28, "SCORE",
+	DrawOutlinedText(panelX + 30, scoreY + 24, "SCORE",
 		GetColor(255, 235, 140), GetColor(60, 10, 0));
 	char scoreBuf[64] = {};
 	std::snprintf(scoreBuf, sizeof(scoreBuf), "%d", finalScore);
 	SetFontSize(40);
-	DrawOutlinedText(panelX + panelW - 240, topY + 2 * (panelH + gapY) + 30,
+	DrawOutlinedText(panelX + panelW - 240, scoreY + 26,
 		scoreBuf, GetColor(255, 255, 255), GetColor(60, 10, 0));
+
 
 
 	// Footer hint
