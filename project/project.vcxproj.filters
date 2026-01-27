@@ -144,6 +144,7 @@
     <ClCompile Include="Source\Field.cpp">
       <Filter>PlayScene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Sun.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -382,6 +383,7 @@
     <ClInclude Include="Source\GameConfig.h">
       <Filter>StageSelect</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Sun.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">
