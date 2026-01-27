@@ -59,4 +59,17 @@ private:
 	void DrawOutlinedText(int x, int y, const char* text, unsigned int textColor, unsigned int outlineColor) const;
 
 	void FormatTime(char out[32]) const;
+
+	// Fonts
+	int fontTitle_ = -1;      // GAME CLEAR 代替
+	int fontThanks_ = -1;     // Thank you 代替
+	int fontMsg_ = -1;        // 一言メッセージ
+	int fontRankLabel_ = -1;  // "RANK"
+	int fontRankValue_ = -1;  // "S" など
+	int fontPanel_ = -1;      // CLEAR TIME / SCORE / 値
+	int fontHint_ = -1;       // Footer hint
+
+	// アウトライン
+	void DrawOutlinedTextToHandle(int x, int y, const char* text, unsigned int textColor, unsigned int outlineColor, int fontHandle) const;
+
 };

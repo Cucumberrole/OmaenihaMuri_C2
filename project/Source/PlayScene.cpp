@@ -1,4 +1,5 @@
 #include "PlayScene.h"
+#include "Hud.h"
 
 #include <DxLib.h>
 #include "../Library/Time.h"
@@ -25,7 +26,13 @@ PlayScene::PlayScene()
 {
 	hImage = LoadGraph("data/image/Atama.png");
 
+
+	heartImage = LoadGraph("data/image/heart.png");
+	Hud::SetHeartGraph(heartImage);
+
 	new Background();
+	Hud::Init();
+	VanishingFloor::ResetAll();
 
 	// ステージ未選択なら強制的に1へ
 	if (SelectedStage < 0)
@@ -58,6 +65,7 @@ PlayScene::PlayScene()
 
 PlayScene::~PlayScene()
 {
+	Hud::Shutdown();
 	InitSoundMem();
 }
 
@@ -133,7 +141,6 @@ void PlayScene::Update()
 		// 生存中Rリトライ
 		if (CheckHitKey(KEY_INPUT_R))
 		{
-			VanishingFloor::ResetAll();
 
 			fader->FadeOut(0.5f);
 			fader->FadeIn(1.0f);
@@ -201,7 +208,6 @@ void PlayScene::Draw()
 
 		DrawBox(0, 0, sw, sh, GetColor(0, 0, 0), TRUE);
 
-		// 表示文字（中央配置）
 		const char* retryText = "RETRY push to [R]";
 		int textWidth = GetDrawStringWidth(retryText, -1);
 		int x = (sw - textWidth) / 2;
@@ -213,34 +219,21 @@ void PlayScene::Draw()
 		return;
 	}
 
-	// 通常表示（デバッグ表示）
-	int col = GetColor(255, 255, 255);
-	SetFontSize(32);
-	int h = GetFontSize();
+	// HUD
+	// スコア
+	const int hudScore = score;
 
-	char buf[128];
-	DrawString(0, 0 + h * 0, "PLAY SCENE", GetColor(255, 255, 255));
+	// 時間
+	const int hudTimeSeconds = (int)g_ClearTimeSeconds;
 
-	// TIME
-	sprintf_s(buf, "TIME : %.2f", g_ClearTimeSeconds);
-	DrawString(0, 0 + h * 1, buf, col);
+	// 3) ライフ
+	const int hudLife = life;
 
-	// SCORE
-	sprintf_s(buf, "SCORE : %d", score);
-	DrawString(0, 0 + h * 2, buf, col);
+	// HUD 描画
+	Hud::Draw(hudScore, hudTimeSeconds, hudLife);
 
-	// PlayerX/Y
-	if (player)
-	{
-		DrawFormatString(0, 0 + h * 3, GetColor(255, 255, 255), "PlayerX: %.2f", player->GetX());
-		DrawFormatString(0, 0 + h * 4, GetColor(255, 255, 255), "PlayerY: %.2f", player->GetY());
-	}
-
-	// LIFE
-	sprintf_s(buf, "LIFE : %d", life);
-	DrawString(0, 0 + h * 5, buf, col);
-
-	DrawFormatString(0, 0 + h * 6, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
+	// FPS
+	//DrawFormatString(10, 120, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
 }
 
 

@@ -144,6 +144,9 @@
     <ClCompile Include="Source\Field.cpp">
       <Filter>PlayScene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Hud.cpp">
+      <Filter>HUD</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -382,6 +385,9 @@
     <ClInclude Include="Source\GameConfig.h">
       <Filter>StageSelect</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Hud.h">
+      <Filter>HUD</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">
@@ -421,6 +427,9 @@
     </Filter>
     <Filter Include="Fader">
       <UniqueIdentifier>{f43482be-1665-429d-961e-3defde9eb671}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HUD">
+      <UniqueIdentifier>{5f91f7ff-7faf-46fb-a315-813d577d5b20}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

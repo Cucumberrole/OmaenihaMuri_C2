@@ -15,6 +15,11 @@ static int s_titleRefCount = 0;
 static int s_imgTitleClear = -1;
 static int s_imgTitleThanks = -1;
 
+static int CreateJPFont(const TCHAR* name, int size, int thick)
+{
+	int h = CreateFontToHandle(name, size, thick, DX_FONTTYPE_ANTIALIASING_8X8);
+	return h;
+}
 
 ClearScene::ClearScene()
 {
@@ -40,6 +45,43 @@ ClearScene::ClearScene()
 	// Load character image (optional).
 	imgChar = LoadGraph(kCharPath);
 
+	// --- Fonts (SelectStage風フォールバック) ---
+	fontTitle_ = CreateJPFont(TEXT("HGS創英角ﾎﾟｯﾌﾟ体"), 100, 4);
+	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("Meiryo UI"), 84, 4);
+	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("MS ゴシック"), 84, 3);
+	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("Arial Black"), 84, 4);
+
+	fontThanks_ = CreateJPFont(TEXT("HGS創英角ﾎﾟｯﾌﾟ体"), 46, 2);
+	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("Meiryo UI"), 46, 2);
+	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("MS ゴシック"), 46, 2);
+	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("Arial"), 46, 2);
+
+	fontMsg_ = CreateJPFont(TEXT("メイリオ"), 34, 2);
+	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("Meiryo UI"), 34, 2);
+	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("MS ゴシック"), 34, 2);
+	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("Arial"), 34, 2);
+
+	fontRankLabel_ = CreateJPFont(TEXT("HGS創英角ﾎﾟｯﾌﾟ体"), 82, 4);
+	if (fontRankLabel_ < 0) fontRankLabel_ = CreateJPFont(TEXT("Meiryo UI"), 82, 4);
+	if (fontRankLabel_ < 0) fontRankLabel_ = CreateJPFont(TEXT("MS ゴシック"), 82, 3);
+	if (fontRankLabel_ < 0) fontRankLabel_ = CreateJPFont(TEXT("Arial Black"), 82, 4);
+
+	fontRankValue_ = CreateJPFont(TEXT("HGS創英角ﾎﾟｯﾌﾟ体"), 118, 5);
+	if (fontRankValue_ < 0) fontRankValue_ = CreateJPFont(TEXT("Meiryo UI"), 118, 5);
+	if (fontRankValue_ < 0) fontRankValue_ = CreateJPFont(TEXT("MS ゴシック"), 118, 4);
+	if (fontRankValue_ < 0) fontRankValue_ = CreateJPFont(TEXT("Arial Black"), 118, 5);
+
+	fontPanel_ = CreateJPFont(TEXT("BIZ UDP明朝 Medium"), 40, 2);
+	if (fontPanel_ < 0) fontPanel_ = CreateJPFont(TEXT("Meiryo UI"), 40, 2);
+	if (fontPanel_ < 0) fontPanel_ = CreateJPFont(TEXT("MS ゴシック"), 40, 2);
+	if (fontPanel_ < 0) fontPanel_ = CreateJPFont(TEXT("Arial"), 40, 2);
+
+	fontHint_ = CreateJPFont(TEXT("メイリオ"), 26, 2);
+	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("Meiryo UI"), 26, 2);
+	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("MS ゴシック"), 26, 2);
+	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("Arial"), 26, 2);
+
+
 	frame = 0;
 	InitConfetti();
 }
@@ -57,6 +99,14 @@ ClearScene::~ClearScene()
 		if (s_imgTitleClear >= 0) { DeleteGraph(s_imgTitleClear); s_imgTitleClear = -1; }
 		if (s_imgTitleThanks >= 0) { DeleteGraph(s_imgTitleThanks); s_imgTitleThanks = -1; }
 	}
+	if (fontTitle_ >= 0) { DeleteFontToHandle(fontTitle_); fontTitle_ = -1; }
+	if (fontThanks_ >= 0) { DeleteFontToHandle(fontThanks_); fontThanks_ = -1; }
+	if (fontMsg_ >= 0) { DeleteFontToHandle(fontMsg_); fontMsg_ = -1; }
+	if (fontRankLabel_ >= 0) { DeleteFontToHandle(fontRankLabel_); fontRankLabel_ = -1; }
+	if (fontRankValue_ >= 0) { DeleteFontToHandle(fontRankValue_); fontRankValue_ = -1; }
+	if (fontPanel_ >= 0) { DeleteFontToHandle(fontPanel_); fontPanel_ = -1; }
+	if (fontHint_ >= 0) { DeleteFontToHandle(fontHint_); fontHint_ = -1; }
+
 }
 
 void ClearScene::Update()
@@ -107,9 +157,10 @@ void ClearScene::Draw()
 	}
 	else
 	{
-		SetFontSize(100);
-		DrawOutlinedText(W / 2 - GetDrawStringWidth("GAME CLEAR", -1) / 2, 55, "GAME CLEAR",
-			GetColor(255, 220, 80), GetColor(80, 20, 0));
+		DrawOutlinedTextToHandle(W / 2 - GetDrawStringWidthToHandle("GAME CLEAR", -1, fontTitle_) / 2,
+			55, "GAME CLEAR",
+			GetColor(255, 220, 80), GetColor(80, 20, 0), fontTitle_);
+
 		titleBottomY = 155;
 	}
 
@@ -130,10 +181,11 @@ void ClearScene::Draw()
 	}
 	else
 	{
-		SetFontSize(46);
 		const char* sub = "Thank you for Playing!";
-		DrawOutlinedText(W / 2 - GetDrawStringWidth(sub, -1) / 2, thankTopY, sub,
-			GetColor(255, 240, 200), GetColor(80, 20, 0));
+		DrawOutlinedTextToHandle(W / 2 - GetDrawStringWidthToHandle(sub, -1, fontThanks_) / 2,
+			thankTopY, sub,
+			GetColor(255, 240, 200), GetColor(80, 20, 0), fontThanks_);
+
 		titleBottomY = thankTopY + 52;
 	}
 
@@ -141,11 +193,11 @@ void ClearScene::Draw()
 	int msgBottomY = titleBottomY;
 	if (!oneLineMsg.empty())
 	{
-		SetFontSize(34);
 		const int msgY = titleBottomY + 10;
-		const int msgX = W / 2 - GetDrawStringWidth(oneLineMsg.c_str(), -1) / 2;
-		DrawOutlinedText(msgX, msgY, oneLineMsg.c_str(),
-			GetColor(255, 240, 220), GetColor(80, 20, 0));
+		const int msgX = W / 2 - GetDrawStringWidthToHandle(oneLineMsg.c_str(), -1, fontMsg_) / 2;
+		DrawOutlinedTextToHandle(msgX, msgY, oneLineMsg.c_str(),
+			GetColor(255, 240, 220), GetColor(80, 20, 0), fontMsg_);
+
 		msgBottomY = msgY + 40;
 	}
 
@@ -178,52 +230,41 @@ void ClearScene::Draw()
 	// Panel 1: RANK (big panel)
 	DrawPanel(panelX, rankY, panelW, rankPanelH);
 
-	// "RANK" LEFT-ALIGNED (not centered)
-	SetFontSize(82);
+	// "RANK"
 	const char* rankLabel = "RANK";
-	const int rankLabelX = panelX + 30;     // left padding
-	const int rankLabelY = rankY + 16;
-	DrawOutlinedText(rankLabelX, rankLabelY, rankLabel,
-		GetColor(255, 235, 140), GetColor(60, 10, 0));
+	DrawOutlinedTextToHandle(panelX + 30, rankY + 16, rankLabel,
+		GetColor(255, 235, 140), GetColor(60, 10, 0), fontRankLabel_);
 
-	// Rank value stays centered under it (same as before)
-	SetFontSize(118);
-	const int rankValueW = GetDrawStringWidth(rankText.c_str(), -1);
+	// Rank value
+	const int rankValueW = GetDrawStringWidthToHandle(rankText.c_str(), -1, fontRankValue_);
 	const int rankValueX = panelX + (panelW - rankValueW) / 2;
-	const int rankValueY = rankY + rankPanelH - 118 - 14;
-	DrawOutlinedText(rankValueX, rankValueY, rankText.c_str(),
-		rankColor, GetColor(60, 10, 0));
+	const int rankValueY = rankY + rankPanelH - 118 - 14; // ※118はフォントサイズに合わせたまま
+	DrawOutlinedTextToHandle(rankValueX, rankValueY, rankText.c_str(),
+		rankColor, GetColor(60, 10, 0), fontRankValue_);
 
-
-	// Panel 2: CLEAR TIME
-	DrawPanel(panelX, timeY, panelW, infoPanelH);
-	SetFontSize(40);
-	DrawOutlinedText(panelX + 30, timeY + 24, "CLEAR TIME",
-		GetColor(255, 235, 140), GetColor(60, 10, 0));
+	// --- 追加：表示用バッファを用意 ---
 	char timeBuf[32] = {};
 	FormatTime(timeBuf);
-	SetFontSize(40);
-	DrawOutlinedText(panelX + panelW - 270, timeY + 26,
-		timeBuf, GetColor(255, 255, 255), GetColor(60, 10, 0));
 
-	// Panel 3: SCORE
-	DrawPanel(panelX, scoreY, panelW, infoPanelH);
-	SetFontSize(40);
-	DrawOutlinedText(panelX + 30, scoreY + 24, "SCORE",
-		GetColor(255, 235, 140), GetColor(60, 10, 0));
 	char scoreBuf[64] = {};
 	std::snprintf(scoreBuf, sizeof(scoreBuf), "%d", finalScore);
-	SetFontSize(40);
-	DrawOutlinedText(panelX + panelW - 240, scoreY + 26,
-		scoreBuf, GetColor(255, 255, 255), GetColor(60, 10, 0));
 
+	DrawOutlinedTextToHandle(panelX + 30, timeY + 24, "CLEAR TIME",
+		GetColor(255, 235, 140), GetColor(60, 10, 0), fontPanel_);
 
+	DrawOutlinedTextToHandle(panelX + panelW - 270, timeY + 26,
+		timeBuf, GetColor(255, 255, 255), GetColor(60, 10, 0), fontPanel_);
+
+	DrawOutlinedTextToHandle(panelX + 30, scoreY + 24, "SCORE",
+		GetColor(255, 235, 140), GetColor(60, 10, 0), fontPanel_);
+
+	DrawOutlinedTextToHandle(panelX + panelW - 240, scoreY + 26,
+		scoreBuf, GetColor(255, 255, 255), GetColor(60, 10, 0), fontPanel_);
 
 	// Footer hint
-	SetFontSize(26);
 	const char* hint = "Press T / Enter / Space to return to Title.  Esc: Exit";
-	DrawOutlinedText(W / 2 - GetDrawStringWidth(hint, -1) / 2, H - 70, hint,
-		GetColor(255, 240, 200), GetColor(80, 20, 0));
+	DrawOutlinedTextToHandle(W / 2 - GetDrawStringWidthToHandle(hint, -1, fontHint_) / 2, H - 70, hint, GetColor(255, 240, 200), GetColor(80, 20, 0), fontHint_);
+
 
 	// Character (right side)
 	const float bob = std::sin(frame * 0.07f) * 10.0f;
@@ -412,19 +453,19 @@ void ClearScene::DrawPanel(int x, int y, int w, int h) const
 	DrawBox(x + 10, y + 10, x + w - 10, y + 16, GetColor(255, 230, 140), TRUE);
 }
 
-void ClearScene::DrawOutlinedText(int x, int y, const char* text, unsigned int textColor, unsigned int outlineColor) const
+void ClearScene::DrawOutlinedTextToHandle(int x, int y, const char* text, unsigned int textColor, unsigned int outlineColor, int fontHandle) const
 {
 	// 8-direction outline
-	DrawString(x - 2, y, text, outlineColor);
-	DrawString(x + 2, y, text, outlineColor);
-	DrawString(x, y - 2, text, outlineColor);
-	DrawString(x, y + 2, text, outlineColor);
-	DrawString(x - 2, y - 2, text, outlineColor);
-	DrawString(x + 2, y - 2, text, outlineColor);
-	DrawString(x - 2, y + 2, text, outlineColor);
-	DrawString(x + 2, y + 2, text, outlineColor);
+	DrawStringToHandle(x - 2, y, text, outlineColor, fontHandle);
+	DrawStringToHandle(x + 2, y, text, outlineColor, fontHandle);
+	DrawStringToHandle(x, y - 2, text, outlineColor, fontHandle);
+	DrawStringToHandle(x, y + 2, text, outlineColor, fontHandle);
+	DrawStringToHandle(x - 2, y - 2, text, outlineColor, fontHandle);
+	DrawStringToHandle(x + 2, y - 2, text, outlineColor, fontHandle);
+	DrawStringToHandle(x - 2, y + 2, text, outlineColor, fontHandle);
+	DrawStringToHandle(x + 2, y + 2, text, outlineColor, fontHandle);
 
-	DrawString(x, y, text, textColor);
+	DrawStringToHandle(x, y, text, textColor, fontHandle);
 }
 
 void ClearScene::FormatTime(char out[32]) const

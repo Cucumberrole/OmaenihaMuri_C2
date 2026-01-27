@@ -14,6 +14,7 @@ public:
 	int GetRetry(int retry);
 
 	int hImage;
+	int heartImage;
 
 private:
 	enum class Playstate

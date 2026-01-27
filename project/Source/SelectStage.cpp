@@ -129,7 +129,7 @@ void SelectStage::Update()
 
 		// 左右キーでも選べるよ
 		if (CheckHitKey(KEY_INPUT_LEFT) || CheckHitKey(KEY_INPUT_A)) selected_ = 0;
-		if (CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_F)) selected_ = 1;
+		if (CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_D)) selected_ = 1;
 
 		// 決定
 		if (CheckHitKey(KEY_INPUT_RETURN) || CheckHitKey(KEY_INPUT_Z))

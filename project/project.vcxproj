@@ -165,6 +165,7 @@
     <ClInclude Include="Source\GameConfig.h" />
     <ClInclude Include="Source\GameResult.h" />
     <ClInclude Include="Source\HiddenSpike.h" />
+    <ClInclude Include="Source\Hud.h" />
     <ClInclude Include="Source\LaserTurret.h" />
     <ClInclude Include="Source\MovingSmallTrap.h" />
     <ClInclude Include="Source\MovingWall.h" />
@@ -218,6 +219,7 @@
     <ClCompile Include="Source\Field.cpp" />
     <ClCompile Include="Source\GameResult.cpp" />
     <ClCompile Include="Source\HiddenSpike.cpp" />
+    <ClCompile Include="Source\Hud.cpp" />
     <ClCompile Include="Source\LaserTurret.cpp" />
     <ClCompile Include="Source\MovingSmallTrap.cpp" />
     <ClCompile Include="Source\MovingWall.cpp" />
