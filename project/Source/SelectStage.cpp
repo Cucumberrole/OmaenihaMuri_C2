@@ -397,7 +397,7 @@ void SelectStage::Draw()
 		TEXT("ìÔÇµÇ¢"),
 		TEXT("ÇΩÇ≠Ç≥ÇÒéÄÇ…ÇΩÇ¢êlÇ…Ç®Ç∑Ç∑Çﬂ"),
 		TEXT("écã@êî 3"),
-		TEXT("Push to [D]")
+		TEXT("Push to [H]")
 	};
 
 	drawCenterLines(leftX + oxL + cardW / 2, (cardY + oyL) + 90, easyLines, 5, 46, fontCard_, aL);
