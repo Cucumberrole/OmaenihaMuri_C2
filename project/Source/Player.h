@@ -38,6 +38,9 @@ public:
 
 	bool deathTelopStarted = false;
 
+	//逆操作
+	//bool IsReverse;
+
 private:
 	// --- 基本パラメータ ---
 	int hImage;
