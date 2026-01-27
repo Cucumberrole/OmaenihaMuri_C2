@@ -3,6 +3,8 @@
 #include <DxLib.h>
 #include "../Library/Time.h"
 
+#include "GameConfig.h"
+#include "SelectStage.h"
 #include "GameResult.h"
 #include "Player.h"
 #include "Field.h"
@@ -13,7 +15,7 @@
 #include "../Library/Trigger.h"
 
 int PlayScene::SelectedStage = -1;
-static int g_Life = 5;          // 初期残機
+static int g_Life = 0;          // 初期
 static int g_RetryCount = 0;    // 死んだ回数
 float g_ClearTimeSeconds = 0.0f;
 static int g_deathCount = 0;
@@ -34,6 +36,10 @@ PlayScene::PlayScene()
 	sound = 0;
 	Ssound = LoadSoundMem("data/sound/bgm_ogg.ogg");
 
+	if (!g_IsRetry)
+	{
+		g_Life = MaxLives();   // Easy=5 / Hard=3
+	}
 	life = g_Life;
 	retryCount = g_RetryCount;
 	deathCount = g_deathCount;
@@ -153,7 +159,7 @@ void PlayScene::Update()
 		if (life <= 0)
 		{
 			// 次回プレイ用に初期化
-			g_Life = 5;
+			g_Life = MaxLives();
 			SceneManager::ChangeScene("GAMEOVER");
 			return;
 		}

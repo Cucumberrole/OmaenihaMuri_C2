@@ -1,4 +1,5 @@
 #include "SelectStage.h"
+#include "GameConfig.h"
 
 #include <algorithm>
 
@@ -69,6 +70,18 @@ SelectStage::~SelectStage()
 void SelectStage::Decide(int stageId)
 {
 	PlayScene::SelectedStage = stageId; // 1=Easy, 2=Hard
+
+	if (stageId == 1)
+	{
+		SelectedDifficulty() = Difficulty::Easy;
+		MaxLives() = 5; // 簡単残機5
+	}
+	else
+	{
+		SelectedDifficulty() = Difficulty::Hard;
+		MaxLives() = 3; // 難しい残機3
+	}
+
 	deciding_ = true;
 	fade_ = 0.0f;
 }

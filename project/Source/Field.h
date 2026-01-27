@@ -14,8 +14,6 @@ public:
 	// “固いタイルか？”（ブロック・土管など）
 	bool IsBlock(int tx, int ty);
 
-	void SpawnFlyingSpike(float x, float y, float direction);
-
 	// ゴール判定（9 または 99 両対応にして安全側に）
 	bool IsGoal(int px, int py);
 
@@ -62,6 +60,10 @@ public:
 	int HitCheckLeft(int px, int py);
 	int HitCheckDown(int px, int py);
 	int HitCheckUp(int px, int py);
+
+	int HitCheckRightMapOnly(int px, int py);
+	int HitCheckLeftMapOnly(int px, int py);
+
 
 private:
 	// マップはグローバルからメンバへ

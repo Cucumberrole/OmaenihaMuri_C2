@@ -111,6 +111,8 @@ void MovingWall::MoveStep()
 //--------------------------------------
 // プレイヤー押し出し + 挟まれ死亡（毎フレーム）
 //--------------------------------------
+#include <cmath>
+
 void MovingWall::CheckCrushWithPlayer()
 {
 	if (buildLevel <= 0) return;
@@ -118,14 +120,11 @@ void MovingWall::CheckCrushWithPlayer()
 	Player* player = FindGameObject<Player>();
 	if (!player) return;
 
-	Field* field = FindGameObject<Field>();
-	if (!field) return;
-
 	// 壁全体の矩形
-	float wallLeft = x;
-	float wallRight = x + width;
-	float wallBottom = y + blockSize;
-	float wallTop = y - blockSize * (buildLevel - 1);
+	const float wallLeft = x;
+	const float wallRight = x + width;
+	const float wallBottom = y + blockSize;
+	const float wallTop = y - blockSize * (buildLevel - 1);
 
 	// プレイヤー円
 	float cx, cy, cr;
@@ -138,32 +137,103 @@ void MovingWall::CheckCrushWithPlayer()
 	float ddx = cx - nearestX;
 	float ddy = cy - nearestY;
 
-	bool overlap = (ddx * ddx + ddy * ddy <= cr * cr);
+	const bool overlap = (ddx * ddx + ddy * ddy <= cr * cr);
 	if (!overlap) return;
 
-	// ===========================
-	// ここから「押す」処理が本体
-	// ===========================
-	// 壁がこのフレームで動いていないなら押せない（停止中など）
-	if (lastMoveDx != 0.0f)
+	// --------------------------------------------
+	// 重要：壁が動いたフレームだけ “必要量” で押し出す
+	// --------------------------------------------
+	float pushDx = 0.0f;
+
+	const float playerX = player->GetX();
+	const float playerW = player->GetW(); // 64想定
+	const float halfW = playerW * 0.5f;
+
+	// overlap が true の後（円 vs 矩形）に入れるイメージ
+	if (lastMoveDx > 0.0f)
 	{
-		// 壁の移動量ぶんプレイヤーを押す
-		// ※ Player に PushByWall(dx) を追加してください
-		player->PushByWall(lastMoveDx);
+		// 右へ動く壁：円の中心 cx は wallRight + cr 以上にしたい
+		float need = (wallRight + cr) - cx;
+		if (need > 0.0f)
+			player->PushByWall(need + 0.5f); // 少し余裕
+	}
+	else if (lastMoveDx < 0.0f)
+	{
+		// 左へ動く壁：cx は wallLeft - cr 以下にしたい
+		float need = (wallLeft - cr) - cx;
+		if (need < 0.0f)
+			player->PushByWall(need - 0.5f);
 	}
 
-	// 押した後もまだ重なってるなら「押し切れない＝挟まれ」
+	const float beforeX = player->GetX();
+	if (pushDx != 0.0f)
+	{
+		player->PushByWall(pushDx);
+	}
+	const float afterX = player->GetX();
+	const float actualDx = afterX - beforeX;
+
+	// 押した後にまだ重なっているか再判定
 	player->GetHitCircle(cx, cy, cr);
 	nearestX = ClampFloat(cx, wallLeft, wallRight);
 	nearestY = ClampFloat(cy, wallTop, wallBottom);
-
 	ddx = cx - nearestX;
 	ddy = cy - nearestY;
 
 	bool stillOverlap = (ddx * ddx + ddy * ddy <= cr * cr);
-	if (stillOverlap)
-	{
+	if (!stillOverlap) return;
 
+	// --------------------------------------------
+	// ここが修正ポイント：
+	// 「動く壁に押されて、必要量ぶん動けなかった」時だけ死亡（挟まれ）
+	// ＝ player がフィールド等に阻まれて押し出しが足りない
+	// --------------------------------------------
+	const float eps = 0.01f;
+
+	const bool wallMoving = (lastMoveDx != 0.0f);
+	const bool triedToPush = (pushDx != 0.0f);
+
+	bool blocked = false;
+	if (wallMoving && triedToPush)
+	{
+		// 必要押し出し量に対して、実際の移動が明らかに足りないなら「押し潰し」
+		if (fabsf(actualDx) + eps < fabsf(pushDx))
+		{
+			blocked = true;
+		}
+	}
+
+	if (blocked)
+	{
+		player->ForceDie();
+		player->SetDead();
+		return;
+	}
+
+	// blocked じゃないのに stillOverlap の場合は、丸め/境界の微小ズレが多い
+	// → 死亡させず、数回だけ微小押し出しして確実に分離させる
+	for (int i = 0; i < 4; ++i)
+	{
+		player->GetHitCircle(cx, cy, cr);
+		nearestX = ClampFloat(cx, wallLeft, wallRight);
+		ddx = cx - nearestX;
+
+		// 水平方向に少しだけ押す（壁の外側へ）
+		float tiny = 0.0f;
+		if (cx < (wallLeft + wallRight) * 0.5f) tiny = -1.0f;
+		else                                   tiny = +1.0f;
+
+		player->PushByWall(tiny);
+
+		// 再チェック
+		player->GetHitCircle(cx, cy, cr);
+		nearestX = ClampFloat(cx, wallLeft, wallRight);
+		nearestY = ClampFloat(cy, wallTop, wallBottom);
+		ddx = cx - nearestX;
+		ddy = cy - nearestY;
+
+		stillOverlap = (ddx * ddx + ddy * ddy <= cr * cr);
+		if (!stillOverlap) break;
 	}
 }
 

@@ -155,26 +155,21 @@ void Player::PushByWall(float dx)
 	Field* field = FindGameObject<Field>();
 	if (!field) { x += dx; return; }
 
-	// おす
 	x += dx;
 
-	// 押された後にフィールドへめり込んだら押し戻す
 	int push = 0;
-
 	if (dx > 0)
 	{
-		int push1 = field->HitCheckRight((int)(x + 63), (int)(y + 5));
-		int push2 = field->HitCheckRight((int)(x + 63), (int)(y + 58));
+		int push1 = field->HitCheckRightMapOnly((int)(x + 63), (int)(y + 5));
+		int push2 = field->HitCheckRightMapOnly((int)(x + 63), (int)(y + 58));
 		push = max(push1, push2);
-
 		if (push > 0) x -= (float)push;
 	}
 	else
 	{
-		int push1 = field->HitCheckLeft((int)(x + 0), (int)(y + 5));
-		int push2 = field->HitCheckLeft((int)(x + 0), (int)(y + 58));
+		int push1 = field->HitCheckLeftMapOnly((int)(x + 0), (int)(y + 5));
+		int push2 = field->HitCheckLeftMapOnly((int)(x + 0), (int)(y + 58));
 		push = max(push1, push2);
-
 		if (push > 0) x += (float)push;
 	}
 }
