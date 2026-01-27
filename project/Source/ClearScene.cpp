@@ -5,8 +5,6 @@
 #include <cmath>
 #include <cstdio>
 
-// Image (64x64) shown on the right side.
-// Put the file under the executable working directory.
 static const char* kCharPath = "data/image/omae.png";
 
 // Title images
@@ -225,13 +223,8 @@ void ClearScene::Draw()
 
 void ClearScene::CalcScoreAndRank()
 {
-	// 重要：スコア/ランクは GameResult 側で確定済み。
-	// ここではUI表現（文字/色/メッセージ）だけ作る。
-
 	rankText.clear();
-	rankText.push_back(rankChar);     // 既存UIに合わせて1文字表示のまま
-	// もし "S RANK" 表示にしたいなら：
-	// rankText = std::string(1, rankChar) + " RANK";
+	rankText.push_back(rankChar);
 
 	if (rankChar == 'S') rankColor = GetColor(255, 240, 100);
 	else if (rankChar == 'A') rankColor = GetColor(255, 210, 120);
@@ -239,7 +232,7 @@ void ClearScene::CalcScoreAndRank()
 	else if (rankChar == 'C') rankColor = GetColor(210, 210, 210);
 	else rankColor = GetColor(255, 160, 160);
 
-	// 一言メッセージの選択（既存テーブルをそのまま使用）
+	// 一言メッセージの選択
 	static const char* const S_MSGS[] = {
 		"\u7121\u7406\u3068\u304B\u8A00\u3063\u3066\u3059\u307F\u307E\u305B\u3093\u3067\u3057\u305F\u2026\u3042\u306A\u305F\u306F\u5929\u624D\u3067\u3059\u3002",
 		"\u30A8\u30E9\u30FC\u3002\u4F5C\u8005\u306E\u60F3\u5B9A\u3092\u8D85\u3048\u307E\u3057\u305F\u3002",
