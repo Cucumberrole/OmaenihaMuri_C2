@@ -117,7 +117,7 @@ void FallingFloor::Update()
 				player->SetDead();
 				if (telop)
 				{
-					if (x >= 1343) {
+					if (x >= 1343 && x <= 1400) {
 						telop->TouchedTrap3 = true;
 					}
 					else if (x >= 1010 && x <= 1344) {
