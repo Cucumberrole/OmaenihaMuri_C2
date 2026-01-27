@@ -144,8 +144,13 @@
     <ClCompile Include="Source\Field.cpp">
       <Filter>PlayScene</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="Source\Hud.cpp">
       <Filter>HUD</Filter>
+=======
+    <ClCompile Include="Source\Sun.cpp">
+      <Filter>Trap</Filter>
+>>>>>>> origin/main
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -385,8 +390,13 @@
     <ClInclude Include="Source\GameConfig.h">
       <Filter>StageSelect</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="Source\Hud.h">
       <Filter>HUD</Filter>
+=======
+    <ClInclude Include="Source\Sun.h">
+      <Filter>Trap</Filter>
+>>>>>>> origin/main
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
