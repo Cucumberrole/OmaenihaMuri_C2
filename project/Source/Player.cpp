@@ -195,6 +195,15 @@ void Player::Update()
 	// --- 死亡演出 ---
 	if (isDead)
 	{
+		if (!deathTelopStarted)
+		{
+			if (telop)
+			{
+				telop->StartDeathTelop(this);
+			}
+			deathTelopStarted = true;
+		}
+
 		y += velocity;
 		velocity += Gravity;
 
@@ -211,6 +220,7 @@ void Player::Update()
 			deathAnimEnd = true;
 		}
 
+		
 		return;
 	}
 
