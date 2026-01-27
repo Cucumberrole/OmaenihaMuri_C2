@@ -5,8 +5,6 @@
 #include <cmath>
 #include <cstdio>
 
-// Image (64x64) shown on the right side.
-// Put the file under the executable working directory.
 static const char* kCharPath = "data/image/omae.png";
 
 // Title images
@@ -154,14 +152,18 @@ void ClearScene::Draw()
 	// Panels + character are centered as one block.
 
 	const int panelW = 720;
-	const int panelH = 110;
-	const int gapY = 28;
+
+	// Make RANK panel bigger (like the reference image)
+	const int rankPanelH = 170;
+	const int infoPanelH = 95;
+	const int gapY = 26;
+
 	const int charScale = 6; // 64x64 -> 384x384
 	const int charW = 64 * charScale;
 	const int charH = 64 * charScale;
 	const int gapX = 60;
 
-	const int totalPanelH = panelH * 3 + gapY * 2;
+	const int totalPanelH = rankPanelH + infoPanelH * 2 + gapY * 2;
 	int topY = (H - totalPanelH) / 2 + 90;
 	if (topY < msgBottomY + 70) topY = msgBottomY + 70;
 
@@ -169,36 +171,52 @@ void ClearScene::Draw()
 	const int panelX = (W - totalW) / 2;
 	const int charX = panelX + panelW + gapX;
 
-	// Panel 1: RANK
-	DrawPanel(panelX, topY + 0 * (panelH + gapY), panelW, panelH);
-	SetFontSize(40);
-	DrawOutlinedText(panelX + 30, topY + 0 * (panelH + gapY) + 28, "RANK",
+	const int rankY = topY;
+	const int timeY = rankY + rankPanelH + gapY;
+	const int scoreY = timeY + infoPanelH + gapY;
+
+	// Panel 1: RANK (big panel)
+	DrawPanel(panelX, rankY, panelW, rankPanelH);
+
+	// "RANK" LEFT-ALIGNED (not centered)
+	SetFontSize(82);
+	const char* rankLabel = "RANK";
+	const int rankLabelX = panelX + 30;     // left padding
+	const int rankLabelY = rankY + 16;
+	DrawOutlinedText(rankLabelX, rankLabelY, rankLabel,
 		GetColor(255, 235, 140), GetColor(60, 10, 0));
-	SetFontSize(54);
-	DrawOutlinedText(panelX + panelW - 150, topY + 0 * (panelH + gapY) + 18,
-		rankText.c_str(), rankColor, GetColor(60, 10, 0));
+
+	// Rank value stays centered under it (same as before)
+	SetFontSize(118);
+	const int rankValueW = GetDrawStringWidth(rankText.c_str(), -1);
+	const int rankValueX = panelX + (panelW - rankValueW) / 2;
+	const int rankValueY = rankY + rankPanelH - 118 - 14;
+	DrawOutlinedText(rankValueX, rankValueY, rankText.c_str(),
+		rankColor, GetColor(60, 10, 0));
+
 
 	// Panel 2: CLEAR TIME
-	DrawPanel(panelX, topY + 1 * (panelH + gapY), panelW, panelH);
+	DrawPanel(panelX, timeY, panelW, infoPanelH);
 	SetFontSize(40);
-	DrawOutlinedText(panelX + 30, topY + 1 * (panelH + gapY) + 28, "CLEAR TIME",
+	DrawOutlinedText(panelX + 30, timeY + 24, "CLEAR TIME",
 		GetColor(255, 235, 140), GetColor(60, 10, 0));
 	char timeBuf[32] = {};
 	FormatTime(timeBuf);
 	SetFontSize(40);
-	DrawOutlinedText(panelX + panelW - 270, topY + 1 * (panelH + gapY) + 30,
+	DrawOutlinedText(panelX + panelW - 270, timeY + 26,
 		timeBuf, GetColor(255, 255, 255), GetColor(60, 10, 0));
 
 	// Panel 3: SCORE
-	DrawPanel(panelX, topY + 2 * (panelH + gapY), panelW, panelH);
+	DrawPanel(panelX, scoreY, panelW, infoPanelH);
 	SetFontSize(40);
-	DrawOutlinedText(panelX + 30, topY + 2 * (panelH + gapY) + 28, "SCORE",
+	DrawOutlinedText(panelX + 30, scoreY + 24, "SCORE",
 		GetColor(255, 235, 140), GetColor(60, 10, 0));
 	char scoreBuf[64] = {};
 	std::snprintf(scoreBuf, sizeof(scoreBuf), "%d", finalScore);
 	SetFontSize(40);
-	DrawOutlinedText(panelX + panelW - 240, topY + 2 * (panelH + gapY) + 30,
+	DrawOutlinedText(panelX + panelW - 240, scoreY + 26,
 		scoreBuf, GetColor(255, 255, 255), GetColor(60, 10, 0));
+
 
 
 	// Footer hint
@@ -225,13 +243,8 @@ void ClearScene::Draw()
 
 void ClearScene::CalcScoreAndRank()
 {
-	// 重要：スコア/ランクは GameResult 側で確定済み。
-	// ここではUI表現（文字/色/メッセージ）だけ作る。
-
 	rankText.clear();
-	rankText.push_back(rankChar);     // 既存UIに合わせて1文字表示のまま
-	// もし "S RANK" 表示にしたいなら：
-	// rankText = std::string(1, rankChar) + " RANK";
+	rankText.push_back(rankChar);
 
 	if (rankChar == 'S') rankColor = GetColor(255, 240, 100);
 	else if (rankChar == 'A') rankColor = GetColor(255, 210, 120);
@@ -239,7 +252,7 @@ void ClearScene::CalcScoreAndRank()
 	else if (rankChar == 'C') rankColor = GetColor(210, 210, 210);
 	else rankColor = GetColor(255, 160, 160);
 
-	// 一言メッセージの選択（既存テーブルをそのまま使用）
+	// 一言メッセージの選択
 	static const char* const S_MSGS[] = {
 		"\u7121\u7406\u3068\u304B\u8A00\u3063\u3066\u3059\u307F\u307E\u305B\u3093\u3067\u3057\u305F\u2026\u3042\u306A\u305F\u306F\u5929\u624D\u3067\u3059\u3002",
 		"\u30A8\u30E9\u30FC\u3002\u4F5C\u8005\u306E\u60F3\u5B9A\u3092\u8D85\u3048\u307E\u3057\u305F\u3002",
