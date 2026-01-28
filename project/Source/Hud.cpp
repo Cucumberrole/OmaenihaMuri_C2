@@ -33,7 +33,7 @@ static void DrawPanel(int x, int y, int w, int h)
 
 static void DrawTextOutlined(int x, int y, const char* text, int textColor, int outlineColor, int fontHandle)
 {
-	// 文字に縁取りを付けて描画する（上下左右にずらして縁色、最後に本体色）
+	// 文字描画
 	DrawStringToHandle(x - 1, y, text, outlineColor, fontHandle);
 	DrawStringToHandle(x + 1, y, text, outlineColor, fontHandle);
 	DrawStringToHandle(x, y - 1, text, outlineColor, fontHandle);
@@ -92,30 +92,30 @@ void Hud::Draw(int score, int timeLeftSeconds, int life)
 
 	DrawPanel(panelX, panelY, panelW, panelH);
 
-	// 色設定（縁取り、ラベル、値）
-	const int outline = GetColor(0, 0, 0);
-	const int labelC = GetColor(255, 230, 120);
-	const int valueC = GetColor(255, 255, 255);
+	// 色設定
+	const int outline = GetColor(0, 0, 0);		// 縁取り
+	const int labelC = GetColor(255, 230, 120);	// ラベル
+	const int valueC = GetColor(255, 255, 255);	// 値
 
 	// 1行目/2行目のY座標
 	const int row1Y = panelY + 14;
 	const int row2Y = panelY + 54;
 
-	// SCORE ラベル + 値
+	// スコア
 	DrawTextOutlined(panelX + 14, row1Y, "SCORE", labelC, outline, s_fontSmall);
 	const std::string scoreStr = FormatScore6(score);
-	// 右寄せするために文字列の幅を取得
+	// 文字列の幅を取得
 	const int scoreW = GetDrawStringWidthToHandle(scoreStr.c_str(), -1, s_fontLarge);
 	DrawTextOutlined(panelX + panelW - 14 - scoreW, row1Y - 6, scoreStr.c_str(), valueC, outline, s_fontLarge);
 
-	// TIME ラベル + 値
+	// タイム
 	DrawTextOutlined(panelX + 14, row2Y, "TIME", labelC, outline, s_fontSmall);
 	const std::string timeStr = FormatTimeMMSS(timeLeftSeconds);
-	// 右寄せするために文字列の幅を取得
+	// 文字列の幅を取得
 	const int timeW = GetDrawStringWidthToHandle(timeStr.c_str(), -1, s_fontLarge);
 	DrawTextOutlined(panelX + panelW - 14 - timeW, row2Y - 6, timeStr.c_str(), valueC, outline, s_fontLarge);
 
-	// 右上パネル（ライフ）
+	// ライフ（右上）
 	const int lifePanelW = 240;
 	const int lifePanelH = 52;
 	const int lifeX = screenW - pad - lifePanelW;
@@ -146,20 +146,11 @@ void Hud::Draw(int score, int timeLeftSeconds, int life)
 		if (life > maxHeartsToShow)
 		{
 			char buf[16];
-			std::snprintf(buf, sizeof(buf), "x%d", life);
+			std::snprintf(buf, sizeof(buf), "×%d", life);
 			const int w = GetDrawStringWidthToHandle(buf, -1, s_fontLarge);
 			DrawTextOutlined(lifeX + lifePanelW - 14 - w, lifeY + 6, buf,
 				GetColor(255, 255, 255), GetColor(0, 0, 0), s_fontLarge);
 		}
-	}
-
-	else
-	{
-		// ハート画像がない場合の代替表示
-		char buf[16];
-		std::snprintf(buf, sizeof(buf), "x%d", max(life, 0));
-		const int w = GetDrawStringWidthToHandle(buf, -1, s_fontLarge);
-		DrawTextOutlined(lifeX + lifePanelW - 14 - w, lifeY + 6, buf, valueC, outline, s_fontLarge);
 	}
 }
 
