@@ -43,7 +43,7 @@ static void DrawTextOutlined(int x, int y, const char* text, int textColor, int 
 
 static std::string FormatScore6(int score)
 {
-	// スコアを0以上に丸め、6桁ゼロ埋め（例：000123）にする
+	// スコアを0以上に丸め、6桁ゼロ埋めにする
 	score = max(0, score);
 	char buf[32];
 	std::snprintf(buf, sizeof(buf), "%06d", score);
@@ -52,7 +52,7 @@ static std::string FormatScore6(int score)
 
 static std::string FormatTimeMMSS(int totalSeconds)
 {
-	// 残り秒数を0以上にして、mm:ss（例：02:05）形式に整形する
+	// 残り秒数を0以上にして、mm:ss形式に整形する
 	if (totalSeconds < 0) totalSeconds = 0;
 	const int mm = totalSeconds / 60;
 	const int ss = totalSeconds % 60;
@@ -130,8 +130,8 @@ void Hud::Draw(int score, int timeLeftSeconds, int life)
 
 		const int iconW = 24;
 		const int iconH = 24;
-		const int stepX = 28;   // 間隔（iconWより少し大きい）
-		const int hx = lifeX + 78; // 少し左寄せ（80→78でもOK）
+		const int stepX = 28;   // 間隔
+		const int hx = lifeX + 78; // 少し左寄せ
 		const int hy = lifeY + 14; // 少し下げて中央寄せ
 
 		const int hearts = min(max(life, 0), maxHeartsToShow);
@@ -155,7 +155,7 @@ void Hud::Draw(int score, int timeLeftSeconds, int life)
 
 	else
 	{
-		// ハート画像がない場合の代替表示： "xN"
+		// ハート画像がない場合の代替表示
 		char buf[16];
 		std::snprintf(buf, sizeof(buf), "x%d", max(life, 0));
 		const int w = GetDrawStringWidthToHandle(buf, -1, s_fontLarge);
