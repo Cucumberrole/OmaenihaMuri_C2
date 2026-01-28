@@ -39,7 +39,7 @@ public:
 	bool deathTelopStarted = false;
 
 	//逆操作
-	//bool IsReverse;
+	void SetReverse(bool flag) { IsReverse = flag; }
 
 private:
 	// --- 基本パラメータ ---
@@ -94,4 +94,6 @@ private:
 	static int sHitOverlayTimer;
 	static constexpr int HIT_OVERLAY_MAX = 30;
 
+	//逆操作
+	bool IsReverse = false;
 };

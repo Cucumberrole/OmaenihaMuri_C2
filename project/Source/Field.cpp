@@ -7,6 +7,7 @@
 #include "SmallTrap.h"
 #include "MovingSmallTrap.h"
 #include "Sun.h"
+#include "Zone.h"
 #include "FallingFloor.h"
 #include "FakeFloor.h"
 #include "FlyingSpikeTrap.h"
@@ -258,6 +259,10 @@ Field::Field(int stage)
 			else if (cell == 106) 
 			{
 				new Sun(xx * 64.0f, yy + 64.0f);
+			}
+			else if (cell == 120)
+			{
+				new Zone(xx * 64.0f, yy + 64.0f);
 			}
 		}
 	}
