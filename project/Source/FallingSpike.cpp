@@ -36,7 +36,7 @@ FallingSpike::FallingSpike(int sx, int sy, bool chaseAfterLand, int triggerGroup
 	isChaser = chaseAfterLand;
 	startedChase = false;
 	vx = 0.0f;
-	chaseSpeed = 6.0f;  // 横に走る速さ（好みで調整）
+	chaseSpeed = 6.0f;  // 横に走る速さ
 
 	// 登録
 	s_allSpikes.push_back(this);
@@ -57,7 +57,6 @@ FallingSpike::FallingSpike(int sx, int sy, bool chaseAfterLand, int triggerGroup
 //--------------------------------------
 FallingSpike::~FallingSpike()
 {
-	// 自分をリストから外す
 	auto it = std::find(s_allSpikes.begin(), s_allSpikes.end(), this);
 	if (it != s_allSpikes.end())
 	{
@@ -109,7 +108,6 @@ void FallingSpike::Update()
 		{
 			Player* player = FindGameObject<Player>();
 
-			// まだ方向を決めていないなら、最初の1回だけ決定
 			if (!startedChase && player)
 			{
 				float pxCenter = player->GetX() + 32.0f;
@@ -144,7 +142,7 @@ void FallingSpike::Update()
 					{
 						x = oldX;
 						vx = 0.0f;
-						isChaser = false;  // もう動かない
+						isChaser = false;
 						DestroyMe();
 					}
 				}
