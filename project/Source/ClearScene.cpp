@@ -27,7 +27,7 @@ ClearScene::ClearScene()
 	GR_FixOnGoalOnce();
 
 	// GameResult から「確定済みの値」をコピー
-	clearTime = (float)g_GameResult.elapsedMs / 1000.0f;   // 秒
+	clearTime = g_GameResult.elapsedMs / 1000.0f;   // 秒
 	retryCount = g_GameResult.deathCount;            // 1回死ぬごとに
 	finalScore = g_GameResult.score;
 	rankChar = g_GameResult.rank;
@@ -147,8 +147,8 @@ void ClearScene::Draw()
 		int iw = 0, ih = 0;
 		GetGraphSize(s_imgTitleClear, &iw, &ih);
 
-		const int targetW = (int)(W * 0.62f);
-		const int targetH = (iw > 0) ? (int)((float)ih * ((float)targetW / (float)iw)) : 0;
+		const int targetW = (W * 0.62f);
+		const int targetH = (iw > 0) ? (ih * (targetW / iw)) : 0;
 
 		const int x = (W - targetW) / 2;
 		const int y = 28;
@@ -171,8 +171,8 @@ void ClearScene::Draw()
 		int iw = 0, ih = 0;
 		GetGraphSize(s_imgTitleThanks, &iw, &ih);
 
-		const int targetW = (int)(W * 0.72f);
-		const int targetH = (iw > 0) ? (int)((float)ih * ((float)targetW / (float)iw)) : 0;
+		const int targetW = (W * 0.72f);
+		const int targetH = (iw > 0) ? (ih * (targetW / iw)) : 0;
 
 		const int x = (W - targetW) / 2;
 		const int y = thankTopY;
@@ -268,7 +268,7 @@ void ClearScene::Draw()
 
 	// Character (right side)
 	const float bob = std::sin(frame * 0.07f) * 10.0f;
-	const int charY = topY + (totalPanelH - charH) / 2 + (int)bob;
+	const int charY = topY + (totalPanelH - charH) / 2 + bob;
 
 	if (imgChar >= 0)
 	{
@@ -330,11 +330,11 @@ void ClearScene::CalcScoreAndRank()
 	int count = 0;
 	switch (rankChar)
 	{
-	case 'S': table = S_MSGS; count = (int)(sizeof(S_MSGS) / sizeof(S_MSGS[0])); break;
-	case 'A': table = A_MSGS; count = (int)(sizeof(A_MSGS) / sizeof(A_MSGS[0])); break;
-	case 'B': table = B_MSGS; count = (int)(sizeof(B_MSGS) / sizeof(B_MSGS[0])); break;
-	case 'C': table = C_MSGS; count = (int)(sizeof(C_MSGS) / sizeof(C_MSGS[0])); break;
-	default:  table = D_MSGS; count = (int)(sizeof(D_MSGS) / sizeof(D_MSGS[0])); break;
+	case 'S': table = S_MSGS; count = (sizeof(S_MSGS) / sizeof(S_MSGS[0])); break;
+	case 'A': table = A_MSGS; count = (sizeof(A_MSGS) / sizeof(A_MSGS[0])); break;
+	case 'B': table = B_MSGS; count = (sizeof(B_MSGS) / sizeof(B_MSGS[0])); break;
+	case 'C': table = C_MSGS; count = (sizeof(C_MSGS) / sizeof(C_MSGS[0])); break;
+	default:  table = D_MSGS; count = (sizeof(D_MSGS) / sizeof(D_MSGS[0])); break;
 	}
 
 	if (table && count > 0) oneLineMsg = table[GetRand(count - 1)];
@@ -349,11 +349,11 @@ void ClearScene::InitConfetti()
 	for (int i = 0; i < 220; ++i)
 	{
 		Confetti c{};
-		c.x = (float)GetRand(Screen::WIDTH);
-		c.y = (float)GetRand(Screen::HEIGHT);
-		c.vy = 1.2f + (float)GetRand(140) / 60.0f;      // 1.2 .. 3.5
-		c.vx = -0.7f + (float)GetRand(140) / 100.0f;    // -0.7 .. 0.7
-		c.size = 6.0f + (float)GetRand(18);             // 6 .. 24
+		c.x = GetRand(Screen::WIDTH);
+		c.y = GetRand(Screen::HEIGHT);
+		c.vy = 1.2f + GetRand(140) / 60.0f;      // 1.2 .. 3.5
+		c.vx = -0.7f + GetRand(140) / 100.0f;    // -0.7 .. 0.7
+		c.size = 6.0f + GetRand(18);             // 6 .. 24
 		c.kind = GetRand(2);
 
 		const int pal = GetRand(4);
@@ -375,8 +375,8 @@ void ClearScene::UpdateConfetti()
 
 		if (c.y > Screen::HEIGHT + 80.0f)
 		{
-			c.y = -80.0f - (float)GetRand(200);
-			c.x = (float)GetRand(Screen::WIDTH);
+			c.y = -80.0f - GetRand(200);
+			c.x = GetRand(Screen::WIDTH);
 		}
 		if (c.x < -80.0f) c.x = Screen::WIDTH + 80.0f;
 		if (c.x > Screen::WIDTH + 80.0f) c.x = -80.0f;
@@ -389,19 +389,19 @@ void ClearScene::DrawBackground() const
 	DrawBox(0, 0, Screen::WIDTH, Screen::HEIGHT, GetColor(210, 40, 30), TRUE);
 
 	// Rays around the title area
-	const int cx = (int)(Screen::WIDTH * 0.52f);
-	const int cy = (int)(Screen::HEIGHT * 0.18f);
+	const int cx = (Screen::WIDTH * 0.52f);
+	const int cy = (Screen::HEIGHT * 0.18f);
 
 	for (int i = 0; i < 20; ++i)
 	{
-		const float a = (float)i * (3.1415926f * 2.0f / 20.0f);
-		const float r1 = (float)(Screen::WIDTH * 0.10f);
-		const float r2 = (float)(Screen::WIDTH * 0.60f);
+		const float a = i * (3.1415926f * 2.0f / 20.0f);
+		const float r1 = (Screen::WIDTH * 0.10f);
+		const float r2 = (Screen::WIDTH * 0.60f);
 
-		const int x1 = (int)(cx + std::cos(a) * r1);
-		const int y1 = (int)(cy + std::sin(a) * r1);
-		const int x2 = (int)(cx + std::cos(a) * r2);
-		const int y2 = (int)(cy + std::sin(a) * r2);
+		const int x1 = (cx + std::cos(a) * r1);
+		const int y1 = (cy + std::sin(a) * r1);
+		const int x2 = (cx + std::cos(a) * r2);
+		const int y2 = (cy + std::sin(a) * r2);
 
 		DrawLine(x1, y1, x2, y2, GetColor(255, 120, 80));
 	}
@@ -419,9 +419,9 @@ void ClearScene::DrawConfetti() const
 {
 	for (const auto& c : confetti)
 	{
-		const int x = (int)c.x;
-		const int y = (int)c.y;
-		const int s = (int)c.size;
+		const int x = c.x;
+		const int y = c.y;
+		const int s = c.size;
 
 		if (c.kind == 0)
 		{
@@ -455,7 +455,6 @@ void ClearScene::DrawPanel(int x, int y, int w, int h) const
 
 void ClearScene::DrawOutlinedTextToHandle(int x, int y, const char* text, unsigned int textColor, unsigned int outlineColor, int fontHandle) const
 {
-	// 8-direction outline
 	DrawStringToHandle(x - 2, y, text, outlineColor, fontHandle);
 	DrawStringToHandle(x + 2, y, text, outlineColor, fontHandle);
 	DrawStringToHandle(x, y - 2, text, outlineColor, fontHandle);
@@ -471,7 +470,7 @@ void ClearScene::DrawOutlinedTextToHandle(int x, int y, const char* text, unsign
 void ClearScene::FormatTime(char out[32]) const
 {
 	const float t = (clearTime < 0.0f) ? 0.0f : clearTime;
-	const int totalMs = (int)std::round(t * 1000.0f);
+	const int totalMs = round(t * 1000.0f);
 	const int totalSec = totalMs / 1000;
 	const int min = totalSec / 60;
 	const int sec = totalSec % 60;

@@ -2,7 +2,7 @@
 #include <DxLib.h>
 #include <algorithm>
 
-GameResult g_GameResult; // 結果データ本体（全シーンで共有）
+GameResult g_GameResult;
 
 // スコアがマイナスや異常に大きくならないように丸める
 static int ClampScore(int s)
@@ -18,13 +18,7 @@ static int DeathPenalty(const GameResult& gr)
 	return (gr.course == CourseType::Easy) ? gr.easyDeathPenalty : gr.hardDeathPenalty;
 }
 
-// 仕様に沿って最終スコアを計算する
-// 例：
-//  - 初期10000点
-//  - 経過秒 * 10 を減点
-//  - 死亡回数 * (Easy300/Hard600) を減点
-//  - ノーミスなら +2000
-//  - 60秒以内なら +1000
+// スコア計算
 static int CalcScore(const GameResult& gr)
 {
 	const int elapsedSec = max(0, gr.clearTimeSec); // 念のため負数ガード
@@ -40,7 +34,7 @@ static int CalcScore(const GameResult& gr)
 	return ClampScore(score);
 }
 
-// ランク判定（難易度ごとに閾値が違う）
+// ランク判定
 // Easy : S>=9600, A>=8800, B>=7500, C>=6500, else D
 // Hard : S>=10000, A>=9000, B>=7800, C>=6500, else D
 static char CalcRank(const GameResult& gr)
