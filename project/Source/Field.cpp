@@ -76,9 +76,9 @@ Field::Field(int stage)
 	scrollX = 0;
 
 	// マップ走査して配置
-	for (int yy = 0; yy < (int)maps.size(); yy++)
+	for (int yy = 0; yy < maps.size(); yy++)
 	{
-		for (int xx = 0; xx < (int)maps[yy].size(); xx++)
+		for (int xx = 0; xx < maps[yy].size(); xx++)
 		{
 			int cell = maps[yy][xx];
 
@@ -272,7 +272,7 @@ Field::Field(int stage)
 		int bestDy = 100000000;
 
 		// すべての針候補をチェック
-		for (int i = 0; i < (int)fallingSpikes.size(); ++i)
+		for (int i = 0; i < fallingSpikes.size(); ++i)
 		{
 			auto& info = fallingSpikes[i];
 
@@ -327,8 +327,8 @@ void Field::Update()
 	int tx = int(px + 32) / 64;
 	int ty = int(py + 63) / 64;
 
-	if (ty < 0 || ty >= (int)maps.size()) return;
-	if (tx < 0 || tx >= (int)maps[ty].size()) return;
+	if (ty < 0 || ty >= maps.size()) return;
+	if (tx < 0 || tx >= maps[ty].size()) return;
 
 	goalAnimTimer++;
 	if (goalAnimTimer >= goalAnimInterval)
@@ -352,8 +352,8 @@ void Field::Update()
 		{
 			if (!s.alive) continue; // もう落下開始した針は無視
 
-			float sx = (float)s.pos.x;
-			float sy = (float)s.pos.y;
+			float sx = s.pos.x;
+			float sy = s.pos.y;
 
 			VECTOR t1 = VGet(sx, sy, 0.0f);                     // 左上
 			VECTOR t2 = VGet(sx + fallingSpikeWidth, sy, 0.0f);                     // 右上
@@ -371,9 +371,9 @@ void Field::Update()
 	//------------------------------------------
 	// 転がってくる球
 	//------------------------------------------
-	for (int i = 0; i < (int)ballTriggers.size(); i++)
+	for (int i = 0; i < ballTriggers.size(); i++)
 	{
-		if (i >= (int)ballTriggered.size() || i >= (int)ballTimer.size()) break;
+		if (i >= ballTriggered.size() || i >= ballTimer.size()) break;
 
 		int trigX = ballTriggers[i].x / 64;
 		int trigY = ballTriggers[i].y / 64;
@@ -385,9 +385,9 @@ void Field::Update()
 		}
 	}
 
-	for (int i = 0; i < (int)ballTriggers.size(); i++)
+	for (int i = 0; i < ballTriggers.size(); i++)
 	{
-		if (i >= (int)ballTriggered.size() || i >= (int)ballTimer.size()) break;
+		if (i >= ballTriggered.size() || i >= ballTimer.size()) break;
 		if (!ballTriggered[i]) continue;
 
 		if (ballTimer[i] > 0)
@@ -396,7 +396,7 @@ void Field::Update()
 			continue;
 		}
 
-		if (i < (int)ballSpawns.size())
+		if (i < ballSpawns.size())
 		{
 			POINT spawn = ballSpawns[i];
 			new RollingBall(spawn.x, spawn.y, -1.0f);
@@ -433,7 +433,7 @@ void Field::Update()
 		}
 
 		// ここに来たら「落とすタイミング」
-		if (trig.spikeIndex >= 0 && trig.spikeIndex < (int)fallingSpikes.size())
+		if (trig.spikeIndex >= 0 && trig.spikeIndex < fallingSpikes.size())
 		{
 			auto& info = fallingSpikes[trig.spikeIndex];
 
@@ -452,9 +452,9 @@ void Field::Update()
 	//------------------------------------------------------
 	// 動く壁トラップ
 	//------------------------------------------------------
-	for (int i = 0; i < (int)wallTriggers.size(); ++i)
+	for (int i = 0; i < wallTriggers.size(); ++i)
 	{
-		if (i >= (int)wallTriggered.size()) break;
+		if (i >= wallTriggered.size()) break;
 		if (wallTriggered[i]) continue;
 
 		int trigX = wallTriggers[i].x / 64;
@@ -464,11 +464,11 @@ void Field::Update()
 		{
 			wallTriggered[i] = true;
 
-			if (i < (int)wallSpawns.size())
+			if (i < wallSpawns.size())
 			{
 				POINT sp = wallSpawns[i];
 				int dir = (player->GetX() < sp.x) ? -1 : +1;
-				new MovingWall((float)sp.x, (float)sp.y, dir);
+				new MovingWall(sp.x, sp.y, dir);
 			}
 		}
 	}
@@ -480,9 +480,9 @@ void Field::Update()
 void Field::Draw()
 {
 	// ブロック＆ゴール描画
-	for (int yy = 0; yy < (int)maps.size(); yy++)
+	for (int yy = 0; yy < maps.size(); yy++)
 	{
-		for (int xx = 0; xx < (int)maps[yy].size(); xx++)
+		for (int xx = 0; xx < maps[yy].size(); xx++)
 		{
 			int cell = maps[yy][xx];
 
@@ -535,8 +535,8 @@ int Field::HitCheckRight(int px, int py)
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y >= 0 && y < (int)maps.size() &&
-		x >= 0 && x < (int)maps[y].size() &&
+	if (y >= 0 && y < maps.size() &&
+		x >= 0 && x < maps[y].size() &&
 		IsSolidCell(maps[y][x]))
 	{
 		hit = px % 64 + 1;
@@ -562,8 +562,8 @@ int Field::HitCheckLeft(int px, int py)
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y >= 0 && y < (int)maps.size() &&
-		x >= 0 && x < (int)maps[y].size() &&
+	if (y >= 0 && y < maps.size() &&
+		x >= 0 && x < maps[y].size() &&
 		IsSolidCell(maps[y][x]))
 	{
 		hit = 64 - (px % 64);
@@ -589,8 +589,8 @@ int Field::HitCheckUp(int px, int py)
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y >= 0 && y < (int)maps.size() &&
-		x >= 0 && x < (int)maps[y].size() &&
+	if (y >= 0 && y < maps.size() &&
+		x >= 0 && x < maps[y].size() &&
 		IsSolidCell(maps[y][x]))
 	{
 		hit = 64 - (py % 64);
@@ -617,8 +617,8 @@ int Field::HitCheckDown(int px, int py)
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y >= 0 && y < (int)maps.size() &&
-		x >= 0 && x < (int)maps[y].size() &&
+	if (y >= 0 && y < maps.size() &&
+		x >= 0 && x < maps[y].size() &&
 		IsSolidCell(maps[y][x]))
 	{
 		hit = (py % 64) + 1;
@@ -642,8 +642,8 @@ int Field::HitCheckRightMapOnly(int px, int py)
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y >= 0 && y < (int)maps.size() &&
-		x >= 0 && x < (int)maps[y].size() &&
+	if (y >= 0 && y < maps.size() &&
+		x >= 0 && x < maps[y].size() &&
 		IsSolidCell(maps[y][x]))
 	{
 		hit = px % 64 + 1;
@@ -659,8 +659,8 @@ int Field::HitCheckLeftMapOnly(int px, int py)
 	int x = px / 64;
 	int y = py / 64;
 
-	if (y >= 0 && y < (int)maps.size() &&
-		x >= 0 && x < (int)maps[y].size() &&
+	if (y >= 0 && y < maps.size() &&
+		x >= 0 && x < maps[y].size() &&
 		IsSolidCell(maps[y][x]))
 	{
 		hit = 64 - (px % 64);
@@ -685,8 +685,8 @@ bool Field::IsGoal(int px, int py)
 
 int Field::GetCell(int tx, int ty)
 {
-	if (ty < 0 || ty >= (int)maps.size()) return -1;
-	if (tx < 0 || tx >= (int)maps[ty].size()) return -1;
+	if (ty < 0 || ty >= maps.size()) return -1;
+	if (tx < 0 || tx >= maps[ty].size()) return -1;
 	return maps[ty][tx];
 }
 

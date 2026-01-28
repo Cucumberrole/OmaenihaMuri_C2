@@ -104,8 +104,8 @@ Player::Player(int sx, int sy)
 	deathState = DeathState::None;
 	deathAnimEnd = false;
 
-	x = (float)sx;
-	y = (float)sy;
+	x = sx;
+	y = sy;
 	velocity = 0;
 	onGround = false;
 
@@ -160,17 +160,17 @@ void Player::PushByWall(float dx)
 	int push = 0;
 	if (dx > 0)
 	{
-		int push1 = field->HitCheckRightMapOnly((int)(x + 63), (int)(y + 5));
-		int push2 = field->HitCheckRightMapOnly((int)(x + 63), (int)(y + 58));
+		int push1 = field->HitCheckRightMapOnly((x + 63), (y + 5));
+		int push2 = field->HitCheckRightMapOnly((x + 63), (y + 58));
 		push = max(push1, push2);
-		if (push > 0) x -= (float)push;
+		if (push > 0) x -= push;
 	}
 	else
 	{
-		int push1 = field->HitCheckLeftMapOnly((int)(x + 0), (int)(y + 5));
-		int push2 = field->HitCheckLeftMapOnly((int)(x + 0), (int)(y + 58));
+		int push1 = field->HitCheckLeftMapOnly((x + 0), (y + 5));
+		int push2 = field->HitCheckLeftMapOnly((x + 0), (y + 58));
 		push = max(push1, push2);
-		if (push > 0) x += (float)push;
+		if (push > 0) x += push;
 	}
 }
 
@@ -252,7 +252,7 @@ void Player::Update()
 	// まず移動
 	if (moveX != 0)
 	{
-		x += (float)moveX;
+		x += moveX;
 
 		// 壁押し戻し量
 		int push = 0;
@@ -260,13 +260,13 @@ void Player::Update()
 		// --- Field 判定 ---
 		if (moveX > 0) {
 			// 右端は「63」にする
-			int push1 = field->HitCheckRight((int)(x + 63), (int)(y + 5));
-			int push2 = field->HitCheckRight((int)(x + 63), (int)(y + 58));
+			int push1 = field->HitCheckRight((x + 63), (y + 5));
+			int push2 = field->HitCheckRight((x + 63), (y + 58));
 			push = max(push1, push2);
 		}
 		else {
-			int push1 = field->HitCheckLeft((int)(x + 0), (int)(y + 5));
-			int push2 = field->HitCheckLeft((int)(x + 0), (int)(y + 58));
+			int push1 = field->HitCheckLeft((x + 0), (y + 5));
+			int push2 = field->HitCheckLeft((x + 0), (y + 58));
 			push = max(push1, push2);
 		}
 
@@ -274,13 +274,13 @@ void Player::Update()
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
 			if (moveX > 0) {
-				int p1 = f->HitCheckRight((int)(x + 63), (int)(y + 1));
-				int p2 = f->HitCheckRight((int)(x + 63), (int)(y + 62));
+				int p1 = f->HitCheckRight((x + 63), (y + 1));
+				int p2 = f->HitCheckRight((x + 63), (y + 62));
 				push = max(push, max(p1, p2));
 			}
 			else {
-				int p1 = f->HitCheckLeft((int)(x + 0), (int)(y + 1));
-				int p2 = f->HitCheckLeft((int)(x + 0), (int)(y + 62));
+				int p1 = f->HitCheckLeft((x + 0), (y + 1));
+				int p2 = f->HitCheckLeft((x + 0), (y + 62));
 				push = max(push, max(p1, p2));
 			}
 		}
@@ -291,21 +291,21 @@ void Player::Update()
 			if (!vf->IsActive()) continue;
 
 			if (moveX > 0) {
-				int p1 = vf->HitCheckRight((int)(x + 63), (int)(y + 1));
-				int p2 = vf->HitCheckRight((int)(x + 63), (int)(y + 62));
+				int p1 = vf->HitCheckRight((x + 63), (y + 1));
+				int p2 = vf->HitCheckRight((x + 63), (y + 62));
 				push = max(push, max(p1, p2));
 			}
 			else {
-				int p1 = vf->HitCheckLeft((int)(x + 0), (int)(y + 1));
-				int p2 = vf->HitCheckLeft((int)(x + 0), (int)(y + 62));
+				int p1 = vf->HitCheckLeft((x + 0), (y + 1));
+				int p2 = vf->HitCheckLeft((x + 0), (y + 62));
 				push = max(push, max(p1, p2));
 			}
 		}
 
 		// 押し戻し
 		if (push > 0) {
-			if (moveX > 0) x -= (float)push;
-			else           x += (float)push;
+			if (moveX > 0) x -= push;
+			else           x += push;
 		}
 	}
 
@@ -337,27 +337,27 @@ void Player::Update()
 	// 縦方向当たり判定（床／天井）
 	//========================================================
 	if (velocity >= 0) {
-		int push1 = field->HitCheckDown((int)(x + 5), (int)(y + 64));
-		int push2 = field->HitCheckDown((int)(x + 58), (int)(y + 64));
+		int push1 = field->HitCheckDown((x + 5), (y + 64));
+		int push2 = field->HitCheckDown((x + 58), (y + 64));
 		int push = max(push1, push2);
 
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
-			int p1 = f->HitCheckDown((int)(x + 1), (int)(y + 64));
-			int p2 = f->HitCheckDown((int)(x + 62), (int)(y + 64));
+			int p1 = f->HitCheckDown((x + 1), (y + 64));
+			int p2 = f->HitCheckDown((x + 62), (y + 64));
 			push = max(push, max(p1, p2));
 		}
 
 		auto vFloors = FindGameObjects<VanishingFloor>();
 		for (auto vf : vFloors) {
 			if (!vf->IsActive()) continue;
-			int p1 = vf->HitCheckDown((int)(x + 1), (int)(y + 64));
-			int p2 = vf->HitCheckDown((int)(x + 62), (int)(y + 64));
+			int p1 = vf->HitCheckDown((x + 1), (y + 64));
+			int p2 = vf->HitCheckDown((x + 62), (y + 64));
 			push = max(push, max(p1, p2));
 		}
 
 		if (push > 0) {
-			y -= (float)(push - 1);
+			y -= (push - 1);
 			velocity = 0;
 			onGround = true;
 		}
@@ -366,27 +366,27 @@ void Player::Update()
 		}
 	}
 	else {
-		int push1 = field->HitCheckUp((int)(x + 5), (int)(y + 1));
-		int push2 = field->HitCheckUp((int)(x + 58), (int)(y + 1));
+		int push1 = field->HitCheckUp((x + 5), (y + 1));
+		int push2 = field->HitCheckUp((x + 58), (y + 1));
 		int push = max(push1, push2);
 
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
-			int p1 = f->HitCheckUp((int)(x + 1), (int)(y + 0));
-			int p2 = f->HitCheckUp((int)(x + 62), (int)(y + 0));
+			int p1 = f->HitCheckUp((x + 1), (y + 0));
+			int p2 = f->HitCheckUp((x + 62), (y + 0));
 			push = max(push, max(p1, p2));
 		}
 
 		auto vFloors = FindGameObjects<VanishingFloor>();
 		for (auto vf : vFloors) {
 			if (!vf->IsActive()) continue;
-			int p1 = vf->HitCheckUp((int)(x + 1), (int)(y + 0));
-			int p2 = vf->HitCheckUp((int)(x + 62), (int)(y + 0));
+			int p1 = vf->HitCheckUp((x + 1), (y + 0));
+			int p2 = vf->HitCheckUp((x + 62), (y + 0));
 			push = max(push, max(p1, p2));
 		}
 
 		if (push > 0) {
-			y += (float)push;
+			y += push;
 			velocity = 0;
 		}
 	}
@@ -404,13 +404,13 @@ void Player::Update()
 
 		float footY = py + ph;
 
-		for (int i = 0; i < (int)field->pipesIn.size(); i++)
+		for (int i = 0; i < field->pipesIn.size(); i++)
 		{
 			POINT in = field->pipesIn[i];
 
-			float pipeLeft = (float)in.x;
-			float pipeRight = (float)in.x + 64.0f;
-			float pipeTop = (float)in.y;
+			float pipeLeft = in.x;
+			float pipeRight = in.x + 64.0f;
+			float pipeTop = in.y;
 
 			bool overlapX =
 				(px + pw > pipeLeft) &&
@@ -423,8 +423,8 @@ void Player::Update()
 				if (!field->pipesOut.empty())
 				{
 					POINT out = field->pipesOut[i % field->pipesOut.size()];
-					x = (float)out.x;
-					y = (float)out.y + ph;
+					x = out.x;
+					y = out.y + ph;
 					
 					if (telop && !telop->TouchedTrap2)
 					{
@@ -451,11 +451,11 @@ void Player::Draw()
 	{
 		if (deathState == DeathState::Up)
 		{
-			DrawGraph((int)x, (int)y, hDeadUpImage, TRUE);
+			DrawGraph(x, y, hDeadUpImage, TRUE);
 		}
 		else
 		{
-			DrawGraph((int)x, (int)y, hDeadFallImage, TRUE);
+			DrawGraph(x, y, hDeadFallImage, TRUE);
 		}
 		return;
 	}
@@ -465,7 +465,7 @@ void Player::Draw()
 	int yRect = (animIndex / ATLAS_WIDTH) * CHARACTER_HEIGHT;
 
 	DrawRectGraph(
-		(int)x, (int)y,
+		x, y,
 		xRect, yRect,
 		CHARACTER_WIDTH, CHARACTER_HEIGHT,
 		hImage,
@@ -476,7 +476,7 @@ void Player::Draw()
 	// デバッグ用：当たり判定円
 	float cx, cy, r;
 	GetHitCircle(cx, cy, r);
-	DrawCircle((int)cx, (int)cy, (int)r, GetColor(0, 255, 0), FALSE);
+	DrawCircle(cx, cy, r, GetColor(0, 255, 0), FALSE);
 
 	DrawHitOverlay();
 }

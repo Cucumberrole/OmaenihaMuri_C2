@@ -85,7 +85,7 @@ void PlayScene::Update()
 	{
 		// プレイ中のみ時間/スコア更新
 		playTime += Time::DeltaTime();
-		score = 10000 - (int)(playTime) * 10 - retryCount * 500;
+		score = 10000 - (playTime) * 10 - retryCount * 500;
 
 		// =========================
 		// 死亡判定：トラップ等で死んだら
@@ -115,13 +115,13 @@ void PlayScene::Update()
 		// =========================
 		// クリア判定（生存中のみ）
 		// =========================
-		if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
+		if (field->IsGoal((player->GetX() + 32), (player->GetY() + 32)))
 		{
 			// クリアタイムは「全体時間」を採用
 			const float clearTime = g_ClearTimeSeconds;
 
 			// （あなたが新GameResult方式なら）
-			GR_FixOnGoalOnce_Manual((int)clearTime, retryCount);
+			GR_FixOnGoalOnce_Manual(clearTime, retryCount);
 
 			SceneManager::ChangeScene("CLEAR");
 			return;
@@ -224,7 +224,7 @@ void PlayScene::Draw()
 	const int hudScore = score;
 
 	// 時間
-	const int hudTimeSeconds = (int)g_ClearTimeSeconds;
+	const int hudTimeSeconds = g_ClearTimeSeconds;
 
 	// 3) ライフ
 	const int hudLife = life;
