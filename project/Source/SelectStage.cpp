@@ -6,6 +6,8 @@
 #include <cmath>
 #include <cstdlib>
 
+#include <DxLib.h>
+
 #include "../Library/SceneManager.h"
 #include "PlayScene.h"
 
@@ -15,6 +17,61 @@ static int CreateJPFont(const TCHAR* name, int size, int thick)
 {
 	int h = CreateFontToHandle(name, size, thick, DX_FONTTYPE_ANTIALIASING_8X8);
 	return h;
+}
+
+static inline float Clamp01(float v) { return v < 0.f ? 0.f : (v > 1.f ? 1.f : v); }
+
+// 0..1 の滑らかな補間
+static inline float SmoothStep(float a, float b, float x)
+{
+	float t = Clamp01((x - a) / (b - a));
+	return t * t * (3.f - 2.f * t);
+}
+
+// ビネット生成（srcW/srcH は生成解像度。target は最終表示サイズ）
+static int BuildVignetteGraph(int srcW, int srcH, int targetW, int targetH,
+	float inner = 0.55f, float outer = 1.05f,
+	float power = 2.2f, int maxAlpha = 190,
+	float centerYBias = -0.06f)
+{
+	int si = MakeARGB8ColorSoftImage(srcW, srcH);
+	if (si < 0) return -1;
+
+	const float cx = (srcW - 1) * 0.5f;
+	const float cy = (srcH - 1) * 0.5f;
+
+
+	const float aspect = (targetH > 0) ? (float)targetW / (float)targetH : 1.0f;
+	const float invRx = 1.0f / cx;
+	const float invRy = 1.0f / cy;
+
+	for (int y = 0; y < srcH; ++y)
+	{
+		for (int x = 0; x < srcW; ++x)
+		{
+			float nx = (x - cx) * invRx;              // -1..1
+			float ny = (y - cy) * invRy;              // -1..1
+
+			ny -= centerYBias;
+
+			nx *= (1.0f / aspect);
+
+			float d = std::sqrt(nx * nx + ny * ny);   // 0..~1.4
+
+			float t = SmoothStep(inner, outer, d);
+			t = std::pow(t, power);
+
+			int a = (int)(maxAlpha * t);
+			if (a < 0) a = 0;
+			if (a > 255) a = 255;
+
+			DrawPixelSoftImage(si, x, y, 0, 0, 0, a);
+		}
+	}
+
+	int g = CreateGraphFromSoftImage(si);
+	DeleteSoftImage(si);
+	return g;
 }
 
 SelectStage::SelectStage()
@@ -53,6 +110,15 @@ SelectStage::SelectStage()
 		sp_[i].kind = GetRand(2);                       // 0..2
 	}
 
+	// 1/2解像度で作る
+	vignetteTargetW_ = sw;
+	vignetteTargetH_ = sh;
+	vignetteSrcW_ = max(320, sw / 2);
+	vignetteSrcH_ = max(180, sh / 2);
+
+	vignetteImg_ = BuildVignetteGraph(vignetteSrcW_, vignetteSrcH_, sw, sh);
+
+
 	introStartMs_ = GetNowCount();
 	introT_ = 0.0f;
 	introDone_ = false;
@@ -65,6 +131,8 @@ SelectStage::~SelectStage()
 	if (fontSub_ >= 0) DeleteFontToHandle(fontSub_);
 	if (fontCard_ >= 0) DeleteFontToHandle(fontCard_);
 	if (fontHint_ >= 0) DeleteFontToHandle(fontHint_);
+	if (vignetteImg_ >= 0) DeleteGraph(vignetteImg_);
+
 }
 
 void SelectStage::Decide(int stageId)
@@ -185,12 +253,13 @@ void SelectStage::DrawTiledWall(int sw, int sh) const
 
 void SelectStage::DrawVignette(int sw, int sh) const
 {
-	// 簡易ビネット、ただの四角形４つ
-	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 80);
-	DrawBox(0, 0, sw, 60, GetColor(0, 0, 0), TRUE);
-	DrawBox(0, sh - 60, sw, sh, GetColor(0, 0, 0), TRUE);
-	DrawBox(0, 0, 60, sh, GetColor(0, 0, 0), TRUE);
-	DrawBox(sw - 60, 0, sw, sh, GetColor(0, 0, 0), TRUE);
+	if (vignetteImg_ < 0) return;
+
+	// 強さ調整
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 127);
+
+	DrawExtendGraph(0, 0, sw, sh, vignetteImg_, TRUE);
+
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
@@ -234,6 +303,17 @@ void SelectStage::Draw()
 	int sw = 0, sh = 0;
 	GetDrawScreenSize(&sw, &sh);
 
+	if (sw != vignetteTargetW_ || sh != vignetteTargetH_)
+	{
+		vignetteTargetW_ = sw;
+		vignetteTargetH_ = sh;
+
+		if (vignetteImg_ >= 0) { DeleteGraph(vignetteImg_); vignetteImg_ = -1; }
+
+		vignetteSrcW_ = max(320, sw / 2);
+		vignetteSrcH_ = max(180, sh / 2);
+		vignetteImg_ = BuildVignetteGraph(vignetteSrcW_, vignetteSrcH_, sw, sh);
+	}
 
 	// == 遷移アニメーション（フェード） ==
 	auto clamp01 = [](float t) {

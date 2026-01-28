@@ -7,7 +7,6 @@
 
 static const char* kCharPath = "data/image/omae.png";
 
-// Title images
 static const char* kTitleClearPath = "data/Font/GAMECLEAR.png";
 static const char* kTitleThanksPath = "data/Font/thankyou.png";
 
@@ -19,6 +18,28 @@ static int CreateJPFont(const TCHAR* name, int size, int thick)
 {
 	int h = CreateFontToHandle(name, size, thick, DX_FONTTYPE_ANTIALIASING_8X8);
 	return h;
+}
+
+static void DrawGraphKeepAspectCentered(
+	int centerX, int topY, int maxW, int maxH, int graphHandle,
+	int* outDstW = nullptr, int* outDstH = nullptr)
+{
+	int srcW = 0, srcH = 0;
+	GetGraphSize(graphHandle, &srcW, &srcH);
+	if (srcW <= 0 || srcH <= 0) return;
+
+	const float sx = (float)maxW / (float)srcW;
+	const float sy = (float)maxH / (float)srcH;
+	const float s = (sx < sy) ? sx : sy;
+
+	const int dstW = (int)(srcW * s + 0.5f);
+	const int dstH = (int)(srcH * s + 0.5f);
+
+	if (outDstW) *outDstW = dstW;
+	if (outDstH) *outDstH = dstH;
+
+	const int left = centerX - dstW / 2;
+	DrawExtendGraph(left, topY, left + dstW, topY + dstH, graphHandle, TRUE);
 }
 
 ClearScene::ClearScene()
@@ -56,7 +77,7 @@ ClearScene::ClearScene()
 	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("MS ゴシック"), 46, 2);
 	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("Arial"), 46, 2);
 
-	fontMsg_ = CreateJPFont(TEXT("メイリオ"), 34, 2);
+	fontMsg_ = CreateJPFont(TEXT("游明朝 Demibold"), 40, 2);
 	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("Meiryo UI"), 34, 2);
 	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("MS ゴシック"), 34, 2);
 	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("Arial"), 34, 2);
@@ -141,48 +162,45 @@ void ClearScene::Draw()
 	// Title images
 	int titleBottomY = 0;
 
-	// Draw GAME CLEAR image
+	// GAME CLEAR画像
 	if (s_imgTitleClear >= 0)
 	{
-		int iw = 0, ih = 0;
-		GetGraphSize(s_imgTitleClear, &iw, &ih);
+		int dstW = 0, dstH = 0;
+		const int topY = 18;
 
-		const int targetW = (W * 0.62f);
-		const int targetH = (iw > 0) ? (ih * (targetW / iw)) : 0;
+		DrawGraphKeepAspectCentered(W / 2, topY,
+			(int)(W * 0.70f), (int)(H * 0.22f),
+			s_imgTitleClear, &dstW, &dstH);
 
-		const int x = (W - targetW) / 2;
-		const int y = 28;
-		DrawExtendGraph(x, y, x + targetW, y + targetH, s_imgTitleClear, TRUE);
-		titleBottomY = y + targetH;
+		titleBottomY = topY + dstH;
 	}
 	else
 	{
-		DrawOutlinedTextToHandle(W / 2 - GetDrawStringWidthToHandle("GAME CLEAR", -1, fontTitle_) / 2,
+		DrawOutlinedTextToHandle(
+			W / 2 - GetDrawStringWidthToHandle("GAME CLEAR", -1, fontTitle_) / 2,
 			55, "GAME CLEAR",
 			GetColor(255, 220, 80), GetColor(80, 20, 0), fontTitle_);
 
 		titleBottomY = 155;
 	}
 
-	// Draw Thank you image
+	// Thank you 画像
 	int thankTopY = titleBottomY + 6;
 	if (s_imgTitleThanks >= 0)
 	{
-		int iw = 0, ih = 0;
-		GetGraphSize(s_imgTitleThanks, &iw, &ih);
+		int dstW = 0, dstH = 0;
 
-		const int targetW = (W * 0.72f);
-		const int targetH = (iw > 0) ? (ih * (targetW / iw)) : 0;
+		DrawGraphKeepAspectCentered(W / 2, thankTopY,
+			(int)(W * 0.50f), (int)(H * 0.18f),
+			s_imgTitleThanks, &dstW, &dstH);
 
-		const int x = (W - targetW) / 2;
-		const int y = thankTopY;
-		DrawExtendGraph(x, y, x + targetW, y + targetH, s_imgTitleThanks, TRUE);
-		titleBottomY = y + targetH;
+		titleBottomY = thankTopY + dstH;
 	}
 	else
 	{
 		const char* sub = "Thank you for Playing!";
-		DrawOutlinedTextToHandle(W / 2 - GetDrawStringWidthToHandle(sub, -1, fontThanks_) / 2,
+		DrawOutlinedTextToHandle(
+			W / 2 - GetDrawStringWidthToHandle(sub, -1, fontThanks_) / 2,
 			thankTopY, sub,
 			GetColor(255, 240, 200), GetColor(80, 20, 0), fontThanks_);
 
@@ -195,15 +213,18 @@ void ClearScene::Draw()
 	{
 		const int msgY = titleBottomY + 10;
 		const int msgX = W / 2 - GetDrawStringWidthToHandle(oneLineMsg.c_str(), -1, fontMsg_) / 2;
+
 		DrawOutlinedTextToHandle(msgX, msgY, oneLineMsg.c_str(),
 			GetColor(255, 240, 220), GetColor(80, 20, 0), fontMsg_);
 
-		msgBottomY = msgY + 40;
+		const int msgH = GetFontSizeToHandle(fontMsg_);
+		msgBottomY = msgY + msgH + 6;
 	}
 
 	// Panels + character are centered as one block.
 
 	const int panelW = 720;
+	const int infoPanelW = 560;
 
 	// Make RANK panel bigger (like the reference image)
 	const int rankPanelH = 170;
@@ -249,17 +270,36 @@ void ClearScene::Draw()
 	char scoreBuf[64] = {};
 	std::snprintf(scoreBuf, sizeof(scoreBuf), "%d", finalScore);
 
+	// CLEAR TIME
+	DrawPanel(panelX, timeY, infoPanelW, infoPanelH);
+
 	DrawOutlinedTextToHandle(panelX + 30, timeY + 24, "CLEAR TIME",
 		GetColor(255, 235, 140), GetColor(60, 10, 0), fontPanel_);
 
-	DrawOutlinedTextToHandle(panelX + panelW - 270, timeY + 26,
-		timeBuf, GetColor(255, 255, 255), GetColor(60, 10, 0), fontPanel_);
+	// 右端揃え
+	{
+		const int padR = 30;
+		const int w = GetDrawStringWidthToHandle(timeBuf, -1, fontPanel_);
+		const int x = panelX + infoPanelW - padR - w;
+		DrawOutlinedTextToHandle(x, timeY + 26, timeBuf,
+			GetColor(255, 255, 255), GetColor(60, 10, 0), fontPanel_);
+	}
+
+	// SCORE
+	DrawPanel(panelX, scoreY, infoPanelW, infoPanelH);
 
 	DrawOutlinedTextToHandle(panelX + 30, scoreY + 24, "SCORE",
 		GetColor(255, 235, 140), GetColor(60, 10, 0), fontPanel_);
 
-	DrawOutlinedTextToHandle(panelX + panelW - 240, scoreY + 26,
-		scoreBuf, GetColor(255, 255, 255), GetColor(60, 10, 0), fontPanel_);
+	// 右端揃え
+	{
+		const int padR = 30;
+		const int w = GetDrawStringWidthToHandle(scoreBuf, -1, fontPanel_);
+		const int x = panelX + infoPanelW - padR - w;
+		DrawOutlinedTextToHandle(x, scoreY + 26, scoreBuf,
+			GetColor(255, 255, 255), GetColor(60, 10, 0), fontPanel_);
+	}
+
 
 	// Footer hint
 	const char* hint = "Press T / Enter / Space to return to Title.  Esc: Exit";

@@ -46,4 +46,11 @@ private:
 	struct Sparkle { float x, y, v, s; int kind; };
 	static const int kSparkleCount = 70;
 	Sparkle sp_[kSparkleCount]{};
+
+	// 画面のビネット
+	int vignetteImg_ = -1;
+	int vignetteSrcW_ = 0;
+	int vignetteSrcH_ = 0;
+	int vignetteTargetW_ = 0;
+	int vignetteTargetH_ = 0;
 };
