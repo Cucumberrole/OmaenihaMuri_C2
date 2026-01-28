@@ -192,6 +192,7 @@
     <ClInclude Include="Source\TitleScene.h" />
     <ClInclude Include="Source\Trap.h" />
     <ClInclude Include="Source\VanishingFloor.h" />
+    <ClInclude Include="Source\Zone.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ImGui\imgui.cpp" />
@@ -245,6 +246,7 @@
     <ClCompile Include="Source\TitleScene.cpp" />
     <ClCompile Include="Source\Trap.cpp" />
     <ClCompile Include="Source\VanishingFloor.cpp" />
+    <ClCompile Include="Source\Zone.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -240,6 +240,10 @@ void Player::Update()
 		moveX = -WALK_SPEED;
 		frip = true;
 	}
+	if (IsReverse)
+	{
+		moveX *= -1;
+	}
 
 	// 歩行アニメーション（常時アニメしたいなら moveX 判定を外す）
 	if (moveX != 0) {
@@ -436,6 +440,10 @@ void Player::Update()
 			}
 		}
 	}
+
+	//逆操作
+	//触れてたらON,触れてなかったらOFF
+	IsReverse = false;
 
 	UpdateHitOverlay();
 }
