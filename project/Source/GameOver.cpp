@@ -20,10 +20,14 @@ GameOver::GameOver()
 	MsgImage8 = LoadGraph("data/font/ゲームオーバー画面文字/止まるんじゃねぇぞ・・・.png");//
 	MsgImage9 = LoadGraph("data/font/ゲームオーバー画面文字/疲れてるんじゃない？.png");//
 
+	ChangeVolumeSoundMem(150, GameOverBGM);
+	GameOverBGM = LoadSoundMem("data/BGM/Gameover.mp3");
+	PlaySoundMem(GameOverBGM, DX_PLAYTYPE_LOOP);
 }
 
 GameOver::~GameOver()
 {
+	StopSoundMem(GameOverBGM);
 }
 
 void GameOver::Update()

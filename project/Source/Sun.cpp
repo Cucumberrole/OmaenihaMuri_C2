@@ -40,7 +40,7 @@ void Sun::Update()
 		vy = (GetRand(200) - 100) / 100.0f;
 
 		// スピード調整
-		float speed = 2.0f;
+		float speed = 1.5f;
 		vx *= speed;
 		vy *= speed;
 	}

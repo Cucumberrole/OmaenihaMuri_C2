@@ -88,4 +88,6 @@ private:
 	// アウトライン
 	void DrawOutlinedTextToHandle(int x, int y, const char* text, unsigned int textColor, unsigned int outlineColor, int fontHandle) const;
 
+	//BGM
+	int GoalBGM;
 };

@@ -50,6 +50,7 @@ TitleScene::TitleScene()
 	}
 
 	// BGM
+	ChangeVolumeSoundMem(120, sHandle);
 	sHandle = LoadSoundMem("data/bgm/Title.mp3");
 	if (sHandle >= 0) PlaySoundMem(sHandle, DX_PLAYTYPE_LOOP);
 
