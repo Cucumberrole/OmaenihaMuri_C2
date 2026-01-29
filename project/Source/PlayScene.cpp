@@ -43,11 +43,12 @@ PlayScene::PlayScene()
 	new Field(SelectedStage);
 
 	sound = 0;
-	ChangeVolumeSoundMem(150, StageBGM1);
-	ChangeVolumeSoundMem(150, StageBGM2);
 	StageBGM1 = LoadSoundMem("data/BGM/Stage1.mp3");
 	StageBGM2 = LoadSoundMem("data/BGM/Stage2.mp3");
+    ChangeVolumeSoundMem(100, StageBGM1);
+    ChangeVolumeSoundMem(100, StageBGM2);
 	LastSE = LoadSoundMem("data/BGM/life_warning.mp3");
+    RetrySE = LoadSoundMem("data/BGM/Continue.mp3");
 
 	if (SelectedStage == 1)
 	{
@@ -166,9 +167,11 @@ void PlayScene::Update()
             fader->FadeOut(0.5f);
             fader->FadeIn(1.0f);
 
+            PlaySoundMem(RetrySE, DX_PLAYTYPE_BACK);
             g_IsRetry = true;
             SceneManager::ForceChangeScene("PLAY");
         }
+        
 
         if (CheckHitKey(KEY_INPUT_ESCAPE)) SceneManager::Exit();
 

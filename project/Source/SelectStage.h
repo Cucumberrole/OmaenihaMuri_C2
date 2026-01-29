@@ -56,4 +56,8 @@ private:
 
 	//BGM
 	int SelectBGM;
+	int SelectSE;
+	
+
+	int prevSelected = selected_;
 };

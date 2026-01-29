@@ -87,8 +87,6 @@ Player::Player()
 
 	JumpSE = LoadSoundMem("data/sound/jump.wav");
 	DieSE = LoadSoundMem("data/sound/DeathSound.mp3");
-	//PlaySoundMem(DieSE, DX_PLAYTYPE_BACK);
-
 }
 
 //--------------------------------------
