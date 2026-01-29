@@ -50,6 +50,7 @@ private:
 	int jumpcount;
 	int Maxjumpcount;
 	int hp;
+	float pushX;
 
 	bool isDead;  // ← プレイヤーが死んで固定状態か？
 
