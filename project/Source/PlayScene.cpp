@@ -45,10 +45,10 @@ PlayScene::PlayScene()
 
 	StageBGM1 = LoadSoundMem("data/BGM/Stage1.mp3");
 	StageBGM2 = LoadSoundMem("data/BGM/Stage2.mp3");
-    ChangeVolumeSoundMem(100, StageBGM1);
-    ChangeVolumeSoundMem(100, StageBGM2);
+	ChangeVolumeSoundMem(100, StageBGM1);
+	ChangeVolumeSoundMem(100, StageBGM2);
 	LastSE = LoadSoundMem("data/BGM/life_warning.mp3");
-    RetrySE = LoadSoundMem("data/BGM/Continue.mp3");
+	RetrySE = LoadSoundMem("data/BGM/Continue.mp3");
 
 	if (StageBGM1 >= 0) ChangeVolumeSoundMem(150, StageBGM1);
 	if (StageBGM2 >= 0) ChangeVolumeSoundMem(150, StageBGM2);
@@ -200,121 +200,6 @@ void PlayScene::Update()
 		return;
 	}
 	}
-  
-    Player* player = FindGameObject<Player>();
-    Field* field = FindGameObject<Field>();
-    Fader* fader = FindGameObject<Fader>();
-    if (!player || !field || !fader) return;
-
-    switch (state)
-    {
-    case Playstate::Play:
-    {
-        const float dt = Time::DeltaTime();
-
-        // プレイ中だけ GameResult 側の時間減点を進める
-        GR_UpdateDuringPlay();
-
-        // 現在スコア（liveScore）をHUD用に取得
-        score = GR_GetLiveScore();
-
-
-        // =========================
-        // 死亡判定
-        // =========================
-        if (player->IsDead())
-        {
-            if (!deathHandled)
-            {
-                deathHandled = true;
-
-                GR_OnDeath();
-
-                life--;
-                retryCount++;
-                deathCount++;
-
-                g_Life = life;
-                g_RetryCount = retryCount;
-                g_deathCount = deathCount;
-                StopSoundMem(StageBGM1);
-                StopSoundMem(StageBGM2);
-
-            }
-
-            state = Playstate::Death;
-            return;
-        }
-
-        // =========================
-        // クリア判定
-        // =========================
-        if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
-        {
-            GR_FixOnGoalOnce();
-            SceneManager::ChangeScene("CLEAR");
-            return;
-        }
-
-
-        // 入力など
-        if (CheckHitKey(KEY_INPUT_E)) SceneManager::ChangeScene("STAGE");
-        if (CheckHitKey(KEY_INPUT_G)) SceneManager::ChangeScene("GAMEOVER");
-        if (CheckHitKey(KEY_INPUT_C)) SceneManager::ChangeScene("CLEAR");
-        if (CheckHitKey(KEY_INPUT_O) || CheckHitKey(KEY_INPUT_T)) SceneManager::ChangeScene("TITLE");
-
-        if (CheckHitKey(KEY_INPUT_R))
-        {
-            fader->FadeOut(0.5f);
-            fader->FadeIn(1.0f);
-
-            PlaySoundMem(RetrySE, DX_PLAYTYPE_BACK);
-            g_IsRetry = true;
-            SceneManager::ForceChangeScene("PLAY");
-        }
-        
-
-        if (CheckHitKey(KEY_INPUT_ESCAPE)) SceneManager::Exit();
-
-        return;
-    }
-
-    case Playstate::Death:
-    {
-        if (!player->IsdeathAnimEnd()) return;
-
-        if (life <= 0)
-        {
-            g_Life = MaxLives();
-            SceneManager::ChangeScene("GAMEOVER");
-            return;
-        }
-
-        state = Playstate::Zanki;
-        if (life == 1)
-        {
-            PlaySoundMem(LastSE, DX_PLAYTYPE_BACK);
-        }
-        StopSoundMem(LastSE);
-
-        return;
-    }
-
-    case Playstate::Zanki:
-    {
-        if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
-        {
-            VanishingFloor::ResetAll();
-
-            fader->FadeOut(0.5f);
-            fader->FadeIn(1.0f);
-
-            g_IsRetry = true;
-            SceneManager::ForceChangeScene("PLAY");
-        }
-        return;
-    }
-    }
 }
 
 

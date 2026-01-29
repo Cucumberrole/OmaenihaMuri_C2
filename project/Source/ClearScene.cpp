@@ -1,4 +1,4 @@
-#include "ClearScene.h"
+﻿#include "ClearScene.h"
 #include "GameResult.h"
 #include "../Library/SceneManager.h"
 #include <DxLib.h>
@@ -92,21 +92,21 @@ ClearScene::ClearScene()
 	// ---- build bonus list for presentation ----
 	bonusCount_ = 0;
 
-	// GameResult ���̏����ƈ�v������i���Ȃ���GameResult.cpp�̏����j
+	// GameResult    ̏    ƈ v      i   Ȃ   GameResult.cpp ̏    j
 	if (g_GameResult.deathCount == 0 && bonusCount_ < kMaxBonuses)
 	{
 		bonusLabel_[bonusCount_] = "NO MISS BONUS";
-		bonusValue_[bonusCount_] = g_GameResult.noMissBonus;     // ��: 2000
+		bonusValue_[bonusCount_] = g_GameResult.noMissBonus;     //   : 2000
 		bonusCount_++;
 	}
 	if (g_GameResult.clearTimeSec <= 60 && bonusCount_ < kMaxBonuses)
 	{
 		bonusLabel_[bonusCount_] = "TIME BONUS";
-		bonusValue_[bonusCount_] = g_GameResult.under60sBonus;   // ��: 1000
+		bonusValue_[bonusCount_] = g_GameResult.under60sBonus;   //   : 1000
 		bonusCount_++;
 	}
 
-	// baseScore = �ŏI�X�R�A - �{�[�i�X���v�i�\���p�j
+	// baseScore =  ŏI X R A -  { [ i X   v i \   p j
 	int sumBonus = 0;
 	for (int i = 0; i < bonusCount_; ++i) sumBonus += bonusValue_[i];
 
@@ -118,7 +118,7 @@ ClearScene::ClearScene()
 	bonusAlpha_ = 0;
 	bonusScale_ = 1.0f;
 
-	// �\���p�e�L�X�g�E�F�E�ꌾ���b�Z�[�W�������߂�
+	//  \   p e L X g E F E ꌾ   b Z [ W       ߂ 
 	// 表示用テキスト・色・一言メッセージだけ決める
 	CalcScoreAndRank();
 
@@ -240,7 +240,7 @@ void ClearScene::Update()
 	const float tScoreS = 0.55f, tScoreE = 1.90f;
 	const float tRankS = 1.60f, tRankE = 2.20f;
 
-	// �{�[�i�X���o�ɕK�v�ȏI������
+	//  { [ i X   o ɕK v ȏI      
 	const float tBonusStart = tScoreE + 0.10f;
 	const float bonusDur = 0.55f;
 	float tEnd = tRankE;
@@ -296,7 +296,7 @@ void ClearScene::Update()
 			const float tBonusAddS = 0.18f;
 			const float tBonusAddE = 0.55f;
 
-			// 1) �܂���b�X�R�A��
+			// 1)  ܂   b X R A  
 			if (animTime_ <= tBaseS)
 			{
 				dispScore_ = 0;
@@ -314,7 +314,7 @@ void ClearScene::Update()
 			}
 			else
 			{
-				// 2) �{�[�i�X�����ɉ��Z
+				// 2)  { [ i X     ɉ  Z
 				int scoreNow = baseScore_;
 				bonusActiveIndex_ = -1;
 				bonusAlpha_ = 0;
@@ -328,21 +328,21 @@ void ClearScene::Update()
 				{
 					const float tFromBonus0 = animTime_ - tBonusStart;
 
-					// ���łɊ��������{�[�i�X��
+					//    łɊ        { [ i X  
 					int done = (tFromBonus0 <= 0.0f) ? 0 : (int)std::floor(tFromBonus0 / bonusDur);
 					if (done < 0) done = 0;
 					if (done > bonusCount_) done = bonusCount_;
 
-					// �������͊m����Z
+					//        ͊m    Z
 					for (int i = 0; i < done; ++i) scoreNow += bonusValue_[i];
 
-					// ���ݐi�s���̃{�[�i�X�i����΁j
+					//    ݐi s   ̃{ [ i X i    ΁j
 					if (done < bonusCount_)
 					{
 						bonusActiveIndex_ = done;
 						const float local = tFromBonus0 - (done * bonusDur); // 0..bonusDur
 
-						// �|�b�v�\���ialpha/scale�j
+						//  | b v \   ialpha/scale j
 						{
 							float tp = local / tBonusPop;
 							float eA = EaseOutCubic(tp);
@@ -353,7 +353,7 @@ void ClearScene::Update()
 							bonusScale_ = LerpFloat(0.8f, 1.0f, eB);
 						}
 
-						// ���Z�A�j���iscore + bonus * lerp�j
+						//    Z A j   iscore + bonus * lerp j
 						{
 							float ta = (local - tBonusAddS) / (tBonusAddE - tBonusAddS);
 							float e = EaseOutCubic(ta);
@@ -558,19 +558,19 @@ void ClearScene::Draw()
 		std::snprintf(buf, sizeof(buf), "%s +%d",
 			bonusLabel_[bonusActiveIndex_], bonusValue_[bonusActiveIndex_]);
 
-		// �\���ʒu�FSCORE�p�l���́u��̗]���igap�j�v�ɏo��
+		//  \   ʒu FSCORE p l   ́u  ̗]   igap j v ɏo  
 		const int bx = panelX + 30;
-		const int by = scoreY - gapY + 6;   // SCORE�̒���iTIME��SCORE�̊ԁj
+		const int by = scoreY - gapY + 6;   // SCORE ̒   iTIME  SCORE ̊ԁj
 
-		// �p�l���̃t�F�[�h�ƃ{�[�i�X�̃��𗼕��l��
+		//  p l   ̃t F [ h ƃ{ [ i X ̃  𗼕  l  
 		const int a = (panelAlpha_ < bonusAlpha_) ? panelAlpha_ : bonusAlpha_;
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, a);
 
-		// ���h���ǂ��̂ŉ���蕶�����g��
+		//    h   ǂ  ̂ŉ   蕶     g  
 		DrawOutlinedTextToHandle(bx, by, buf,
 			GetColor(255, 255, 255), GetColor(60, 10, 0), fontHint_);
 
-		// UI�`��̓p�l�����ɖ߂�
+		// UI `  ̓p l     ɖ߂ 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, panelAlpha_);
 	}
 
