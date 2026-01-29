@@ -50,7 +50,7 @@ TitleScene::TitleScene()
 	}
 
 	// BGM
-	sHandle = LoadSoundMem("data/bgm/002.ogg");
+	sHandle = LoadSoundMem("data/bgm/Title.mp3");
 	if (sHandle >= 0) PlaySoundMem(sHandle, DX_PLAYTYPE_LOOP);
 
 	// CSVロード
