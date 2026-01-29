@@ -118,10 +118,12 @@ SelectStage::SelectStage()
 
 	vignetteImg_ = BuildVignetteGraph(vignetteSrcW_, vignetteSrcH_, sw, sh);
 
-
 	introStartMs_ = GetNowCount();
 	introT_ = 0.0f;
 	introDone_ = false;
+
+	SelectBGM  = LoadSoundMem("data/BGM/StageSelect.mp3");
+	PlaySoundMem(SelectBGM, DX_PLAYTYPE_LOOP);
 }
 
 SelectStage::~SelectStage()
@@ -214,6 +216,7 @@ void SelectStage::Update()
 		if (fade_ >= 1.0f)
 		{
 			SceneManager::ChangeScene("PLAY");
+			StopSoundMem(SelectBGM);
 			return;
 		}
 	}

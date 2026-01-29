@@ -130,7 +130,7 @@ Player::Player(int sx, int sy)
 
 	pushX = 0;
 	JumpSE = LoadSoundMem("data/sound/jump.wav");
-	DieSE = LoadSoundMem("data/sound/DeathSound.mp3");
+	DieSE = LoadSoundMem("data/BGM/miss.mp3");
 }
 
 //--------------------------------------
@@ -203,7 +203,6 @@ void Player::Update()
 	if (isDead)
 	{
 		
-
 		if (!deathTelopStarted)
 		{
 			if (telop)
@@ -228,7 +227,7 @@ void Player::Update()
 		{
 			deathAnimEnd = true;
 		}
-
+		
 		return;
 	}
 
@@ -512,6 +511,7 @@ void Player::ForceDie()
 {
 	if (Common::GetInstance() && Common::GetInstance()->invincible)
 	{
+		
 		return;
 	}
 
@@ -523,6 +523,8 @@ void Player::ForceDie()
 	deathAnimEnd = false;
 	deathState = DeathState::Up;
 	velocity = V0;
+
+	PlaySoundMem(DieSE, DX_PLAYTYPE_BACK);
 
 	TriggerHitOverlay();
 }

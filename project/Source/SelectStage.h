@@ -53,4 +53,7 @@ private:
 	int vignetteSrcH_ = 0;
 	int vignetteTargetW_ = 0;
 	int vignetteTargetH_ = 0;
+
+	//BGM
+	int SelectBGM;
 };

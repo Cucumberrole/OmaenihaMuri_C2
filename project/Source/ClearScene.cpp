@@ -102,6 +102,10 @@ ClearScene::ClearScene()
 
 	frame = 0;
 	InitConfetti();
+
+	ChangeVolumeSoundMem(120, GoalBGM);
+	GoalBGM = LoadSoundMem("data/BGM/bgm_result.mp3");
+	PlaySoundMem(GoalBGM, DX_PLAYTYPE_LOOP);
 }
 
 ClearScene::~ClearScene()
@@ -125,6 +129,7 @@ ClearScene::~ClearScene()
 	if (fontPanel_ >= 0) { DeleteFontToHandle(fontPanel_); fontPanel_ = -1; }
 	if (fontHint_ >= 0) { DeleteFontToHandle(fontHint_); fontHint_ = -1; }
 
+	StopSoundMem(GoalBGM);
 }
 
 void ClearScene::Update()
