@@ -7,6 +7,45 @@
 
 static const char* kCharPath = "data/image/omae.png";
 
+static float Clamp01(float x) { return (x < 0.0f) ? 0.0f : (x > 1.0f ? 1.0f : x); }
+
+static float EaseOutCubic(float t)
+{
+	t = Clamp01(t);
+	float u = 1.0f - t;
+	return 1.0f - u * u * u;
+}
+
+static float EaseOutBack(float t) // ちょい跳ねる
+{
+	t = Clamp01(t);
+	const float c1 = 1.70158f;
+	const float c3 = c1 + 1.0f;
+	return 1.0f + c3 * (t - 1.0f) * (t - 1.0f) * (t - 1.0f) + c1 * (t - 1.0f) * (t - 1.0f);
+}
+
+static int LerpInt(int a, int b, float t)
+{
+	t = Clamp01(t);
+	return (int)std::lround((double)a + ((double)b - (double)a) * (double)t);
+}
+
+static float LerpFloat(float a, float b, float t)
+{
+	t = Clamp01(t);
+	return a + (b - a) * t;
+}
+
+static void FormatTimeSec(float sec, char out[32])
+{
+	if (sec < 0.0f) sec = 0.0f;
+	const int totalMs = (int)std::lround(sec * 1000.0f);
+	const int totalSec = totalMs / 1000;
+	const int min = totalSec / 60;
+	const int s = totalSec % 60;
+	std::snprintf(out, 32, "%02d:%02d", min, s);
+}
+
 static const char* kTitleClearPath = "data/Font/GAMECLEAR.png";
 static const char* kTitleThanksPath = "data/Font/thankyou.png";
 
@@ -99,9 +138,21 @@ ClearScene::ClearScene()
 	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("MS ゴシック"), 26, 2);
 	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("Arial"), 26, 2);
 
-
 	frame = 0;
 	InitConfetti();
+
+	animStartMs_ = GetNowCount();
+	lastMs_ = animStartMs_;
+	animTime_ = 0.0f;
+	animSkip_ = false;
+	animDone_ = false;
+
+	dispScore_ = 0;
+	dispTimeSec_ = 0.0f;
+
+	panelAlpha_ = 0;
+	rankAlpha_ = 0;
+	rankOffsetY_ = -20.0f;
 }
 
 ClearScene::~ClearScene()
@@ -131,18 +182,93 @@ void ClearScene::Update()
 {
 	++frame;
 
-	// Back to title.
-	if (CheckHitKey(KEY_INPUT_T) || CheckHitKey(KEY_INPUT_RETURN) || CheckHitKey(KEY_INPUT_SPACE))
-	{
-		SceneManager::ChangeScene("TITLE");
-		return;
-	}
-
 	// Exit application.
 	if (CheckHitKey(KEY_INPUT_ESCAPE))
 	{
 		SceneManager::Exit();
 		return;
+	}
+
+	// アニメのスキップ or タイトルへ
+	const bool pressReturn =
+		CheckHitKey(KEY_INPUT_T) || CheckHitKey(KEY_INPUT_RETURN) || CheckHitKey(KEY_INPUT_SPACE);
+
+	// dt
+	const int now = GetNowCount();
+	float dt = (now - lastMs_) / 1000.0f;
+	if (dt < 0.0f) dt = 0.0f;
+	if (dt > 0.1f) dt = 0.1f; // 突発の長フレーム対策
+	lastMs_ = now;
+
+	// Timeline (seconds)
+	const float tFadeInS = 0.00f, tFadeInE = 0.25f;
+	const float tTimeS = 0.20f, tTimeE = 1.10f;
+	const float tScoreS = 0.55f, tScoreE = 1.90f;
+	const float tRankS = 1.60f, tRankE = 2.20f;
+	const float tEnd = 2.20f;
+
+	if (pressReturn)
+	{
+		if (!animDone_) animSkip_ = true;   // アニメ中：スキップ
+		else
+		{
+			SceneManager::ChangeScene("TITLE"); // アニメ後：タイトルへ
+			return;
+		}
+	}
+
+	if (!animDone_)
+	{
+		if (animSkip_)
+		{
+			animTime_ = tEnd;
+		}
+		else
+		{
+			animTime_ += dt;
+			if (animTime_ >= tEnd) { animTime_ = tEnd; }
+		}
+
+		// Panel fade
+		{
+			float t = (animTime_ - tFadeInS) / (tFadeInE - tFadeInS);
+			panelAlpha_ = (int)std::lround(255.0f * EaseOutCubic(t));
+			if (panelAlpha_ < 0) panelAlpha_ = 0;
+			if (panelAlpha_ > 255) panelAlpha_ = 255;
+		}
+
+		// Time count-up
+		{
+			float t = (animTime_ - tTimeS) / (tTimeE - tTimeS);
+			float e = EaseOutCubic(t);
+			dispTimeSec_ = LerpFloat(0.0f, clearTime, e);
+		}
+
+		// Score count-up
+		{
+			float t = (animTime_ - tScoreS) / (tScoreE - tScoreS);
+			float e = EaseOutCubic(t);
+			dispScore_ = LerpInt(0, finalScore, e);
+		}
+
+		// Rank appear (fade + bounce)
+		{
+			float t = (animTime_ - tRankS) / (tRankE - tRankS);
+			float eA = EaseOutCubic(t);
+			float eB = EaseOutBack(t);
+
+			rankAlpha_ = (int)std::lround(255.0f * eA);
+			if (rankAlpha_ < 0) rankAlpha_ = 0;
+			if (rankAlpha_ > 255) rankAlpha_ = 255;
+
+			// 上から落ちてくる＋少しバウンス
+			rankOffsetY_ = LerpFloat(-24.0f, 0.0f, eB);
+		}
+
+		if (animTime_ >= tEnd)
+		{
+			animDone_ = true;
+		}
 	}
 
 	UpdateConfetti();
@@ -151,12 +277,11 @@ void ClearScene::Update()
 void ClearScene::Draw()
 {
 	// Debug (temporary)
-	DrawFormatString(20, 20, GetColor(255, 255, 255),
-		"elapsedMs=%d  score=%d  rank=%c",
-		g_GameResult.elapsedMs, g_GameResult.score, g_GameResult.rank);
+	//DrawFormatString(20, 20, GetColor(255, 255, 255), "elapsedMs=%d  score=%d  rank=%c", g_GameResult.elapsedMs, g_GameResult.score, g_GameResult.rank);
 
 	DrawBackground();
 	DrawConfetti();
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, panelAlpha_);
 
 	const int W = Screen::WIDTH;
 	const int H = Screen::HEIGHT;
@@ -261,16 +386,22 @@ void ClearScene::Draw()
 	// Rank value
 	const int rankValueW = GetDrawStringWidthToHandle(rankText.c_str(), -1, fontRankValue_);
 	const int rankValueX = panelX + (panelW - rankValueW) / 2;
-	const int rankValueY = rankY + rankPanelH - 118 - 14; // ※118はフォントサイズに合わせたまま
-	DrawOutlinedTextToHandle(rankValueX, rankValueY, rankText.c_str(),
+	const int baseRankValueY = rankY + rankPanelH - 118 - 14;
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, (panelAlpha_ < rankAlpha_) ? panelAlpha_ : rankAlpha_);
+	DrawOutlinedTextToHandle(rankValueX, baseRankValueY + (int)std::lround(rankOffsetY_), rankText.c_str(),
 		rankColor, GetColor(60, 10, 0), fontRankValue_);
+
+	// 以降のUIはパネルαに戻す
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, panelAlpha_);
 
 	// --- 追加：表示用バッファを用意 ---
 	char timeBuf[32] = {};
-	FormatTime(timeBuf);
+	FormatTimeSec(dispTimeSec_, timeBuf);
 
 	char scoreBuf[64] = {};
-	std::snprintf(scoreBuf, sizeof(scoreBuf), "%d", finalScore);
+	std::snprintf(scoreBuf, sizeof(scoreBuf), "%d", dispScore_);
+
 
 	// CLEAR TIME
 	DrawPanel(panelX, timeY, infoPanelW, infoPanelH);
@@ -336,6 +467,7 @@ void ClearScene::Draw()
 	}
 	*/
 
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void ClearScene::CalcScoreAndRank()
