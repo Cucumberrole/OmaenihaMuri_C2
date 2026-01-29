@@ -1,7 +1,5 @@
 #pragma once
 #include <vector>
-#include <unordered_map>
-#include <functional>
 #include "../Library/GameObject.h"
 
 class Field : public GameObject
@@ -41,7 +39,7 @@ public:
 	{
 		POINT pos{};
 		bool  alive = true;   // 天井で待機表示するか
-		bool  chaser = false; // 落下後に追尾飛行するか（15用）
+		bool  chaser = false; // 落下後に追尾飛行するか（14用）
 	};
 
 	struct FallingSpikeTrigger
@@ -64,10 +62,6 @@ public:
 	int HitCheckUp(int px, int py);
 
 private:
-	// cell番号 -> 生成処理（Field.cpp で登録）
-	void RegisterCellSpawners();
-	std::unordered_map<int, std::function<void(int /*tx*/, int /*ty*/)>> cellSpawners;
-
 	// マップはグローバルからメンバへ
 	std::vector<std::vector<int>> maps;
 
