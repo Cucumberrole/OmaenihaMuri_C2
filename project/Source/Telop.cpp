@@ -21,7 +21,6 @@ void Telop::StartDeathTelop(Player* p)
     const char* messages[] = {
         "うんこだな",
         "痛いよ",
-        "プログラムがんばろう ",
         "人の心とかないんか",
         "（´・ω・｀）",
         "(´;ω;｀)"

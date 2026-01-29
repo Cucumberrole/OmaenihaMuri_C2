@@ -135,6 +135,9 @@ void PlayScene::Update()
                 g_Life = life;
                 g_RetryCount = retryCount;
                 g_deathCount = deathCount;
+                StopSoundMem(StageBGM1);
+                StopSoundMem(StageBGM2);
+
             }
 
             state = Playstate::Death;
@@ -184,6 +187,12 @@ void PlayScene::Update()
         }
 
         state = Playstate::Zanki;
+        if (life == 1)
+        {
+            PlaySoundMem(LastSE, DX_PLAYTYPE_BACK);
+        }
+        StopSoundMem(LastSE);
+
         return;
     }
 
