@@ -258,11 +258,11 @@ Field::Field(int stage)
 			}
 			else if (cell == 106) 
 			{
-				new Sun(xx * 64.0f, yy + 64.0f);
+				new Sun(xx * 64.0f, yy * 64.0f);
 			}
 			else if (cell == 120)
 			{
-				new Zone(xx * 64.0f, yy + 64.0f);
+				new Zone(xx * 64.0f, yy * 64.0f);
 			}
 		}
 	}

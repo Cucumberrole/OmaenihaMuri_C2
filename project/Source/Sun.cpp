@@ -50,8 +50,8 @@ void Sun::Update()
 	y += vy;
 
 	// âÊñ äOÇ…èoÇ»Ç¢ÇÊÇ§Ç…îΩéÀ
-	if (x < 0 || x > 1900 - size) vx *= -1;
-	if (y < 0 || y > 1060 - size) vy *= -1;
+	if (x < 512 || x > 1950 - size) vx *= -1;
+	if (y < 450 || y > 650 - size) vy *= -1;
 
 	if (GetRand(100) < 3)
 	{

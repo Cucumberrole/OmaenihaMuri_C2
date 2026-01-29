@@ -51,6 +51,12 @@ private:
 	int Maxjumpcount;
 	int hp;
 
+	//SE
+	int JumpSE;
+	int DieSE;
+
+	
+
 	bool isDead;  // ← プレイヤーが死んで固定状態か？
 
 	// 円当たり判定用 (中心からの半径だけ持っておく)
