@@ -26,4 +26,6 @@ private:
 	int MsgImage7;
 	int MsgImage8;
 	int MsgImage9;
+	
+	int GameOverBGM;
 };

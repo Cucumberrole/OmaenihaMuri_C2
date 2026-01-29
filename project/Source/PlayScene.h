@@ -40,4 +40,5 @@ private:
 
 	int StageBGM1;
 	int StageBGM2;
+	int LastSE;
 };

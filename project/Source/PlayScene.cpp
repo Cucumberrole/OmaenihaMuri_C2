@@ -41,7 +41,20 @@ PlayScene::PlayScene()
 	new Field(SelectedStage);
 
 	sound = 0;
-	Ssound = LoadSoundMem("data/sound/bgm_ogg.ogg");
+	ChangeVolumeSoundMem(150, StageBGM1);
+	ChangeVolumeSoundMem(150, StageBGM2);
+	StageBGM1 = LoadSoundMem("data/BGM/Stage1.mp3");
+	StageBGM2 = LoadSoundMem("data/BGM/Stage2.mp3");
+	LastSE = LoadSoundMem("data/BGM/life_warning.mp3");
+
+	if (SelectedStage == 1)
+	{
+		PlaySoundMem(StageBGM1, DX_PLAYTYPE_LOOP);
+	}
+	else if (SelectedStage == 2)
+	{
+		PlaySoundMem(StageBGM2, DX_PLAYTYPE_LOOP);
+	}
 
 	if (!g_IsRetry)
 	{
@@ -61,12 +74,14 @@ PlayScene::PlayScene()
 		g_ClearTimeSeconds = 0.0f;
 	}
 	g_IsRetry = false;
+	
 }
 
 PlayScene::~PlayScene()
 {
 	Hud::Shutdown();
 	InitSoundMem();
+	
 }
 
 void PlayScene::Update()
@@ -105,6 +120,9 @@ void PlayScene::Update()
 				g_Life = life;
 				g_RetryCount = retryCount;
 				g_deathCount = deathCount;
+				StopSoundMem(StageBGM1);
+				StopSoundMem(StageBGM2);
+				
 			}
 
 			// 死亡演出中へ（入力は遮断）
@@ -124,6 +142,7 @@ void PlayScene::Update()
 			GR_FixOnGoalOnce_Manual((int)clearTime, retryCount);
 
 			SceneManager::ChangeScene("CLEAR");
+		
 			return;
 		}
 
@@ -173,11 +192,18 @@ void PlayScene::Update()
 
 		// 残機が残っているなら残機表示へ
 		state = Playstate::Zanki;
+		if (life == 1)
+		{
+			PlaySoundMem(LastSE, DX_PLAYTYPE_BACK);
+		}
+		StopSoundMem(LastSE);
 		return;
 	}
 
 	case Playstate::Zanki:
 	{
+		
+		
 		// 黒画面中はRだけ受付
 		if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
 		{
@@ -191,6 +217,7 @@ void PlayScene::Update()
 			SceneManager::ForceChangeScene("PLAY");
 		}
 		return;
+		
 	}
 	}
 }
