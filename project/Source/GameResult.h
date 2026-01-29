@@ -36,11 +36,19 @@ struct GameResult
 
 	int noMissBonus = 2000;  // ノーミス（deathCount==0）ボーナス
 	int under60sBonus = 1000;  // 60秒以内クリアボーナス
+
+	// 現在スコア（プレイ中にリアルタイム更新する）
+	int liveScore = 0;
+
+	// 時間減点を適用済みの「秒」(差分適用のため)
+	int appliedTimeSec = 0;
 };
+
+// 現在のライブスコア取得（HUD用）
+int GR_GetLiveScore();
 
 // どこからでも参照できる用結果データ
 extern GameResult g_GameResult;
-
 
 // 新しくプレイを開始する時に呼ぶ
 void GR_ResetRun(CourseType course);

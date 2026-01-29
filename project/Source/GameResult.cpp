@@ -62,28 +62,48 @@ static char CalcRank(const GameResult& gr)
 // プレイ開始時に呼ぶ：結果を初期化して計測開始
 void GR_ResetRun(CourseType course)
 {
-	g_GameResult = GameResult{};        // すべてデフォルト値へ戻す
-	g_GameResult.course = course;       // 難易度を設定
+	g_GameResult = GameResult{};
+	g_GameResult.course = course;
 
-	g_GameResult.fixed = false;         // まだ確定していない
-	g_GameResult.deathCount = 0;        // 死亡回数リセット
+	g_GameResult.fixed = false;
+	g_GameResult.deathCount = 0;
 
-	g_GameResult.startTimeMs = GetNowCount(); // 計測開始時刻を保存
-	g_GameResult.elapsedMs = 0;              // 経過時間リセット
+	g_GameResult.startTimeMs = GetNowCount();
+	g_GameResult.elapsedMs = 0;
+
+	g_GameResult.liveScore = g_GameResult.initialScore;
+	g_GameResult.appliedTimeSec = 0;
 }
 
 // プレイ中に毎フレーム呼ぶ：経過時間を更新（確定後は更新しない）
 void GR_UpdateDuringPlay()
 {
-	if (g_GameResult.fixed) return; // ゴール後は止める（重要）
+	if (g_GameResult.fixed) return;
+
 	g_GameResult.elapsedMs = GetNowCount() - g_GameResult.startTimeMs;
+
+	const int elapsedSec = max(0, g_GameResult.elapsedMs) / 1000;
+
+	// 秒が進んだ分だけ時間減点を適用
+	if (elapsedSec > g_GameResult.appliedTimeSec)
+	{
+		const int deltaSec = elapsedSec - g_GameResult.appliedTimeSec;
+		g_GameResult.liveScore -= deltaSec * g_GameResult.timePenaltyPerSec;
+		g_GameResult.liveScore = ClampScore(g_GameResult.liveScore);
+
+		g_GameResult.appliedTimeSec = elapsedSec;
+	}
 }
 
 // 死亡した瞬間に呼ぶ：死亡回数を増やす（確定後は増やさない）
 void GR_OnDeath()
 {
-	if (g_GameResult.fixed) return;
-	g_GameResult.deathCount++;
+    if (g_GameResult.fixed) return;
+
+    g_GameResult.deathCount++;
+
+    g_GameResult.liveScore -= DeathPenalty(g_GameResult);
+    g_GameResult.liveScore = ClampScore(g_GameResult.liveScore);
 }
 
 // 現在の経過時間を「秒」で返す（HUD表示用）
@@ -93,26 +113,47 @@ int GR_GetElapsedSecLive()
 	return ms / 1000;                              // ミリ秒→秒（切り捨て）
 }
 
+int GR_GetLiveScore()
+{
+	return ClampScore(g_GameResult.liveScore);
+}
+
 // ゴールした瞬間に呼ぶ：タイム/スコア/ランクを1回だけ確定する
 void GR_FixOnGoalOnce()
 {
-	if (g_GameResult.fixed) return;  // 2回目以降は何もしない
+	if (g_GameResult.fixed) return;
 	g_GameResult.fixed = true;
 
-	g_GameResult.clearTimeSec = GR_GetElapsedSecLive();   // クリア秒を確定
-	g_GameResult.score = CalcScore(g_GameResult);         // スコア確定
-	g_GameResult.rank = CalcRank(g_GameResult);          // ランク確定
+	g_GameResult.clearTimeSec = GR_GetElapsedSecLive();
+
+	int finalScore = g_GameResult.liveScore;
+
+	// ボーナス
+	if (g_GameResult.deathCount == 0) finalScore += g_GameResult.noMissBonus;
+	if (g_GameResult.clearTimeSec <= 60) finalScore += g_GameResult.under60sBonus;
+
+	g_GameResult.score = ClampScore(finalScore);
+	g_GameResult.rank = CalcRank(g_GameResult);
 }
 
 // ゴール時に「外部から渡された値」で確定したい場合（PlayScene側の値をそのまま渡す）
 void GR_FixOnGoalOnce_Manual(int clearTimeSec, int deathCount)
 {
-	if (g_GameResult.fixed) return;  // 2回目以降は何もしない
+	if (g_GameResult.fixed) return;
 	g_GameResult.fixed = true;
 
-	g_GameResult.clearTimeSec = max(0, clearTimeSec); // 渡されたクリア秒を確定
-	g_GameResult.deathCount = max(0, deathCount);   // 渡された死亡回数を確定
+	g_GameResult.clearTimeSec = max(0, clearTimeSec);
+	g_GameResult.deathCount = max(0, deathCount);
 
-	g_GameResult.score = CalcScore(g_GameResult);     // スコア確定
-	g_GameResult.rank = CalcRank(g_GameResult);      // ランク確定
+	// Manualの場合も時間整合を取る（任意だが推奨）
+	g_GameResult.elapsedMs = g_GameResult.clearTimeSec * 1000;
+	g_GameResult.appliedTimeSec = g_GameResult.clearTimeSec;
+
+	int finalScore = g_GameResult.liveScore;
+
+	if (g_GameResult.deathCount == 0) finalScore += g_GameResult.noMissBonus;
+	if (g_GameResult.clearTimeSec <= 60) finalScore += g_GameResult.under60sBonus;
+
+	g_GameResult.score = ClampScore(finalScore);
+	g_GameResult.rank = CalcRank(g_GameResult);
 }

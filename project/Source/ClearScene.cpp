@@ -44,9 +44,6 @@ static void DrawGraphKeepAspectCentered(
 
 ClearScene::ClearScene()
 {
-	// 結果を確定
-	GR_FixOnGoalOnce();
-
 	// GameResult から「確定済みの値」をコピー
 	clearTime = g_GameResult.elapsedMs / 1000.0f;   // 秒
 	retryCount = g_GameResult.deathCount;            // 1回死ぬごとに
@@ -153,6 +150,11 @@ void ClearScene::Update()
 
 void ClearScene::Draw()
 {
+	// Debug (temporary)
+	DrawFormatString(20, 20, GetColor(255, 255, 255),
+		"elapsedMs=%d  score=%d  rank=%c",
+		g_GameResult.elapsedMs, g_GameResult.score, g_GameResult.rank);
+
 	DrawBackground();
 	DrawConfetti();
 
@@ -320,6 +322,20 @@ void ClearScene::Draw()
 		SetFontSize(24);
 		DrawString(charX + 10, charY + 10, "IMG LOAD FAILED", GetColor(255, 255, 255));
 	}
+
+	// ---- DEBUG OVERLAY ----
+	/*
+	{
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 220);
+		DrawBox(0, 0, 560, 90, GetColor(0, 0, 0), TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
+		DrawFormatString(10, 10, GetColor(255, 255, 255),
+			"elapsedMs=%d  clearTime=%.3f  score=%d  rank=%c",
+			g_GameResult.elapsedMs, clearTime, g_GameResult.score, g_GameResult.rank);
+	}
+	*/
+
 }
 
 void ClearScene::CalcScoreAndRank()
@@ -514,7 +530,6 @@ void ClearScene::FormatTime(char out[32]) const
 	const int totalSec = totalMs / 1000;
 	const int min = totalSec / 60;
 	const int sec = totalSec % 60;
-	const int ms = totalMs % 1000;
 
-	std::snprintf(out, 32, "%02d:%02d.%03d", min, sec, ms);
+	std::snprintf(out, 32, "%02d:%02d", min, sec);
 }

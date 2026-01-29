@@ -128,6 +128,7 @@ Player::Player(int sx, int sy)
 
 	SetDrawOrder(0);
 
+	pushX = 0;
 	JumpSE = LoadSoundMem("data/sound/jump.wav");
 	DieSE = LoadSoundMem("data/sound/DeathSound.mp3");
 }
@@ -159,9 +160,10 @@ void Player::PushByWall(float dx)
 	if (dx == 0.0f) return;
 
 	Field* field = FindGameObject<Field>();
-	if (!field) { x += dx; return; }
+//	if (!field) { x += dx; return; }
 
-	x += dx;
+//	x += dx;
+	pushX = dx;
 
 	int push = 0;
 	if (dx > 0)
@@ -169,14 +171,18 @@ void Player::PushByWall(float dx)
 		int push1 = field->HitCheckRightMapOnly((int)(x + 63), (int)(y + 5));
 		int push2 = field->HitCheckRightMapOnly((int)(x + 63), (int)(y + 58));
 		push = max(push1, push2);
-		if (push > 0) x -= (float)push;
+		if (push > 0) {
+			x -= (float)push;
+		}
 	}
 	else
 	{
 		int push1 = field->HitCheckLeftMapOnly((int)(x + 0), (int)(y + 5));
 		int push2 = field->HitCheckLeftMapOnly((int)(x + 0), (int)(y + 58));
 		push = max(push1, push2);
-		if (push > 0) x += (float)push;
+		if (push > 0) {
+			x += (float)push;
+		}
 	}
 }
 
@@ -261,7 +267,7 @@ void Player::Update()
 	}
 
 	// まず移動
-	if (moveX != 0)
+	if (moveX != 0 || pushX != 0)
 	{
 		x += (float)moveX;
 
@@ -269,30 +275,31 @@ void Player::Update()
 		int push = 0;
 
 		// --- Field 判定 ---
-		if (moveX > 0) {
+		if (moveX > 0 ||pushX != 0) {
 			// 右端は「63」にする
 			int push1 = field->HitCheckRight((int)(x + 63), (int)(y + 5));
 			int push2 = field->HitCheckRight((int)(x + 63), (int)(y + 58));
+	
 			push = max(push1, push2);
 		}
-		else {
+		else if (moveX<0 || pushX>0){
 			int push1 = field->HitCheckLeft((int)(x + 0), (int)(y + 5));
 			int push2 = field->HitCheckLeft((int)(x + 0), (int)(y + 58));
-			push = max(push1, push2);
+			push = -max(push1, push2);
 		}
 
 		// --- FallingFloor 判定 ---
 		auto floors = FindGameObjects<FallingFloor>();
 		for (auto f : floors) {
-			if (moveX > 0) {
+			if (moveX > 0 || pushX != 0) {
 				int p1 = f->HitCheckRight((int)(x + 63), (int)(y + 1));
 				int p2 = f->HitCheckRight((int)(x + 63), (int)(y + 62));
 				push = max(push, max(p1, p2));
 			}
-			else {
+			else if (moveX<0 || pushX>0){
 				int p1 = f->HitCheckLeft((int)(x + 0), (int)(y + 1));
 				int p2 = f->HitCheckLeft((int)(x + 0), (int)(y + 62));
-				push = max(push, max(p1, p2));
+				push = -max(-push, max(p1, p2));
 			}
 		}
 
@@ -301,23 +308,24 @@ void Player::Update()
 		for (auto vf : vFloors) {
 			if (!vf->IsActive()) continue;
 
-			if (moveX > 0) {
+			if (moveX > 0||pushX != 0) {
 				int p1 = vf->HitCheckRight((int)(x + 63), (int)(y + 1));
 				int p2 = vf->HitCheckRight((int)(x + 63), (int)(y + 62));
 				push = max(push, max(p1, p2));
 			}
-			else {
+			else if (moveX<0 || pushX>0){
 				int p1 = vf->HitCheckLeft((int)(x + 0), (int)(y + 1));
 				int p2 = vf->HitCheckLeft((int)(x + 0), (int)(y + 62));
-				push = max(push, max(p1, p2));
+				push = -max(-push, max(p1, p2));
 			}
 		}
 
 		// 押し戻し
-		if (push > 0) {
-			if (moveX > 0) x -= (float)push;
-			else           x += (float)push;
-		}
+		x -=push;
+//		if (push > 0) {
+//			if (moveX > 0) x -= (float)push;
+//			else           x += (float)push;
+//		}
 	}
 
 	//========================================================
@@ -455,6 +463,8 @@ void Player::Update()
 	IsReverse = false;
 
 	UpdateHitOverlay();
+
+	pushX = 0;
 }
 
 
