@@ -47,6 +47,22 @@ private:
 	int frame = 0;
 	std::vector<Confetti> confetti;
 
+	// ---- Result UI Animation ----
+	int   animStartMs_ = 0;
+	int   lastMs_ = 0;
+	float animTime_ = 0.0f;
+	bool  animSkip_ = false;
+	bool  animDone_ = false;
+
+	// display values (animated)
+	int   dispScore_ = 0;
+	float dispTimeSec_ = 0.0f;
+
+	// alpha / motion
+	int   panelAlpha_ = 0;     // 0..255
+	int   rankAlpha_ = 0;     // 0..255
+	float rankOffsetY_ = -20.0f;
+
 private:
 	void CalcScoreAndRank();
 

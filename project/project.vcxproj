@@ -212,6 +212,7 @@
     <ClCompile Include="Source\Background.cpp" />
     <ClCompile Include="Source\Boss.cpp" />
     <ClCompile Include="Source\BouncingAnimatedTrap.cpp" />
+    <ClCompile Include="Source\ClearScene.cpp" />
     <ClCompile Include="Source\Collision.cpp" />
     <ClCompile Include="Source\Common.cpp" />
     <ClCompile Include="Source\DirectionalSpike.cpp" />
@@ -228,7 +229,6 @@
     <ClCompile Include="Source\PatrplEnemy.cpp" />
     <ClCompile Include="Source\RollingBall.cpp" />
     <ClCompile Include="Source\BootScene.cpp" />
-    <ClCompile Include="Source\ClearScene.cpp" />
     <ClCompile Include="Source\CsvReader.cpp" />
     <ClCompile Include="Source\Dokan.cpp" />
     <ClCompile Include="Source\Dokan2.cpp" />

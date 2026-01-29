@@ -59,9 +59,6 @@
     <ClCompile Include="Source\Background.cpp">
       <Filter>PlayScene</Filter>
     </ClCompile>
-    <ClCompile Include="Source\ClearScene.cpp">
-      <Filter>ClearScene</Filter>
-    </ClCompile>
     <ClCompile Include="Source\GameOver.cpp">
       <Filter>GameOver</Filter>
     </ClCompile>
@@ -144,11 +141,15 @@
     <ClCompile Include="Source\Field.cpp">
       <Filter>PlayScene</Filter>
     </ClCompile>
-	  <ClCompile Include="Source\Hud.cpp">
-		  <Filter>HUD</Filter>
-	  </ClCompile>
+    <ClCompile Include="Source\Hud.cpp">
+      <Filter>HUD</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Sun.cpp">
       <Filter>Trap</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Zone.cpp" />
+    <ClCompile Include="Source\ClearScene.cpp">
+      <Filter>ClearScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -388,12 +389,13 @@
     <ClInclude Include="Source\GameConfig.h">
       <Filter>StageSelect</Filter>
     </ClInclude>
-	  <ClInclude Include="Source\Hud.h">
-		  <Filter>HUD</Filter>
-	  </ClInclude>
+    <ClInclude Include="Source\Hud.h">
+      <Filter>HUD</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Sun.h">
       <Filter>Trap</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Zone.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">
