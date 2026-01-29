@@ -37,4 +37,7 @@ private:
 
 	// この死亡を処理したか？（残機減算などを一度だけ行う）
 	bool deathHandled = false;
+
+	int StageBGM1;
+	int StageBGM2;
 };

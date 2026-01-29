@@ -85,6 +85,9 @@ Player::Player()
 	deathState = DeathState::None;
 	deathAnimEnd = false;
 
+	JumpSE = LoadSoundMem("data/sound/jump.wav");
+	DieSE = LoadSoundMem("data/sound/DeathSound.mp3");
+	//PlaySoundMem(DieSE, DX_PLAYTYPE_BACK);
 
 }
 
@@ -126,6 +129,8 @@ Player::Player(int sx, int sy)
 	SetDrawOrder(0);
 
 	pushX = 0;
+	JumpSE = LoadSoundMem("data/sound/jump.wav");
+	DieSE = LoadSoundMem("data/sound/DeathSound.mp3");
 }
 
 //--------------------------------------
@@ -197,6 +202,8 @@ void Player::Update()
 	// --- 死亡演出 ---
 	if (isDead)
 	{
+		
+
 		if (!deathTelopStarted)
 		{
 			if (telop)
@@ -222,7 +229,6 @@ void Player::Update()
 			deathAnimEnd = true;
 		}
 
-		
 		return;
 	}
 
@@ -329,6 +335,7 @@ void Player::Update()
 		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
 			velocity = V0;
 			onGround = false;
+			PlaySoundMem(JumpSE, DX_PLAYTYPE_BACK);
 		}
 	}
 
@@ -337,6 +344,7 @@ void Player::Update()
 		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
 			jumpcount -= 1;
 			velocity = V0;
+			PlaySoundMem(JumpSE, DX_PLAYTYPE_BACK);
 		}
 	}
 
