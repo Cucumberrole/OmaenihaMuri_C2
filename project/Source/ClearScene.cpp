@@ -16,7 +16,7 @@ static float EaseOutCubic(float t)
 	return 1.0f - u * u * u;
 }
 
-static float EaseOutBack(float t) // ‚¿‚å‚¢’µ‚Ë‚é
+static float EaseOutBack(float t) // ã¡ã‚‡ã„è·³ã­ã‚‹
 {
 	t = Clamp01(t);
 	const float c1 = 1.70158f;
@@ -83,30 +83,30 @@ static void DrawGraphKeepAspectCentered(
 
 ClearScene::ClearScene()
 {
-	// GameResult ‚©‚çuŠm’èÏ‚İ‚Ì’lv‚ğƒRƒs[
-	clearTime = g_GameResult.elapsedMs / 1000.0f;   // •b
-	retryCount = g_GameResult.deathCount;            // 1‰ñ€‚Ê‚²‚Æ‚É
+	// GameResult ã‹ã‚‰ã€Œç¢ºå®šæ¸ˆã¿ã®å€¤ã€ã‚’ã‚³ãƒ”ãƒ¼
+	clearTime = g_GameResult.elapsedMs / 1000.0f;   // ç§’
+	retryCount = g_GameResult.deathCount;            // 1å›æ­»ã¬ã”ã¨ã«
 	finalScore = g_GameResult.score;
 	rankChar = g_GameResult.rank;
 
 	// ---- build bonus list for presentation ----
 	bonusCount_ = 0;
 
-	// GameResult ‘¤‚ÌğŒ‚Æˆê’v‚³‚¹‚éi‚ ‚È‚½‚ÌGameResult.cpp‚ÌğŒj
+	// GameResult ï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½Æˆï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½GameResult.cppï¿½Ìï¿½ï¿½ï¿½ï¿½j
 	if (g_GameResult.deathCount == 0 && bonusCount_ < kMaxBonuses)
 	{
 		bonusLabel_[bonusCount_] = "NO MISS BONUS";
-		bonusValue_[bonusCount_] = g_GameResult.noMissBonus;     // —á: 2000
+		bonusValue_[bonusCount_] = g_GameResult.noMissBonus;     // ï¿½ï¿½: 2000
 		bonusCount_++;
 	}
 	if (g_GameResult.clearTimeSec <= 60 && bonusCount_ < kMaxBonuses)
 	{
 		bonusLabel_[bonusCount_] = "TIME BONUS";
-		bonusValue_[bonusCount_] = g_GameResult.under60sBonus;   // —á: 1000
+		bonusValue_[bonusCount_] = g_GameResult.under60sBonus;   // ï¿½ï¿½: 1000
 		bonusCount_++;
 	}
 
-	// baseScore = ÅIƒXƒRƒA - ƒ{[ƒiƒX‡Œvi•\¦—pj
+	// baseScore = ï¿½ÅIï¿½Xï¿½Rï¿½A - ï¿½{ï¿½[ï¿½iï¿½Xï¿½ï¿½ï¿½vï¿½iï¿½\ï¿½ï¿½ï¿½pï¿½j
 	int sumBonus = 0;
 	for (int i = 0; i < bonusCount_; ++i) sumBonus += bonusValue_[i];
 
@@ -118,7 +118,8 @@ ClearScene::ClearScene()
 	bonusAlpha_ = 0;
 	bonusScale_ = 1.0f;
 
-	// •\¦—pƒeƒLƒXƒgEFEˆêŒ¾ƒƒbƒZ[ƒW‚¾‚¯Œˆ‚ß‚é
+	// ï¿½\ï¿½ï¿½ï¿½pï¿½eï¿½Lï¿½Xï¿½gï¿½Eï¿½Fï¿½Eï¿½êŒ¾ï¿½ï¿½ï¿½bï¿½Zï¿½[ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½
+	// è¡¨ç¤ºç”¨ãƒ†ã‚­ã‚¹ãƒˆãƒ»è‰²ãƒ»ä¸€è¨€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã ã‘æ±ºã‚ã‚‹
 	CalcScoreAndRank();
 
 	// Load title images (shared).
@@ -132,39 +133,39 @@ ClearScene::ClearScene()
 	imgChar = LoadGraph(kCharPath);
 
 	// --- Fonts ---
-	fontTitle_ = CreateJPFont(TEXT("HGS‘n‰pŠpÎß¯Ìß‘Ì"), 100, 4);
+	fontTitle_ = CreateJPFont(TEXT("HGSå‰µè‹±è§’ï¾ï¾Ÿï½¯ï¾Œï¾Ÿä½“"), 100, 4);
 	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("Meiryo UI"), 84, 4);
-	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("MS ƒSƒVƒbƒN"), 84, 3);
+	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("MS ã‚´ã‚·ãƒƒã‚¯"), 84, 3);
 	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("Arial Black"), 84, 4);
 
-	fontThanks_ = CreateJPFont(TEXT("HGS‘n‰pŠpÎß¯Ìß‘Ì"), 46, 2);
+	fontThanks_ = CreateJPFont(TEXT("HGSå‰µè‹±è§’ï¾ï¾Ÿï½¯ï¾Œï¾Ÿä½“"), 46, 2);
 	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("Meiryo UI"), 46, 2);
-	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("MS ƒSƒVƒbƒN"), 46, 2);
+	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("MS ã‚´ã‚·ãƒƒã‚¯"), 46, 2);
 	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("Arial"), 46, 2);
 
-	fontMsg_ = CreateJPFont(TEXT("Ÿà–¾’© Demibold"), 40, 2);
+	fontMsg_ = CreateJPFont(TEXT("æ¸¸æ˜æœ Demibold"), 40, 2);
 	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("Meiryo UI"), 34, 2);
-	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("MS ƒSƒVƒbƒN"), 34, 2);
+	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("MS ã‚´ã‚·ãƒƒã‚¯"), 34, 2);
 	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("Arial"), 34, 2);
 
-	fontRankLabel_ = CreateJPFont(TEXT("HGS‘n‰pŠpÎß¯Ìß‘Ì"), 82, 4);
+	fontRankLabel_ = CreateJPFont(TEXT("HGSå‰µè‹±è§’ï¾ï¾Ÿï½¯ï¾Œï¾Ÿä½“"), 82, 4);
 	if (fontRankLabel_ < 0) fontRankLabel_ = CreateJPFont(TEXT("Meiryo UI"), 82, 4);
-	if (fontRankLabel_ < 0) fontRankLabel_ = CreateJPFont(TEXT("MS ƒSƒVƒbƒN"), 82, 3);
+	if (fontRankLabel_ < 0) fontRankLabel_ = CreateJPFont(TEXT("MS ã‚´ã‚·ãƒƒã‚¯"), 82, 3);
 	if (fontRankLabel_ < 0) fontRankLabel_ = CreateJPFont(TEXT("Arial Black"), 82, 4);
 
-	fontRankValue_ = CreateJPFont(TEXT("HGS‘n‰pŠpÎß¯Ìß‘Ì"), 118, 5);
+	fontRankValue_ = CreateJPFont(TEXT("HGSå‰µè‹±è§’ï¾ï¾Ÿï½¯ï¾Œï¾Ÿä½“"), 118, 5);
 	if (fontRankValue_ < 0) fontRankValue_ = CreateJPFont(TEXT("Meiryo UI"), 118, 5);
-	if (fontRankValue_ < 0) fontRankValue_ = CreateJPFont(TEXT("MS ƒSƒVƒbƒN"), 118, 4);
+	if (fontRankValue_ < 0) fontRankValue_ = CreateJPFont(TEXT("MS ã‚´ã‚·ãƒƒã‚¯"), 118, 4);
 	if (fontRankValue_ < 0) fontRankValue_ = CreateJPFont(TEXT("Arial Black"), 118, 5);
 
-	fontPanel_ = CreateJPFont(TEXT("BIZ UDP–¾’© Medium"), 40, 2);
+	fontPanel_ = CreateJPFont(TEXT("BIZ UDPæ˜æœ Medium"), 40, 2);
 	if (fontPanel_ < 0) fontPanel_ = CreateJPFont(TEXT("Meiryo UI"), 40, 2);
-	if (fontPanel_ < 0) fontPanel_ = CreateJPFont(TEXT("MS ƒSƒVƒbƒN"), 40, 2);
+	if (fontPanel_ < 0) fontPanel_ = CreateJPFont(TEXT("MS ã‚´ã‚·ãƒƒã‚¯"), 40, 2);
 	if (fontPanel_ < 0) fontPanel_ = CreateJPFont(TEXT("Arial"), 40, 2);
 
-	fontHint_ = CreateJPFont(TEXT("ƒƒCƒŠƒI"), 26, 2);
+	fontHint_ = CreateJPFont(TEXT("ãƒ¡ã‚¤ãƒªã‚ª"), 26, 2);
 	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("Meiryo UI"), 26, 2);
-	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("MS ƒSƒVƒbƒN"), 26, 2);
+	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("MS ã‚´ã‚·ãƒƒã‚¯"), 26, 2);
 	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("Arial"), 26, 2);
 
 	frame = 0;
@@ -183,7 +184,7 @@ ClearScene::ClearScene()
 	rankAlpha_ = 0;
 	rankOffsetY_ = -20.0f;
 	GoalBGM = LoadSoundMem("data/BGM/bgm_result.mp3");
-	ChangeVolumeSoundMem(120, GoalBGM);
+	ChangeVolumeSoundMem(130, GoalBGM);
 	PlaySoundMem(GoalBGM, DX_PLAYTYPE_LOOP);
 }
 
@@ -222,7 +223,7 @@ void ClearScene::Update()
 		return;
 	}
 
-	// ƒAƒjƒ‚ÌƒXƒLƒbƒv or ƒ^ƒCƒgƒ‹‚Ö
+	// ã‚¢ãƒ‹ãƒ¡ã®ã‚¹ã‚­ãƒƒãƒ— or ã‚¿ã‚¤ãƒˆãƒ«ã¸
 	const bool pressReturn =
 		CheckHitKey(KEY_INPUT_T) || CheckHitKey(KEY_INPUT_RETURN) || CheckHitKey(KEY_INPUT_SPACE);
 
@@ -230,7 +231,7 @@ void ClearScene::Update()
 	const int now = GetNowCount();
 	float dt = (now - lastMs_) / 1000.0f;
 	if (dt < 0.0f) dt = 0.0f;
-	if (dt > 0.1f) dt = 0.1f; // “Ë”­‚Ì’·ƒtƒŒ[ƒ€‘Îô
+	if (dt > 0.1f) dt = 0.1f; // çªç™ºã®é•·ãƒ•ãƒ¬ãƒ¼ãƒ å¯¾ç­–
 	lastMs_ = now;
 
 	// Timeline (seconds)
@@ -239,7 +240,7 @@ void ClearScene::Update()
 	const float tScoreS = 0.55f, tScoreE = 1.90f;
 	const float tRankS = 1.60f, tRankE = 2.20f;
 
-	// ƒ{[ƒiƒX‰‰o‚É•K—v‚ÈI—¹
+	// ï¿½{ï¿½[ï¿½iï¿½Xï¿½ï¿½ï¿½oï¿½É•Kï¿½vï¿½ÈIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	const float tBonusStart = tScoreE + 0.10f;
 	const float bonusDur = 0.55f;
 	float tEnd = tRankE;
@@ -250,10 +251,10 @@ void ClearScene::Update()
 
 	if (pressReturn)
 	{
-		if (!animDone_) animSkip_ = true;   // ƒAƒjƒ’†FƒXƒLƒbƒv
+		if (!animDone_) animSkip_ = true;   // ã‚¢ãƒ‹ãƒ¡ä¸­ï¼šã‚¹ã‚­ãƒƒãƒ—
 		else
 		{
-			SceneManager::ChangeScene("TITLE"); // ƒAƒjƒŒãFƒ^ƒCƒgƒ‹‚Ö
+			SceneManager::ChangeScene("TITLE"); // ã‚¢ãƒ‹ãƒ¡å¾Œï¼šã‚¿ã‚¤ãƒˆãƒ«ã¸
 			return;
 		}
 	}
@@ -295,7 +296,7 @@ void ClearScene::Update()
 			const float tBonusAddS = 0.18f;
 			const float tBonusAddE = 0.55f;
 
-			// 1) ‚Ü‚¸Šî‘bƒXƒRƒA‚Ö
+			// 1) ï¿½Ü‚ï¿½ï¿½ï¿½bï¿½Xï¿½Rï¿½Aï¿½ï¿½
 			if (animTime_ <= tBaseS)
 			{
 				dispScore_ = 0;
@@ -313,7 +314,7 @@ void ClearScene::Update()
 			}
 			else
 			{
-				// 2) ƒ{[ƒiƒX‚ğ‡‚É‰ÁZ
+				// 2) ï¿½{ï¿½[ï¿½iï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½É‰ï¿½ï¿½Z
 				int scoreNow = baseScore_;
 				bonusActiveIndex_ = -1;
 				bonusAlpha_ = 0;
@@ -327,21 +328,21 @@ void ClearScene::Update()
 				{
 					const float tFromBonus0 = animTime_ - tBonusStart;
 
-					// ‚·‚Å‚ÉŠ®—¹‚µ‚½ƒ{[ƒiƒX”
+					// ï¿½ï¿½ï¿½Å‚ÉŠï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½[ï¿½iï¿½Xï¿½ï¿½
 					int done = (tFromBonus0 <= 0.0f) ? 0 : (int)std::floor(tFromBonus0 / bonusDur);
 					if (done < 0) done = 0;
 					if (done > bonusCount_) done = bonusCount_;
 
-					// Š®—¹•ª‚ÍŠm’è‰ÁZ
+					// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÍŠmï¿½ï¿½ï¿½ï¿½Z
 					for (int i = 0; i < done; ++i) scoreNow += bonusValue_[i];
 
-					// Œ»İis’†‚Ìƒ{[ƒiƒXi‚ ‚ê‚Îj
+					// ï¿½ï¿½ï¿½İiï¿½sï¿½ï¿½ï¿½Ìƒ{ï¿½[ï¿½iï¿½Xï¿½iï¿½ï¿½ï¿½ï¿½Îj
 					if (done < bonusCount_)
 					{
 						bonusActiveIndex_ = done;
 						const float local = tFromBonus0 - (done * bonusDur); // 0..bonusDur
 
-						// ƒ|ƒbƒv•\¦ialpha/scalej
+						// ï¿½|ï¿½bï¿½vï¿½\ï¿½ï¿½ï¿½ialpha/scaleï¿½j
 						{
 							float tp = local / tBonusPop;
 							float eA = EaseOutCubic(tp);
@@ -352,7 +353,7 @@ void ClearScene::Update()
 							bonusScale_ = LerpFloat(0.8f, 1.0f, eB);
 						}
 
-						// ‰ÁZƒAƒjƒiscore + bonus * lerpj
+						// ï¿½ï¿½ï¿½Zï¿½Aï¿½jï¿½ï¿½ï¿½iscore + bonus * lerpï¿½j
 						{
 							float ta = (local - tBonusAddS) / (tBonusAddE - tBonusAddS);
 							float e = EaseOutCubic(ta);
@@ -378,7 +379,7 @@ void ClearScene::Update()
 			if (rankAlpha_ < 0) rankAlpha_ = 0;
 			if (rankAlpha_ > 255) rankAlpha_ = 255;
 
-			// ã‚©‚ç—‚¿‚Ä‚­‚é{­‚µƒoƒEƒ“ƒX
+			// ä¸Šã‹ã‚‰è½ã¡ã¦ãã‚‹ï¼‹å°‘ã—ãƒã‚¦ãƒ³ã‚¹
 			rankOffsetY_ = LerpFloat(-24.0f, 0.0f, eB);
 		}
 
@@ -406,7 +407,7 @@ void ClearScene::Draw()
 	// Title images
 	int titleBottomY = 0;
 
-	// GAME CLEAR‰æ‘œ
+	// GAME CLEARç”»åƒ
 	if (s_imgTitleClear >= 0)
 	{
 		int dstW = 0, dstH = 0;
@@ -428,7 +429,7 @@ void ClearScene::Draw()
 		titleBottomY = 155;
 	}
 
-	// Thank you ‰æ‘œ
+	// Thank you ç”»åƒ
 	int thankTopY = titleBottomY + 6;
 	if (s_imgTitleThanks >= 0)
 	{
@@ -509,10 +510,10 @@ void ClearScene::Draw()
 	DrawOutlinedTextToHandle(rankValueX, baseRankValueY + (int)std::lround(rankOffsetY_), rankText.c_str(),
 		rankColor, GetColor(60, 10, 0), fontRankValue_);
 
-	// ˆÈ~‚ÌUI‚Íƒpƒlƒ‹ƒ¿‚É–ß‚·
+	// ä»¥é™ã®UIã¯ãƒ‘ãƒãƒ«Î±ã«æˆ»ã™
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, panelAlpha_);
 
-	// --- ’Ç‰ÁF•\¦—pƒoƒbƒtƒ@‚ğ—pˆÓ ---
+	// --- è¿½åŠ ï¼šè¡¨ç¤ºç”¨ãƒãƒƒãƒ•ã‚¡ã‚’ç”¨æ„ ---
 	char timeBuf[32] = {};
 	FormatTimeSec(dispTimeSec_, timeBuf);
 
@@ -526,7 +527,7 @@ void ClearScene::Draw()
 	DrawOutlinedTextToHandle(panelX + 30, timeY + 24, "CLEAR TIME",
 		GetColor(255, 235, 140), GetColor(60, 10, 0), fontPanel_);
 
-	// ‰E’[‘µ‚¦
+	// å³ç«¯æƒãˆ
 	{
 		const int padR = 30;
 		const int w = GetDrawStringWidthToHandle(timeBuf, -1, fontPanel_);
@@ -541,7 +542,7 @@ void ClearScene::Draw()
 	DrawOutlinedTextToHandle(panelX + 30, scoreY + 24, "SCORE",
 		GetColor(255, 235, 140), GetColor(60, 10, 0), fontPanel_);
 
-	// ‰E’[‘µ‚¦
+	// å³ç«¯æƒãˆ
 	{
 		const int padR = 30;
 		const int w = GetDrawStringWidthToHandle(scoreBuf, -1, fontPanel_);
@@ -557,19 +558,19 @@ void ClearScene::Draw()
 		std::snprintf(buf, sizeof(buf), "%s +%d",
 			bonusLabel_[bonusActiveIndex_], bonusValue_[bonusActiveIndex_]);
 
-		// •\¦ˆÊ’uFSCOREƒpƒlƒ‹‚Ìuã‚Ì—]”’igapjv‚Éo‚·
+		// ï¿½\ï¿½ï¿½ï¿½Ê’uï¿½FSCOREï¿½pï¿½lï¿½ï¿½ï¿½Ìuï¿½ï¿½Ì—]ï¿½ï¿½ï¿½igapï¿½jï¿½vï¿½Éoï¿½ï¿½
 		const int bx = panelX + 30;
-		const int by = scoreY - gapY + 6;   // SCORE‚Ì’¼ãiTIME‚ÆSCORE‚ÌŠÔj
+		const int by = scoreY - gapY + 6;   // SCOREï¿½Ì’ï¿½ï¿½ï¿½iTIMEï¿½ï¿½SCOREï¿½ÌŠÔj
 
-		// ƒpƒlƒ‹‚ÌƒtƒF[ƒh‚Æƒ{[ƒiƒX‚Ìƒ¿‚ğ—¼•ûl—¶
+		// ï¿½pï¿½lï¿½ï¿½ï¿½Ìƒtï¿½Fï¿½[ï¿½hï¿½Æƒ{ï¿½[ï¿½iï¿½Xï¿½Ìƒï¿½ï¿½ğ—¼•ï¿½ï¿½lï¿½ï¿½
 		const int a = (panelAlpha_ < bonusAlpha_) ? panelAlpha_ : bonusAlpha_;
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, a);
 
-		// Œ©‰h‚¦—Ç‚¢‚Ì‚Å‰æ‚è•¶š‚ğg‚¤
+		// ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½Ç‚ï¿½ï¿½Ì‚Å‰ï¿½ï¿½ï¿½è•¶ï¿½ï¿½ï¿½ï¿½ï¿½gï¿½ï¿½
 		DrawOutlinedTextToHandle(bx, by, buf,
 			GetColor(255, 255, 255), GetColor(60, 10, 0), fontHint_);
 
-		// UI•`‰æ‚Íƒpƒlƒ‹ƒ¿‚É–ß‚·
+		// UIï¿½`ï¿½ï¿½Íƒpï¿½lï¿½ï¿½ï¿½ï¿½ï¿½É–ß‚ï¿½
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, panelAlpha_);
 	}
 
@@ -620,7 +621,7 @@ void ClearScene::CalcScoreAndRank()
 	else if (rankChar == 'C') rankColor = GetColor(210, 210, 210);
 	else rankColor = GetColor(255, 160, 160);
 
-	// ˆêŒ¾ƒƒbƒZ[ƒW‚Ì‘I‘ğ
+	// ä¸€è¨€ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã®é¸æŠ
 	static const char* const S_MSGS[] = {
 		"\u7121\u7406\u3068\u304B\u8A00\u3063\u3066\u3059\u307F\u307E\u305B\u3093\u3067\u3057\u305F\u2026\u3042\u306A\u305F\u306F\u5929\u624D\u3067\u3059\u3002",
 		"\u30A8\u30E9\u30FC\u3002\u4F5C\u8005\u306E\u60F3\u5B9A\u3092\u8D85\u3048\u307E\u3057\u305F\u3002",
