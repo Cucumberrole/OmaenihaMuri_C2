@@ -86,7 +86,9 @@ Player::Player()
 	deathAnimEnd = false;
 
 	JumpSE = LoadSoundMem("data/sound/jump.wav");
+	ChangeVolumeSoundMem(130, JumpSE);
 	DieSE = LoadSoundMem("data/sound/DeathSound.mp3");
+	ChangeVolumeSoundMem(130, DieSE);
 }
 
 //--------------------------------------

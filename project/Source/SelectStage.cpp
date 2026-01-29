@@ -126,7 +126,7 @@ SelectStage::SelectStage()
 	ChangeVolumeSoundMem(130, SelectBGM);
 	PlaySoundMem(SelectBGM, DX_PLAYTYPE_LOOP);
 	SelectSE = LoadSoundMem("data/BGM/cursorSE.mp3");
-	ChangeVolumeSoundMem(130, SelectSE);
+	ChangeVolumeSoundMem(120, SelectSE);
 }
 
 SelectStage::~SelectStage()
