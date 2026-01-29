@@ -195,17 +195,17 @@ void FallingSpike::Draw()
 
 #ifdef _DEBUG
 	// 当たり判定三角形の表示（デバッグ用）
-	int tx1 = static_cast<int>(x);
-	int ty1 = static_cast<int>(y);
+	//int tx1 = static_cast<int>(x);
+	//int ty1 = static_cast<int>(y);
 
-	int tx2 = static_cast<int>(x + width);
-	int ty2 = static_cast<int>(y);
+	//int tx2 = static_cast<int>(x + width);
+	//int ty2 = static_cast<int>(y);
 
-	int tx3 = static_cast<int>(x + width / 2);
-	int ty3 = static_cast<int>(y + height);
+	//int tx3 = static_cast<int>(x + width / 2);
+	//int ty3 = static_cast<int>(y + height);
 
-	int col = GetColor(0, 255, 0);
-	DrawTriangle(tx1, ty1, tx2, ty2, tx3, ty3, col, FALSE);
+	//int col = GetColor(0, 255, 0);
+	//DrawTriangle(tx1, ty1, tx2, ty2, tx3, ty3, col, FALSE);
 #endif
 }
 

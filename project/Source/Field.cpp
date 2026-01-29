@@ -32,6 +32,43 @@ static bool IsSolidCell(int cell)
 	return (cell == 1 || cell == 7 || cell == 8);
 }
 
+// トリガータイル（world座標）の「上」を常に監視して発動させる
+static bool TriggerByWatchingAbove(Field* field, Player* player, const POINT& trigWorldPos)
+{
+	if (!field || !player) return false;
+
+	constexpr int TILE = 64;
+
+	const float px0 = player->GetX();
+	const float px1 = px0 + 64.0f;  // プレイヤー幅（違うなら調整）
+	const float py1 = player->GetY() + 64.0f; // プレイヤー足元（違うなら調整）
+
+	const float tx0 = (float)trigWorldPos.x;
+	const float tx1 = tx0 + TILE;
+	const float ty0 = (float)trigWorldPos.y; // トリガータイル上端
+
+	// Xがトリガータイルと重なっている
+	if (!(px1 > tx0 && px0 < tx1)) return false;
+
+	// プレイヤーがトリガータイルより「上」にいる（踏まなくてもOK）
+	// 地面上で踏んだ場合も py1 は ty0 付近になるのでOK
+	if (py1 > ty0 + 2.0f) return false;
+
+	// 見通しチェック（間に固いブロックがあるなら発火しない）
+	const int trigTx = trigWorldPos.x / TILE;
+	const int trigTy = trigWorldPos.y / TILE;
+	int playerTy = (int)((py1 - 1.0f) / TILE);
+	if (playerTy < 0) playerTy = 0;
+
+	for (int ty = playerTy; ty < trigTy; ++ty)
+	{
+		if (field->IsBlock(trigTx, ty))
+			return false;
+	}
+
+	return true;
+}
+
 //------------------------------------------------------------
 // コンストラクタ
 //------------------------------------------------------------
@@ -100,9 +137,10 @@ Field::Field(int stage)
 				new FlyingSpikeTrap(
 					xx * 64.0f, yy * 64.0f, 64.0f, 64.0f,
 					TrapDir::Right,
-					12.0f,
+					24.0f,
 					NAN,              // laneWorld：追従
-					0.0f            // margin
+					0.0f,			// margin
+					4
 				);
 			}
 			else if (cell == 6)
@@ -256,7 +294,7 @@ Field::Field(int stage)
 			{
 				new MovingSmallTrap(xx * 64.0f + 24.0f, yy * 64.0f + 48.0f);
 			}
-			else if (cell == 106) 
+			else if (cell == 106)
 			{
 				new Sun(xx * 64.0f, yy * 64.0f);
 			}
@@ -332,6 +370,44 @@ void Field::Update()
 	int tx = int(px + 32) / 64;
 	int ty = int(py + 63) / 64;
 
+	auto TriggerSteppedOrAbove = [&](const POINT& trigPos) -> bool
+		{
+			constexpr int TILE = 64;
+
+			const int trigX = trigPos.x / TILE;
+			const int trigY = trigPos.y / TILE;
+
+			// --- 踏んだら ---
+			if (tx == trigX && ty == trigY) return true;
+
+			// --- 飛び越え ---
+			const float px0 = player->GetX();
+			const float px1 = px0 + player->GetW();   // Playerは64x64:contentReference[oaicite:4]{index=4}
+			const float pyB = player->GetY() + player->GetH();
+
+			const float tx0 = (float)(trigX * TILE);
+			const float tx1 = tx0 + TILE;
+			const float ty0 = (float)(trigY * TILE);   // トリガータイル上端
+
+			// Xがトリガータイル列に重なっている
+			if (!(px1 > tx0 && px0 < tx1)) return false;
+
+			// プレイヤーがトリガータイルより上にい1る
+			if (pyB > ty0 + 2.0f) return false;
+
+			// 間にブロックがあれば発火しない
+			int playerTy = (int)((pyB - 1.0f) / TILE);
+			if (playerTy < 0) playerTy = 0;
+
+			for (int y = playerTy; y < trigY; ++y)
+			{
+				if (IsBlock(trigX, y)) return false;
+			}
+
+			return true;
+		};
+
+
 	if (ty < 0 || ty >= (int)maps.size()) return;
 	if (tx < 0 || tx >= (int)maps[ty].size()) return;
 
@@ -380,14 +456,12 @@ void Field::Update()
 	{
 		if (i >= (int)ballTriggered.size() || i >= (int)ballTimer.size()) break;
 
-		int trigX = ballTriggers[i].x / 64;
-		int trigY = ballTriggers[i].y / 64;
-
-		if (!ballTriggered[i] && tx == trigX && ty == trigY)
+		if (!ballTriggered[i] && TriggerSteppedOrAbove(ballTriggers[i]))
 		{
 			ballTriggered[i] = true;
 			ballTimer[i] = 0;
 		}
+
 	}
 
 	for (int i = 0; i < (int)ballTriggers.size(); i++)
@@ -419,11 +493,12 @@ void Field::Update()
 		int tY = trig.triggerPos.y / 64;
 
 		// まだ起動していなくて、プレイヤーがトリガーマスに乗ったら起動
-		if (!trig.activated && tx == tX && ty == tY)
+		if (!trig.activated && TriggerSteppedOrAbove(trig.triggerPos))
 		{
 			trig.activated = true;
-			trig.timer = 20;  // 落ちるまでの待ちフレーム（好みで調整）
+			trig.timer = 20;
 		}
+
 
 		if (!trig.activated)
 		{
@@ -465,7 +540,7 @@ void Field::Update()
 		int trigX = wallTriggers[i].x / 64;
 		int trigY = wallTriggers[i].y / 64;
 
-		if (tx == trigX && ty == trigY)
+		if (TriggerSteppedOrAbove(wallTriggers[i]))
 		{
 			wallTriggered[i] = true;
 

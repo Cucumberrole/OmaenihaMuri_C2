@@ -63,6 +63,18 @@ private:
 	int   rankAlpha_ = 0;     // 0..255
 	float rankOffsetY_ = -20.0f;
 
+	// ---- Bonus animation ----
+	int baseScore_ = 0;
+
+	static const int kMaxBonuses = 4;
+	int bonusCount_ = 0;
+	const char* bonusLabel_[kMaxBonuses] = {};
+	int bonusValue_[kMaxBonuses] = {};
+
+	int bonusActiveIndex_ = -1;   // -1: none / 0..bonusCount-1: showing
+	int bonusAlpha_ = 0;          // 0..255
+	float bonusScale_ = 1.0f;     // pop scale
+
 private:
 	void CalcScoreAndRank();
 

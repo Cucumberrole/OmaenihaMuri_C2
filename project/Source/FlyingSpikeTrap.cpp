@@ -385,6 +385,6 @@ void FlyingSpikeTrap::Draw()
 
 #ifdef _DEBUG
 	// トリガー範囲（デバッグ表示）
-	DrawBox((int)x, (int)y, (int)(x + w), (int)(y + h), GetColor(255, 0, 255), FALSE);
+	//DrawBox((int)x, (int)y, (int)(x + w), (int)(y + h), GetColor(255, 0, 255), FALSE);
 #endif
 }

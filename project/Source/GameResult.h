@@ -42,6 +42,10 @@ struct GameResult
 
 	// 時間減点を適用済みの「秒」(差分適用のため)
 	int appliedTimeSec = 0;
+
+	bool paused = false;
+	int pauseStartMs = 0;
+	int pausedTotalMs = 0;
 };
 
 // 現在のライブスコア取得（HUD用）
@@ -66,3 +70,6 @@ int  GR_GetElapsedSecLive();
 void GR_FixOnGoalOnce();
 
 void GR_FixOnGoalOnce_Manual(int clearTimeSec, int deathCount);
+
+void GR_PauseTimer();
+void GR_ResumeTimer();
