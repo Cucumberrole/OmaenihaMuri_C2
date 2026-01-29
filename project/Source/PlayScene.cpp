@@ -2,6 +2,8 @@
 #include "Hud.h"
 
 #include <DxLib.h>
+#include <cmath>
+
 #include "../Library/Time.h"
 
 #include "GameConfig.h"
@@ -75,6 +77,17 @@ PlayScene::PlayScene()
 	}
 	g_IsRetry = false;
 	
+    if (!g_IsRetry)
+    {
+        // ★新規開始時だけ GameResult を初期化して計測開始
+        // 難易度の取得方法はあなたのプロジェクトに合わせてください
+        // 例：CourseType course = (GameConfig::IsEasy() ? CourseType::Easy : CourseType::Hard);
+        CourseType course = CourseType::Easy; // ←ここは実際の難易度取得に置換
+        GR_ResetRun(course);
+    }
+    g_IsRetry = false;
+
+
 }
 
 PlayScene::~PlayScene()
@@ -86,187 +99,148 @@ PlayScene::~PlayScene()
 
 void PlayScene::Update()
 {
-	Player* player = FindGameObject<Player>();
-	Field* field = FindGameObject<Field>();
-	Fader* fader = FindGameObject<Fader>();
-	if (!player || !field || !fader) return;
+    Player* player = FindGameObject<Player>();
+    Field* field = FindGameObject<Field>();
+    Fader* fader = FindGameObject<Fader>();
+    if (!player || !field || !fader) return;
 
-	// クリア時間
-	g_ClearTimeSeconds += Time::DeltaTime();
+    switch (state)
+    {
+    case Playstate::Play:
+    {
+        const float dt = Time::DeltaTime();
 
-	switch (state)
-	{
-	case Playstate::Play:
-	{
-		// プレイ中のみ時間/スコア更新
-		playTime += Time::DeltaTime();
-		score = 10000 - (int)(playTime) * 10 - retryCount * 500;
+        // プレイ中だけ GameResult 側の時間減点を進める
+        GR_UpdateDuringPlay();
 
-		// =========================
-		// 死亡判定：トラップ等で死んだら
-		// 残機を1減らし、死亡演出を再生
-		// =========================
-		if (player->IsDead())
-		{
-			// 死んだ瞬間に残機減算などを行う
-			if (!deathHandled)
-			{
-				deathHandled = true;
+        // 現在スコア（liveScore）をHUD用に取得
+        score = GR_GetLiveScore();
 
-				life--;
-				retryCount++;
-				deathCount++;
 
-				g_Life = life;
-				g_RetryCount = retryCount;
-				g_deathCount = deathCount;
-				StopSoundMem(StageBGM1);
-				StopSoundMem(StageBGM2);
-				
-			}
+        // =========================
+        // 死亡判定
+        // =========================
+        if (player->IsDead())
+        {
+            if (!deathHandled)
+            {
+                deathHandled = true;
 
-			// 死亡演出中へ（入力は遮断）
-			state = Playstate::Death;
-			return;
-		}
+                GR_OnDeath();
 
-		// =========================
-		// クリア判定（生存中のみ）
-		// =========================
-		if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
-		{
-			// クリアタイムは「全体時間」を採用
-			const float clearTime = g_ClearTimeSeconds;
+                life--;
+                retryCount++;
+                deathCount++;
 
-			// （あなたが新GameResult方式なら）
-			GR_FixOnGoalOnce_Manual((int)clearTime, retryCount);
+                g_Life = life;
+                g_RetryCount = retryCount;
+                g_deathCount = deathCount;
+            }
 
-			SceneManager::ChangeScene("CLEAR");
-		
-			return;
-		}
+            state = Playstate::Death;
+            return;
+        }
 
-		// =========================
-		// 生存中の入力（デバッグ含む）
-		// =========================
-		if (CheckHitKey(KEY_INPUT_K)) fader->FadeIn(0.5f);
-		if (CheckHitKey(KEY_INPUT_L)) fader->FadeOut(1.0f);
+        // =========================
+        // クリア判定
+        // =========================
+        if (field->IsGoal((int)(player->GetX() + 32), (int)(player->GetY() + 32)))
+        {
+            GR_FixOnGoalOnce();
+            SceneManager::ChangeScene("CLEAR");
+            return;
+        }
 
-		if (CheckHitKey(KEY_INPUT_O) || CheckHitKey(KEY_INPUT_T)) SceneManager::ChangeScene("TITLE");
-		if (CheckHitKey(KEY_INPUT_E)) SceneManager::ChangeScene("STAGE");
-		if (CheckHitKey(KEY_INPUT_G)) SceneManager::ChangeScene("GAMEOVER");
-		if (CheckHitKey(KEY_INPUT_C)) SceneManager::ChangeScene("CLEAR");
 
-		// 生存中Rリトライ
-		if (CheckHitKey(KEY_INPUT_R))
-		{
+        // 入力など
+        if (CheckHitKey(KEY_INPUT_E)) SceneManager::ChangeScene("STAGE");
+        if (CheckHitKey(KEY_INPUT_G)) SceneManager::ChangeScene("GAMEOVER");
+        if (CheckHitKey(KEY_INPUT_C)) SceneManager::ChangeScene("CLEAR");
+        if (CheckHitKey(KEY_INPUT_O) || CheckHitKey(KEY_INPUT_T)) SceneManager::ChangeScene("TITLE");
 
-			fader->FadeOut(0.5f);
-			fader->FadeIn(1.0f);
+        if (CheckHitKey(KEY_INPUT_R))
+        {
+            fader->FadeOut(0.5f);
+            fader->FadeIn(1.0f);
 
-			g_IsRetry = true;
-			SceneManager::ForceChangeScene("PLAY");
-		}
+            g_IsRetry = true;
+            SceneManager::ForceChangeScene("PLAY");
+        }
 
-		if (CheckHitKey(KEY_INPUT_ESCAPE)) SceneManager::Exit();
+        if (CheckHitKey(KEY_INPUT_ESCAPE)) SceneManager::Exit();
 
-		return;
-	}
+        return;
+    }
 
-	case Playstate::Death:
-	{
-		// 死亡演出が終わるまで待機（入力不可）
-		if (!player->IsdeathAnimEnd())
-		{
-			return;
-		}
+    case Playstate::Death:
+    {
+        if (!player->IsdeathAnimEnd()) return;
 
-		// 演出終了後、残機が0以下ならゲームオーバーへ
-		if (life <= 0)
-		{
-			// 次回プレイ用に初期化
-			g_Life = MaxLives();
-			SceneManager::ChangeScene("GAMEOVER");
-			return;
-		}
+        if (life <= 0)
+        {
+            g_Life = MaxLives();
+            SceneManager::ChangeScene("GAMEOVER");
+            return;
+        }
 
-		// 残機が残っているなら残機表示へ
-		state = Playstate::Zanki;
-		if (life == 1)
-		{
-			PlaySoundMem(LastSE, DX_PLAYTYPE_BACK);
-		}
-		StopSoundMem(LastSE);
-		return;
-	}
+        state = Playstate::Zanki;
+        return;
+    }
 
-	case Playstate::Zanki:
-	{
-		
-		
-		// 黒画面中はRだけ受付
-		if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
-		{
-			VanishingFloor::ResetAll();
+    case Playstate::Zanki:
+    {
+        if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
+        {
+            VanishingFloor::ResetAll();
 
-			fader->FadeOut(0.5f);
-			fader->FadeIn(1.0f);
+            fader->FadeOut(0.5f);
+            fader->FadeIn(1.0f);
 
-			// リトライ
-			g_IsRetry = true;
-			SceneManager::ForceChangeScene("PLAY");
-		}
-		return;
-		
-	}
-	}
+            g_IsRetry = true;
+            SceneManager::ForceChangeScene("PLAY");
+        }
+        return;
+    }
+    }
 }
 
 
 void PlayScene::Draw()
 {
-	Player* player = FindGameObject<Player>();
+    Player* player = FindGameObject<Player>();
 
-	// 黒画面＋残機表示＋リトライ表示
-	if (state == Playstate::Zanki)
-	{
-		int sw, sh;
-		GetDrawScreenSize(&sw, &sh);
+    // 黒画面＋残機表示＋リトライ表示
+    if (state == Playstate::Zanki)
+    {
+        int sw, sh;
+        GetDrawScreenSize(&sw, &sh);
 
-		DrawBox(0, 0, sw, sh, GetColor(0, 0, 0), TRUE);
+        DrawBox(0, 0, sw, sh, GetColor(0, 0, 0), TRUE);
 
-		const char* retryText = "RETRY push to [R]";
-		int textWidth = GetDrawStringWidth(retryText, -1);
-		int x = (sw - textWidth) / 2;
-		int y = sh / 2;
+        const char* retryText = "RETRY push to [R]";
+        int textWidth = GetDrawStringWidth(retryText, -1);
+        int x = (sw - textWidth) / 2;
+        int y = sh / 2;
 
-		DrawRotaGraph(x + 40, y, 2.0, 0, hImage, TRUE);
-		DrawFormatString(x + 150, y - 10, GetColor(255, 255, 255), "LIFE : %d", life);
-		DrawFormatString(x, y + 70, GetColor(255, 255, 255), "%s", retryText);
-		return;
-	}
+        DrawRotaGraph(x + 40, y, 2.0, 0, hImage, TRUE);
+        DrawFormatString(x + 150, y - 10, GetColor(255, 255, 255), "LIFE : %d", life);
+        DrawFormatString(x, y + 70, GetColor(255, 255, 255), "%s", retryText);
+        return;
+    }
 
-	// HUD
-	// スコア
-	const int hudScore = score;
+    // HUD（GameResultから取得して1回だけ描画）
+    const int hudScore = GR_GetLiveScore();
+    const int hudTimeSeconds = GR_GetElapsedSecLive();
+    const int hudLife = life;
 
-	// 時間
-	const int hudTimeSeconds = (int)g_ClearTimeSeconds;
+    Hud::Draw(hudScore, hudTimeSeconds, hudLife);
 
-	// 3) ライフ
-	const int hudLife = life;
-
-	// HUD 描画
-	Hud::Draw(hudScore, hudTimeSeconds, hudLife);
-
-	// FPS
-	//DrawFormatString(10, 120, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
+    // FPS（必要なら）
+    // DrawFormatString(10, 120, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());
 }
-
 
 int PlayScene::GetRetry(int retry)
 {
 	retry = g_deathCount;
 	return retry;
 }
-

@@ -50,6 +50,7 @@ private:
 	int jumpcount;
 	int Maxjumpcount;
 	int hp;
+	float pushX;
 
 	//SE
 	int JumpSE;
