@@ -7,6 +7,45 @@
 
 static const char* kCharPath = "data/image/omae.png";
 
+static float Clamp01(float x) { return (x < 0.0f) ? 0.0f : (x > 1.0f ? 1.0f : x); }
+
+static float EaseOutCubic(float t)
+{
+	t = Clamp01(t);
+	float u = 1.0f - t;
+	return 1.0f - u * u * u;
+}
+
+static float EaseOutBack(float t) // „Å°„Çá„ÅÑË∑≥„Å≠„Çã
+{
+	t = Clamp01(t);
+	const float c1 = 1.70158f;
+	const float c3 = c1 + 1.0f;
+	return 1.0f + c3 * (t - 1.0f) * (t - 1.0f) * (t - 1.0f) + c1 * (t - 1.0f) * (t - 1.0f);
+}
+
+static int LerpInt(int a, int b, float t)
+{
+	t = Clamp01(t);
+	return (int)std::lround((double)a + ((double)b - (double)a) * (double)t);
+}
+
+static float LerpFloat(float a, float b, float t)
+{
+	t = Clamp01(t);
+	return a + (b - a) * t;
+}
+
+static void FormatTimeSec(float sec, char out[32])
+{
+	if (sec < 0.0f) sec = 0.0f;
+	const int totalMs = (int)std::lround(sec * 1000.0f);
+	const int totalSec = totalMs / 1000;
+	const int min = totalSec / 60;
+	const int s = totalSec % 60;
+	std::snprintf(out, 32, "%02d:%02d", min, s);
+}
+
 static const char* kTitleClearPath = "data/Font/GAMECLEAR.png";
 static const char* kTitleThanksPath = "data/Font/thankyou.png";
 
@@ -44,13 +83,13 @@ static void DrawGraphKeepAspectCentered(
 
 ClearScene::ClearScene()
 {
-	// GameResult Ç©ÇÁÅuämíËçœÇ›ÇÃílÅvÇÉRÉsÅ[
-	clearTime = g_GameResult.elapsedMs / 1000.0f;   // ïb
-	retryCount = g_GameResult.deathCount;            // 1âÒéÄÇ Ç≤Ç∆Ç…
+	// GameResult „Åã„Çâ„ÄåÁ¢∫ÂÆöÊ∏à„Åø„ÅÆÂÄ§„Äç„Çí„Ç≥„Éî„Éº
+	clearTime = g_GameResult.elapsedMs / 1000.0f;   // Áßí
+	retryCount = g_GameResult.deathCount;            // 1ÂõûÊ≠ª„Å¨„Åî„Å®„Å´
 	finalScore = g_GameResult.score;
 	rankChar = g_GameResult.rank;
 
-	// ï\é¶ópÉeÉLÉXÉgÅEêFÅEàÍåæÉÅÉbÉZÅ[ÉWÇæÇØåàÇﬂÇÈ
+	// Ë°®Á§∫Áî®„ÉÜ„Ç≠„Çπ„Éà„ÉªËâ≤„Éª‰∏ÄË®Ä„É°„ÉÉ„Çª„Éº„Ç∏„Å†„ÅëÊ±∫„ÇÅ„Çã
 	CalcScoreAndRank();
 
 	// Load title images (shared).
@@ -63,46 +102,57 @@ ClearScene::ClearScene()
 	// Load character image (optional).
 	imgChar = LoadGraph(kCharPath);
 
-	// --- Fonts (SelectStageïóÉtÉHÅ[ÉãÉoÉbÉN) ---
-	fontTitle_ = CreateJPFont(TEXT("HGSënâpäpŒﬂØÃﬂëÃ"), 100, 4);
+	// --- Fonts (SelectStageÈ¢®„Éï„Ç©„Éº„É´„Éê„ÉÉ„ÇØ) ---
+	fontTitle_ = CreateJPFont(TEXT("HGSÂâµËã±ËßíÔæéÔæüÔΩØÔæåÔæü‰Ωì"), 100, 4);
 	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("Meiryo UI"), 84, 4);
-	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("MS ÉSÉVÉbÉN"), 84, 3);
+	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("MS „Ç¥„Ç∑„ÉÉ„ÇØ"), 84, 3);
 	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("Arial Black"), 84, 4);
 
-	fontThanks_ = CreateJPFont(TEXT("HGSënâpäpŒﬂØÃﬂëÃ"), 46, 2);
+	fontThanks_ = CreateJPFont(TEXT("HGSÂâµËã±ËßíÔæéÔæüÔΩØÔæåÔæü‰Ωì"), 46, 2);
 	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("Meiryo UI"), 46, 2);
-	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("MS ÉSÉVÉbÉN"), 46, 2);
+	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("MS „Ç¥„Ç∑„ÉÉ„ÇØ"), 46, 2);
 	if (fontThanks_ < 0) fontThanks_ = CreateJPFont(TEXT("Arial"), 46, 2);
 
-	fontMsg_ = CreateJPFont(TEXT("ü‡ñæí© Demibold"), 40, 2);
+	fontMsg_ = CreateJPFont(TEXT("Ê∏∏ÊòéÊúù Demibold"), 40, 2);
 	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("Meiryo UI"), 34, 2);
-	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("MS ÉSÉVÉbÉN"), 34, 2);
+	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("MS „Ç¥„Ç∑„ÉÉ„ÇØ"), 34, 2);
 	if (fontMsg_ < 0) fontMsg_ = CreateJPFont(TEXT("Arial"), 34, 2);
 
-	fontRankLabel_ = CreateJPFont(TEXT("HGSënâpäpŒﬂØÃﬂëÃ"), 82, 4);
+	fontRankLabel_ = CreateJPFont(TEXT("HGSÂâµËã±ËßíÔæéÔæüÔΩØÔæåÔæü‰Ωì"), 82, 4);
 	if (fontRankLabel_ < 0) fontRankLabel_ = CreateJPFont(TEXT("Meiryo UI"), 82, 4);
-	if (fontRankLabel_ < 0) fontRankLabel_ = CreateJPFont(TEXT("MS ÉSÉVÉbÉN"), 82, 3);
+	if (fontRankLabel_ < 0) fontRankLabel_ = CreateJPFont(TEXT("MS „Ç¥„Ç∑„ÉÉ„ÇØ"), 82, 3);
 	if (fontRankLabel_ < 0) fontRankLabel_ = CreateJPFont(TEXT("Arial Black"), 82, 4);
 
-	fontRankValue_ = CreateJPFont(TEXT("HGSënâpäpŒﬂØÃﬂëÃ"), 118, 5);
+	fontRankValue_ = CreateJPFont(TEXT("HGSÂâµËã±ËßíÔæéÔæüÔΩØÔæåÔæü‰Ωì"), 118, 5);
 	if (fontRankValue_ < 0) fontRankValue_ = CreateJPFont(TEXT("Meiryo UI"), 118, 5);
-	if (fontRankValue_ < 0) fontRankValue_ = CreateJPFont(TEXT("MS ÉSÉVÉbÉN"), 118, 4);
+	if (fontRankValue_ < 0) fontRankValue_ = CreateJPFont(TEXT("MS „Ç¥„Ç∑„ÉÉ„ÇØ"), 118, 4);
 	if (fontRankValue_ < 0) fontRankValue_ = CreateJPFont(TEXT("Arial Black"), 118, 5);
 
-	fontPanel_ = CreateJPFont(TEXT("BIZ UDPñæí© Medium"), 40, 2);
+	fontPanel_ = CreateJPFont(TEXT("BIZ UDPÊòéÊúù Medium"), 40, 2);
 	if (fontPanel_ < 0) fontPanel_ = CreateJPFont(TEXT("Meiryo UI"), 40, 2);
-	if (fontPanel_ < 0) fontPanel_ = CreateJPFont(TEXT("MS ÉSÉVÉbÉN"), 40, 2);
+	if (fontPanel_ < 0) fontPanel_ = CreateJPFont(TEXT("MS „Ç¥„Ç∑„ÉÉ„ÇØ"), 40, 2);
 	if (fontPanel_ < 0) fontPanel_ = CreateJPFont(TEXT("Arial"), 40, 2);
 
-	fontHint_ = CreateJPFont(TEXT("ÉÅÉCÉäÉI"), 26, 2);
+	fontHint_ = CreateJPFont(TEXT("„É°„Ç§„É™„Ç™"), 26, 2);
 	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("Meiryo UI"), 26, 2);
-	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("MS ÉSÉVÉbÉN"), 26, 2);
+	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("MS „Ç¥„Ç∑„ÉÉ„ÇØ"), 26, 2);
 	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("Arial"), 26, 2);
-
 
 	frame = 0;
 	InitConfetti();
 
+	animStartMs_ = GetNowCount();
+	lastMs_ = animStartMs_;
+	animTime_ = 0.0f;
+	animSkip_ = false;
+	animDone_ = false;
+
+	dispScore_ = 0;
+	dispTimeSec_ = 0.0f;
+
+	panelAlpha_ = 0;
+	rankAlpha_ = 0;
+	rankOffsetY_ = -20.0f;
 	ChangeVolumeSoundMem(120, GoalBGM);
 	GoalBGM = LoadSoundMem("data/BGM/bgm_result.mp3");
 	PlaySoundMem(GoalBGM, DX_PLAYTYPE_LOOP);
@@ -136,18 +186,93 @@ void ClearScene::Update()
 {
 	++frame;
 
-	// Back to title.
-	if (CheckHitKey(KEY_INPUT_T) || CheckHitKey(KEY_INPUT_RETURN) || CheckHitKey(KEY_INPUT_SPACE))
-	{
-		SceneManager::ChangeScene("TITLE");
-		return;
-	}
-
 	// Exit application.
 	if (CheckHitKey(KEY_INPUT_ESCAPE))
 	{
 		SceneManager::Exit();
 		return;
+	}
+
+	// „Ç¢„Éã„É°„ÅÆ„Çπ„Ç≠„ÉÉ„Éó or „Çø„Ç§„Éà„É´„Å∏
+	const bool pressReturn =
+		CheckHitKey(KEY_INPUT_T) || CheckHitKey(KEY_INPUT_RETURN) || CheckHitKey(KEY_INPUT_SPACE);
+
+	// dt
+	const int now = GetNowCount();
+	float dt = (now - lastMs_) / 1000.0f;
+	if (dt < 0.0f) dt = 0.0f;
+	if (dt > 0.1f) dt = 0.1f; // Á™ÅÁô∫„ÅÆÈï∑„Éï„É¨„Éº„É†ÂØæÁ≠ñ
+	lastMs_ = now;
+
+	// Timeline (seconds)
+	const float tFadeInS = 0.00f, tFadeInE = 0.25f;
+	const float tTimeS = 0.20f, tTimeE = 1.10f;
+	const float tScoreS = 0.55f, tScoreE = 1.90f;
+	const float tRankS = 1.60f, tRankE = 2.20f;
+	const float tEnd = 2.20f;
+
+	if (pressReturn)
+	{
+		if (!animDone_) animSkip_ = true;   // „Ç¢„Éã„É°‰∏≠Ôºö„Çπ„Ç≠„ÉÉ„Éó
+		else
+		{
+			SceneManager::ChangeScene("TITLE"); // „Ç¢„Éã„É°ÂæåÔºö„Çø„Ç§„Éà„É´„Å∏
+			return;
+		}
+	}
+
+	if (!animDone_)
+	{
+		if (animSkip_)
+		{
+			animTime_ = tEnd;
+		}
+		else
+		{
+			animTime_ += dt;
+			if (animTime_ >= tEnd) { animTime_ = tEnd; }
+		}
+
+		// Panel fade
+		{
+			float t = (animTime_ - tFadeInS) / (tFadeInE - tFadeInS);
+			panelAlpha_ = (int)std::lround(255.0f * EaseOutCubic(t));
+			if (panelAlpha_ < 0) panelAlpha_ = 0;
+			if (panelAlpha_ > 255) panelAlpha_ = 255;
+		}
+
+		// Time count-up
+		{
+			float t = (animTime_ - tTimeS) / (tTimeE - tTimeS);
+			float e = EaseOutCubic(t);
+			dispTimeSec_ = LerpFloat(0.0f, clearTime, e);
+		}
+
+		// Score count-up
+		{
+			float t = (animTime_ - tScoreS) / (tScoreE - tScoreS);
+			float e = EaseOutCubic(t);
+			dispScore_ = LerpInt(0, finalScore, e);
+		}
+
+		// Rank appear (fade + bounce)
+		{
+			float t = (animTime_ - tRankS) / (tRankE - tRankS);
+			float eA = EaseOutCubic(t);
+			float eB = EaseOutBack(t);
+
+			rankAlpha_ = (int)std::lround(255.0f * eA);
+			if (rankAlpha_ < 0) rankAlpha_ = 0;
+			if (rankAlpha_ > 255) rankAlpha_ = 255;
+
+			// ‰∏ä„Åã„ÇâËêΩ„Å°„Å¶„Åè„ÇãÔºãÂ∞ë„Åó„Éê„Ç¶„É≥„Çπ
+			rankOffsetY_ = LerpFloat(-24.0f, 0.0f, eB);
+		}
+
+		if (animTime_ >= tEnd)
+		{
+			animDone_ = true;
+		}
 	}
 
 	UpdateConfetti();
@@ -156,12 +281,11 @@ void ClearScene::Update()
 void ClearScene::Draw()
 {
 	// Debug (temporary)
-	DrawFormatString(20, 20, GetColor(255, 255, 255),
-		"elapsedMs=%d  score=%d  rank=%c",
-		g_GameResult.elapsedMs, g_GameResult.score, g_GameResult.rank);
+	//DrawFormatString(20, 20, GetColor(255, 255, 255), "elapsedMs=%d  score=%d  rank=%c", g_GameResult.elapsedMs, g_GameResult.score, g_GameResult.rank);
 
 	DrawBackground();
 	DrawConfetti();
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, panelAlpha_);
 
 	const int W = Screen::WIDTH;
 	const int H = Screen::HEIGHT;
@@ -169,7 +293,7 @@ void ClearScene::Draw()
 	// Title images
 	int titleBottomY = 0;
 
-	// GAME CLEARâÊëú
+	// GAME CLEARÁîªÂÉè
 	if (s_imgTitleClear >= 0)
 	{
 		int dstW = 0, dstH = 0;
@@ -191,7 +315,7 @@ void ClearScene::Draw()
 		titleBottomY = 155;
 	}
 
-	// Thank you âÊëú
+	// Thank you ÁîªÂÉè
 	int thankTopY = titleBottomY + 6;
 	if (s_imgTitleThanks >= 0)
 	{
@@ -266,16 +390,22 @@ void ClearScene::Draw()
 	// Rank value
 	const int rankValueW = GetDrawStringWidthToHandle(rankText.c_str(), -1, fontRankValue_);
 	const int rankValueX = panelX + (panelW - rankValueW) / 2;
-	const int rankValueY = rankY + rankPanelH - 118 - 14; // Å¶118ÇÕÉtÉHÉìÉgÉTÉCÉYÇ…çáÇÌÇπÇΩÇ‹Ç‹
-	DrawOutlinedTextToHandle(rankValueX, rankValueY, rankText.c_str(),
+	const int baseRankValueY = rankY + rankPanelH - 118 - 14;
+
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, (panelAlpha_ < rankAlpha_) ? panelAlpha_ : rankAlpha_);
+	DrawOutlinedTextToHandle(rankValueX, baseRankValueY + (int)std::lround(rankOffsetY_), rankText.c_str(),
 		rankColor, GetColor(60, 10, 0), fontRankValue_);
 
-	// --- í«â¡ÅFï\é¶ópÉoÉbÉtÉ@Çópà” ---
+	// ‰ª•Èôç„ÅÆUI„ÅØ„Éë„Éç„É´Œ±„Å´Êàª„Åô
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, panelAlpha_);
+
+	// --- ËøΩÂä†ÔºöË°®Á§∫Áî®„Éê„ÉÉ„Éï„Ç°„ÇíÁî®ÊÑè ---
 	char timeBuf[32] = {};
-	FormatTime(timeBuf);
+	FormatTimeSec(dispTimeSec_, timeBuf);
 
 	char scoreBuf[64] = {};
-	std::snprintf(scoreBuf, sizeof(scoreBuf), "%d", finalScore);
+	std::snprintf(scoreBuf, sizeof(scoreBuf), "%d", dispScore_);
+
 
 	// CLEAR TIME
 	DrawPanel(panelX, timeY, infoPanelW, infoPanelH);
@@ -283,7 +413,7 @@ void ClearScene::Draw()
 	DrawOutlinedTextToHandle(panelX + 30, timeY + 24, "CLEAR TIME",
 		GetColor(255, 235, 140), GetColor(60, 10, 0), fontPanel_);
 
-	// âEí[ëµÇ¶
+	// Âè≥Á´ØÊèÉ„Åà
 	{
 		const int padR = 30;
 		const int w = GetDrawStringWidthToHandle(timeBuf, -1, fontPanel_);
@@ -298,7 +428,7 @@ void ClearScene::Draw()
 	DrawOutlinedTextToHandle(panelX + 30, scoreY + 24, "SCORE",
 		GetColor(255, 235, 140), GetColor(60, 10, 0), fontPanel_);
 
-	// âEí[ëµÇ¶
+	// Âè≥Á´ØÊèÉ„Åà
 	{
 		const int padR = 30;
 		const int w = GetDrawStringWidthToHandle(scoreBuf, -1, fontPanel_);
@@ -341,6 +471,7 @@ void ClearScene::Draw()
 	}
 	*/
 
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
 void ClearScene::CalcScoreAndRank()
@@ -354,7 +485,7 @@ void ClearScene::CalcScoreAndRank()
 	else if (rankChar == 'C') rankColor = GetColor(210, 210, 210);
 	else rankColor = GetColor(255, 160, 160);
 
-	// àÍåæÉÅÉbÉZÅ[ÉWÇÃëIë
+	// ‰∏ÄË®Ä„É°„ÉÉ„Çª„Éº„Ç∏„ÅÆÈÅ∏Êäû
 	static const char* const S_MSGS[] = {
 		"\u7121\u7406\u3068\u304B\u8A00\u3063\u3066\u3059\u307F\u307E\u305B\u3093\u3067\u3057\u305F\u2026\u3042\u306A\u305F\u306F\u5929\u624D\u3067\u3059\u3002",
 		"\u30A8\u30E9\u30FC\u3002\u4F5C\u8005\u306E\u60F3\u5B9A\u3092\u8D85\u3048\u307E\u3057\u305F\u3002",
