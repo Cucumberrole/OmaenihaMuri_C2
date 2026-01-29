@@ -499,10 +499,10 @@ void Player::Draw()
 		frip
 	);
 
-	// デバッグ用：当たり判定円
-	float cx, cy, r;
-	GetHitCircle(cx, cy, r);
-	DrawCircle((int)cx, (int)cy, (int)r, GetColor(0, 255, 0), FALSE);
+	//// デバッグ用：当たり判定円
+	//float cx, cy, r;
+	//GetHitCircle(cx, cy, r);
+	//DrawCircle((int)cx, (int)cy, (int)r, GetColor(0, 255, 0), FALSE);
 
 	DrawHitOverlay();
 }

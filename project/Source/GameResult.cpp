@@ -80,11 +80,16 @@ void GR_UpdateDuringPlay()
 {
 	if (g_GameResult.fixed) return;
 
-	g_GameResult.elapsedMs = GetNowCount() - g_GameResult.startTimeMs;
+	// 一時停止中は更新しない（タイマー停止）
+	if (g_GameResult.paused) return;
 
-	const int elapsedSec = max(0, g_GameResult.elapsedMs) / 1000;
+	// 経過ms（pause分を差し引く）
+	const int now = GetNowCount();
+	g_GameResult.elapsedMs = (now - g_GameResult.startTimeMs) - g_GameResult.pausedTotalMs;
+	if (g_GameResult.elapsedMs < 0) g_GameResult.elapsedMs = 0;
 
-	// 秒が進んだ分だけ時間減点を適用
+	// 時間減点（秒が進んだ分だけ適用）
+	const int elapsedSec = g_GameResult.elapsedMs / 1000;
 	if (elapsedSec > g_GameResult.appliedTimeSec)
 	{
 		const int deltaSec = elapsedSec - g_GameResult.appliedTimeSec;
@@ -94,6 +99,7 @@ void GR_UpdateDuringPlay()
 		g_GameResult.appliedTimeSec = elapsedSec;
 	}
 }
+
 
 // 死亡した瞬間に呼ぶ：死亡回数を増やす（確定後は増やさない）
 void GR_OnDeath()
@@ -156,4 +162,21 @@ void GR_FixOnGoalOnce_Manual(int clearTimeSec, int deathCount)
 
 	g_GameResult.score = ClampScore(finalScore);
 	g_GameResult.rank = CalcRank(g_GameResult);
+}
+
+void GR_PauseTimer()
+{
+	if (g_GameResult.fixed) return;
+	if (g_GameResult.paused) return;
+	g_GameResult.paused = true;
+	g_GameResult.pauseStartMs = GetNowCount();
+}
+
+void GR_ResumeTimer()
+{
+	if (g_GameResult.fixed) return;
+	if (!g_GameResult.paused) return;
+	const int now = GetNowCount();
+	g_GameResult.pausedTotalMs += (now - g_GameResult.pauseStartMs);
+	g_GameResult.paused = false;
 }

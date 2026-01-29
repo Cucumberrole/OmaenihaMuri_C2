@@ -89,6 +89,36 @@ ClearScene::ClearScene()
 	finalScore = g_GameResult.score;
 	rankChar = g_GameResult.rank;
 
+	// ---- build bonus list for presentation ----
+	bonusCount_ = 0;
+
+	// GameResult ���̏����ƈ�v������i���Ȃ���GameResult.cpp�̏����j
+	if (g_GameResult.deathCount == 0 && bonusCount_ < kMaxBonuses)
+	{
+		bonusLabel_[bonusCount_] = "NO MISS BONUS";
+		bonusValue_[bonusCount_] = g_GameResult.noMissBonus;     // ��: 2000
+		bonusCount_++;
+	}
+	if (g_GameResult.clearTimeSec <= 60 && bonusCount_ < kMaxBonuses)
+	{
+		bonusLabel_[bonusCount_] = "TIME BONUS";
+		bonusValue_[bonusCount_] = g_GameResult.under60sBonus;   // ��: 1000
+		bonusCount_++;
+	}
+
+	// baseScore = �ŏI�X�R�A - �{�[�i�X���v�i�\���p�j
+	int sumBonus = 0;
+	for (int i = 0; i < bonusCount_; ++i) sumBonus += bonusValue_[i];
+
+	baseScore_ = finalScore - sumBonus;
+	if (baseScore_ < 0) baseScore_ = 0;
+
+	// bonus popup init
+	bonusActiveIndex_ = -1;
+	bonusAlpha_ = 0;
+	bonusScale_ = 1.0f;
+
+	// �\���p�e�L�X�g�E�F�E�ꌾ���b�Z�[�W�������߂�
 	// 表示用テキスト・色・一言メッセージだけ決める
 	CalcScoreAndRank();
 
@@ -153,7 +183,6 @@ ClearScene::ClearScene()
 	panelAlpha_ = 0;
 	rankAlpha_ = 0;
 	rankOffsetY_ = -20.0f;
-	ChangeVolumeSoundMem(120, GoalBGM);
 	GoalBGM = LoadSoundMem("data/BGM/bgm_result.mp3");
 	ChangeVolumeSoundMem(130, GoalBGM);
 	PlaySoundMem(GoalBGM, DX_PLAYTYPE_LOOP);
@@ -210,7 +239,15 @@ void ClearScene::Update()
 	const float tTimeS = 0.20f, tTimeE = 1.10f;
 	const float tScoreS = 0.55f, tScoreE = 1.90f;
 	const float tRankS = 1.60f, tRankE = 2.20f;
-	const float tEnd = 2.20f;
+
+	// �{�[�i�X���o�ɕK�v�ȏI������
+	const float tBonusStart = tScoreE + 0.10f;
+	const float bonusDur = 0.55f;
+	float tEnd = tRankE;
+	{
+		const float need = tBonusStart + bonusCount_ * bonusDur + 0.05f;
+		if (tEnd < need) tEnd = need;
+	}
 
 	if (pressReturn)
 	{
@@ -249,11 +286,87 @@ void ClearScene::Update()
 			dispTimeSec_ = LerpFloat(0.0f, clearTime, e);
 		}
 
-		// Score count-up
+		// ---- Score (base -> bonuses) ----
 		{
-			float t = (animTime_ - tScoreS) / (tScoreE - tScoreS);
-			float e = EaseOutCubic(t);
-			dispScore_ = LerpInt(0, finalScore, e);
+			const float tBaseS = tScoreS;
+			const float tBaseE = tScoreE;
+			const float tBonusStart = tScoreE + 0.10f;
+			const float bonusDur = 0.55f;
+			const float tBonusPop = 0.18f;
+			const float tBonusAddS = 0.18f;
+			const float tBonusAddE = 0.55f;
+
+			// 1) �܂���b�X�R�A��
+			if (animTime_ <= tBaseS)
+			{
+				dispScore_ = 0;
+				bonusActiveIndex_ = -1;
+				bonusAlpha_ = 0;
+				bonusScale_ = 1.0f;
+			}
+			else if (animTime_ < tBaseE)
+			{
+				float t = (animTime_ - tBaseS) / (tBaseE - tBaseS);
+				dispScore_ = LerpInt(0, baseScore_, EaseOutCubic(t));
+				bonusActiveIndex_ = -1;
+				bonusAlpha_ = 0;
+				bonusScale_ = 1.0f;
+			}
+			else
+			{
+				// 2) �{�[�i�X�����ɉ��Z
+				int scoreNow = baseScore_;
+				bonusActiveIndex_ = -1;
+				bonusAlpha_ = 0;
+				bonusScale_ = 1.0f;
+
+				if (bonusCount_ <= 0)
+				{
+					dispScore_ = baseScore_;
+				}
+				else
+				{
+					const float tFromBonus0 = animTime_ - tBonusStart;
+
+					// ���łɊ��������{�[�i�X��
+					int done = (tFromBonus0 <= 0.0f) ? 0 : (int)std::floor(tFromBonus0 / bonusDur);
+					if (done < 0) done = 0;
+					if (done > bonusCount_) done = bonusCount_;
+
+					// �������͊m����Z
+					for (int i = 0; i < done; ++i) scoreNow += bonusValue_[i];
+
+					// ���ݐi�s���̃{�[�i�X�i����΁j
+					if (done < bonusCount_)
+					{
+						bonusActiveIndex_ = done;
+						const float local = tFromBonus0 - (done * bonusDur); // 0..bonusDur
+
+						// �|�b�v�\���ialpha/scale�j
+						{
+							float tp = local / tBonusPop;
+							float eA = EaseOutCubic(tp);
+							float eB = EaseOutBack(tp);
+							bonusAlpha_ = (int)std::lround(255.0f * eA);
+							if (bonusAlpha_ < 0) bonusAlpha_ = 0;
+							if (bonusAlpha_ > 255) bonusAlpha_ = 255;
+							bonusScale_ = LerpFloat(0.8f, 1.0f, eB);
+						}
+
+						// ���Z�A�j���iscore + bonus * lerp�j
+						{
+							float ta = (local - tBonusAddS) / (tBonusAddE - tBonusAddS);
+							float e = EaseOutCubic(ta);
+							const int add = LerpInt(0, bonusValue_[done], e);
+							scoreNow += add;
+						}
+					}
+
+					// clamp & apply
+					if (scoreNow > finalScore) scoreNow = finalScore;
+					dispScore_ = scoreNow;
+				}
+			}
 		}
 
 		// Rank appear (fade + bounce)
@@ -438,6 +551,28 @@ void ClearScene::Draw()
 			GetColor(255, 255, 255), GetColor(60, 10, 0), fontPanel_);
 	}
 
+	// ---- bonus popup text (only while active) ----
+	if (bonusActiveIndex_ >= 0 && bonusActiveIndex_ < bonusCount_ && bonusAlpha_ > 0)
+	{
+		char buf[128];
+		std::snprintf(buf, sizeof(buf), "%s +%d",
+			bonusLabel_[bonusActiveIndex_], bonusValue_[bonusActiveIndex_]);
+
+		// �\���ʒu�FSCORE�p�l���́u��̗]���igap�j�v�ɏo��
+		const int bx = panelX + 30;
+		const int by = scoreY - gapY + 6;   // SCORE�̒���iTIME��SCORE�̊ԁj
+
+		// �p�l���̃t�F�[�h�ƃ{�[�i�X�̃��𗼕��l��
+		const int a = (panelAlpha_ < bonusAlpha_) ? panelAlpha_ : bonusAlpha_;
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, a);
+
+		// ���h���ǂ��̂ŉ���蕶�����g��
+		DrawOutlinedTextToHandle(bx, by, buf,
+			GetColor(255, 255, 255), GetColor(60, 10, 0), fontHint_);
+
+		// UI�`��̓p�l�����ɖ߂�
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, panelAlpha_);
+	}
 
 	// Footer hint
 	const char* hint = "Press T / Enter / Space to return to Title.  Esc: Exit";
