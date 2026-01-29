@@ -103,8 +103,8 @@ ClearScene::ClearScene()
 	frame = 0;
 	InitConfetti();
 
-	ChangeVolumeSoundMem(120, GoalBGM);
 	GoalBGM = LoadSoundMem("data/BGM/bgm_result.mp3");
+	ChangeVolumeSoundMem(130, GoalBGM);
 	PlaySoundMem(GoalBGM, DX_PLAYTYPE_LOOP);
 }
 
