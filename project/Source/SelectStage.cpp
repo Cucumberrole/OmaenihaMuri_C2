@@ -122,7 +122,7 @@ SelectStage::SelectStage()
 	introT_ = 0.0f;
 	introDone_ = false;
 
-	SelectBGM  = LoadSoundMem("data/BGM/StageSelect.mp3");
+	SelectBGM = LoadSoundMem("data/BGM/StageSelect.mp3");
 	ChangeVolumeSoundMem(130, SelectBGM);
 	PlaySoundMem(SelectBGM, DX_PLAYTYPE_LOOP);
 	SelectSE = LoadSoundMem("data/BGM/cursorSE.mp3");
@@ -183,7 +183,7 @@ void SelectStage::Update()
 
 	++blink_;
 
-	
+
 
 	// 背景のスクロール
 	wallScroll_ += 0.6f;
@@ -203,12 +203,15 @@ void SelectStage::Update()
 		if (CheckHitKey(KEY_INPUT_H)) { selected_ = 1; Decide(2); return; }
 
 		// 左右キーでも選べるよ
-		if (CheckHitKey(KEY_INPUT_LEFT) || CheckHitKey(KEY_INPUT_A)) selected_ = 0;
-		if (CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_D)) selected_ = 1;
-
-		//選ぶたびに音がなる
-		if (selected_ != prevSelected)
+		if (CheckHitKey(KEY_INPUT_LEFT) || CheckHitKey(KEY_INPUT_A))
 		{
+			selected_ = 0;
+			PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);
+		}
+
+		if (CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_D))
+		{
+			selected_ = 1;
 			PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);
 		}
 
