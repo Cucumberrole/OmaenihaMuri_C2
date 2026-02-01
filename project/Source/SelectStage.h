@@ -57,7 +57,15 @@ private:
 	//BGM
 	int SelectBGM;
 	int SelectSE;
-	
 
 	int prevSelected = selected_;
+
+private:
+	char keyNow_[256]{};
+	char keyPrev_[256]{};
+
+	bool KeyDown(int key) const
+	{
+		return (keyNow_[key] != 0) && (keyPrev_[key] == 0);
+	}
 };

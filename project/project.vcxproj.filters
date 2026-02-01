@@ -12,7 +12,7 @@
       <Filter>BootScene</Filter>
     </ClCompile>
     <ClCompile Include="Source\TitleScene.cpp">
-      <Filter>TitleScene</Filter>
+      <Filter>Scene\TitleScene</Filter>
     </ClCompile>
     <ClCompile Include="ImGui\imgui.cpp">
       <Filter>ImGui</Filter>
@@ -60,7 +60,7 @@
       <Filter>PlayScene</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameOver.cpp">
-      <Filter>GameOver</Filter>
+      <Filter>Scene\GameOver</Filter>
     </ClCompile>
     <ClCompile Include="Source\Trap.cpp">
       <Filter>Trap</Filter>
@@ -90,7 +90,7 @@
       <Filter>Trap</Filter>
     </ClCompile>
     <ClCompile Include="Source\SelectStage.cpp">
-      <Filter>StageSelect</Filter>
+      <Filter>Scene\StageSelect</Filter>
     </ClCompile>
     <ClCompile Include="Source\FallingSpike.cpp">
       <Filter>Trap</Filter>
@@ -108,7 +108,7 @@
       <Filter>Trap</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameResult.cpp">
-      <Filter>ClearScene</Filter>
+      <Filter>Scene\ClearScene</Filter>
     </ClCompile>
     <ClCompile Include="Source\Collision.cpp">
       <Filter>PlayScene</Filter>
@@ -149,7 +149,7 @@
     </ClCompile>
     <ClCompile Include="Source\Zone.cpp" />
     <ClCompile Include="Source\ClearScene.cpp">
-      <Filter>ClearScene</Filter>
+      <Filter>Scene\ClearScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -170,7 +170,7 @@
       <Filter>BootScene</Filter>
     </ClInclude>
     <ClInclude Include="Source\TitleScene.h">
-      <Filter>TitleScene</Filter>
+      <Filter>Scene\TitleScene</Filter>
     </ClInclude>
     <ClInclude Include="ImGui\imconfig.h">
       <Filter>ImGui</Filter>
@@ -230,7 +230,7 @@
       <Filter>PlayScene</Filter>
     </ClInclude>
     <ClInclude Include="Source\ClearScene.h">
-      <Filter>ClearScene</Filter>
+      <Filter>Scene\ClearScene</Filter>
     </ClInclude>
     <ClInclude Include="Source\ClearScene.h">
       <Filter>ClearScene</Filter>
@@ -296,7 +296,7 @@
       <Filter>PlayScene</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameOver.h">
-      <Filter>GameOver</Filter>
+      <Filter>Scene\GameOver</Filter>
     </ClInclude>
     <ClInclude Include="Source\Trap.h">
       <Filter>Trap</Filter>
@@ -332,7 +332,7 @@
       <Filter>Trap</Filter>
     </ClInclude>
     <ClInclude Include="Source\SelectStage.h">
-      <Filter>StageSelect</Filter>
+      <Filter>Scene\StageSelect</Filter>
     </ClInclude>
     <ClInclude Include="Source\FallingSpike.h">
       <Filter>Trap</Filter>
@@ -356,7 +356,7 @@
       <Filter>Trap</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameResult.h">
-      <Filter>ClearScene</Filter>
+      <Filter>Scene\ClearScene</Filter>
     </ClInclude>
     <ClInclude Include="Source\Collision.h">
       <Filter>PlayScene</Filter>
@@ -387,7 +387,7 @@
       <Filter>Trap</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameConfig.h">
-      <Filter>StageSelect</Filter>
+      <Filter>Scene\StageSelect</Filter>
     </ClInclude>
     <ClInclude Include="Source\Hud.h">
       <Filter>HUD</Filter>
@@ -404,31 +404,16 @@
     <Filter Include="BootScene">
       <UniqueIdentifier>{4e7a122b-01b5-4a1f-bdd8-381c4cb2403d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TitleScene">
-      <UniqueIdentifier>{a52f9c67-9c6c-4376-8f4c-07a10ecbc3db}</UniqueIdentifier>
-    </Filter>
     <Filter Include="PlayScene">
       <UniqueIdentifier>{8123ada4-16d1-40da-a8f3-3f9e93aafb30}</UniqueIdentifier>
     </Filter>
     <Filter Include="ImGui">
       <UniqueIdentifier>{a717257b-67b3-4bfa-834c-1e34032b33b0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ClearScene">
-      <UniqueIdentifier>{92a63fa5-8db1-48e8-8a26-c9ee49f8359a}</UniqueIdentifier>
-    </Filter>
     <ClInclude Include="Source\TitleScene.h" />
     <ClInclude Include="Source\Trap.h" />
-    <Filter Include="GameOver">
-      <UniqueIdentifier>{13de5265-ab42-4124-8cf4-1005956d3358}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Trap">
       <UniqueIdentifier>{ec7d9f9a-df5c-4b7d-b43e-f784b3489e21}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="StageSelect">
-      <UniqueIdentifier>{f78fe6bc-8697-4244-b3d9-a5a2daecdf45}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Debug">
-      <UniqueIdentifier>{0c8fc6b0-a4c9-47b0-bdb6-6bcfdc7fd4c7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Telop">
       <UniqueIdentifier>{46b0110a-45be-418c-aa6d-95ba90dab9e3}</UniqueIdentifier>
@@ -438,6 +423,21 @@
     </Filter>
     <Filter Include="HUD">
       <UniqueIdentifier>{5f91f7ff-7faf-46fb-a315-813d577d5b20}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{5c537628-d9ba-4e01-90b7-86d74a6fa4b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\ClearScene">
+      <UniqueIdentifier>{92a63fa5-8db1-48e8-8a26-c9ee49f8359a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\TitleScene">
+      <UniqueIdentifier>{a52f9c67-9c6c-4376-8f4c-07a10ecbc3db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\GameOver">
+      <UniqueIdentifier>{13de5265-ab42-4124-8cf4-1005956d3358}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\StageSelect">
+      <UniqueIdentifier>{f78fe6bc-8697-4244-b3d9-a5a2daecdf45}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

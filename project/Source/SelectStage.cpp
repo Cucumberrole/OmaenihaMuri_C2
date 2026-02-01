@@ -5,6 +5,7 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 
 #include <DxLib.h>
 
@@ -162,6 +163,10 @@ void SelectStage::Decide(int stageId)
 
 void SelectStage::Update()
 {
+	// == キー入力の更新 ==
+	std::memcpy(keyPrev_, keyNow_, sizeof(keyNow_));
+	GetHitKeyStateAll(keyNow_);
+
 	// == 遷移アニメーション ==
 	{
 		const float introDurationSec = 0.25f;
@@ -203,16 +208,14 @@ void SelectStage::Update()
 		if (CheckHitKey(KEY_INPUT_H)) { selected_ = 1; Decide(2); return; }
 
 		// 左右キーでも選べるよ
-		if (CheckHitKey(KEY_INPUT_LEFT) || CheckHitKey(KEY_INPUT_A))
+		if (KeyDown(KEY_INPUT_LEFT) || KeyDown(KEY_INPUT_A))
 		{
-			selected_ = 0;
-			PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);
+			if (selected_ != 0) { selected_ = 0; PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK); }
 		}
 
-		if (CheckHitKey(KEY_INPUT_RIGHT) || CheckHitKey(KEY_INPUT_D))
+		if (KeyDown(KEY_INPUT_RIGHT) || KeyDown(KEY_INPUT_D))
 		{
-			selected_ = 1;
-			PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);
+			if (selected_ != 1) { selected_ = 1; PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK); }
 		}
 
 		// 決定
