@@ -144,6 +144,7 @@ void GameOver::Draw()
 {
 	int sw, sh;
 	GetDrawScreenSize(&sw, &sh);
+	const int oldFontSize = GetFontSize();
 
 	// Backround
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, fadeA_);
@@ -263,5 +264,6 @@ void GameOver::Draw()
 	SetFontSize(20);
 	DrawString(20, sh - 40, "ESC : Exit", GetColor(180, 180, 180));
 
+	SetFontSize(oldFontSize);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }

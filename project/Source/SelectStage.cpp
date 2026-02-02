@@ -163,10 +163,8 @@ void SelectStage::Decide(int stageId)
 
 void SelectStage::DecideDebug()
 {
-	// デバッグステージ
 	PlayScene::SelectedStage = 3;
 
-	// 難易度・残機は好きに。ここではEasy扱い＋残機多め（任意）
 	SelectedDifficulty() = Difficulty::Easy;
 	MaxLives() = 99;
 
