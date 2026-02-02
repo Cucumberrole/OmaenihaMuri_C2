@@ -120,8 +120,8 @@ void MovingWall::CheckCrushWithPlayer()
 	Player* player = FindGameObject<Player>();
 	if (!player) return;
 
-/**/	player->PushByWall(0.1f);
-/**/	return;
+	/**/	player->PushByWall(0.1f);
+	/**/	return;
 
 
 	// •Ç‘S‘Ì‚Ì‹éŒ`

@@ -444,7 +444,7 @@ void Field::Update()
 			{
 				player->ForceDie();
 				player->SetDead();
-				return; // 死んだら他の処理はスキップ
+				return;
 			}
 		}
 	}

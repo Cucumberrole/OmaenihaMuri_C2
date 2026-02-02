@@ -93,8 +93,10 @@ Player::Player()
 	deathAnimEnd = false;
 
 	JumpSE = LoadSoundMem("data/sound/jump.wav");
-
 	DieSE = LoadSoundMem("data/sound/DeathSound.mp3");
+	deathDrawX_ = x;
+	deathDrawY_ = y;
+
 }
 
 //--------------------------------------
@@ -137,6 +139,9 @@ Player::Player(int sx, int sy)
 	pushX = 0;
 	JumpSE = LoadSoundMem("data/sound/jump.wav");
 	DieSE = LoadSoundMem("data/BGM/miss.mp3");
+	deathDrawX_ = x;
+	deathDrawY_ = y;
+
 }
 
 //--------------------------------------
@@ -156,8 +161,16 @@ Player::~Player()
 // 円形当たり判定を取得
 void Player::GetHitCircle(float& outX, float& outY, float& outRadius) const
 {
-	outX = x + CHARACTER_WIDTH / 2.0f;   // 中心 X
-	outY = y + CHARACTER_HEIGHT / 2.0f;  // 中心 Y
+	if (isDead)
+	{
+		outX = -100000.0f;
+		outY = -100000.0f;
+		outRadius = 0.0f;
+		return;
+	}
+
+	outX = x + CHARACTER_WIDTH / 2.0f;
+	outY = y + CHARACTER_HEIGHT / 2.0f;
 	outRadius = hitRadius;
 }
 
@@ -208,17 +221,8 @@ void Player::Update()
 	// --- 死亡演出 ---
 	if (isDead)
 	{
-
-		if (!deathTelopStarted)
-		{
-			if (telop)
-			{
-				telop->StartDeathTelop(this);
-			}
-			deathTelopStarted = true;
-		}
-
-		y += velocity;
+		// 見た目だけ落下
+		deathDrawY_ += velocity;
 		velocity += Gravity;
 
 		if (deathState == DeathState::Up && velocity >= 0.0f)
@@ -229,11 +233,10 @@ void Player::Update()
 		int sw = 0, sh = 0;
 		GetDrawScreenSize(&sw, &sh);
 
-		if (y > sh + 100)
+		if (deathDrawY_ > sh + 100)
 		{
 			deathAnimEnd = true;
 		}
-
 		return;
 	}
 
@@ -503,11 +506,11 @@ void Player::Draw()
 	{
 		if (deathState == DeathState::Up)
 		{
-			DrawGraph((int)x, (int)y, hDeadUpImage, TRUE);
+			DrawGraph((int)deathDrawX_, (int)deathDrawY_, hDeadUpImage, TRUE);
 		}
 		else
 		{
-			DrawGraph((int)x, (int)y, hDeadFallImage, TRUE);
+			DrawGraph((int)deathDrawX_, (int)deathDrawY_, hDeadFallImage, TRUE);
 		}
 		return;
 	}
@@ -535,21 +538,30 @@ void Player::Draw()
 
 void Player::ForceDie()
 {
-	if (Common::GetInstance() && Common::GetInstance()->invincible)
-	{
-
-		return;
-	}
-
+	if (Common::GetInstance() && Common::GetInstance()->invincible) return;
 	if (isDead) return;
 
 	onGround = false;
+
+	// 死亡演出の開始位置を保存
+	deathDrawX_ = x;
+	deathDrawY_ = y;
+
+	if (!deathTelopStarted)
+	{
+		Telop* telop = FindGameObject<Telop>();
+		if (telop) telop->StartDeathTelop(this);
+		deathTelopStarted = true;
+	}
+
+	// 物理本体は画面外へ退避
+	x = -100000.0f;
+	y = -100000.0f;
 
 	isDead = true;
 	deathAnimEnd = false;
 	deathState = DeathState::Up;
 	velocity = V0;
-
 
 	ChangeVolumeSoundMem(128, DieSE);
 	PlaySoundMem(DieSE, DX_PLAYTYPE_BACK);

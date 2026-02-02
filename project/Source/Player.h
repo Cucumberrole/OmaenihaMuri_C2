@@ -85,6 +85,11 @@ private:
 		Fall    // 落下
 	};
 
+	// --- 死亡演出：見た目専用座標 ---
+	float deathDrawX_ = 0.0f;
+	float deathDrawY_ = 0.0f;
+
+
 	DeathState deathState;
 	int hDeadUpImage;    // 左の画像
 	int hDeadFallImage;  // 右の画像
