@@ -223,7 +223,7 @@ void ClearScene::Update()
 		return;
 	}
 
-	// アニメのスキップ or タイトルへ
+	// アニメのスキップ・タイトルへ
 	const bool pressReturn =
 		CheckHitKey(KEY_INPUT_T) || CheckHitKey(KEY_INPUT_RETURN) || CheckHitKey(KEY_INPUT_SPACE);
 
@@ -231,7 +231,7 @@ void ClearScene::Update()
 	const int now = GetNowCount();
 	float dt = (now - lastMs_) / 1000.0f;
 	if (dt < 0.0f) dt = 0.0f;
-	if (dt > 0.1f) dt = 0.1f; // 突発の長フレーム対策
+	if (dt > 0.1f) dt = 0.1f; // 長フレーム対策
 	lastMs_ = now;
 
 	// Timeline (seconds)
@@ -240,7 +240,6 @@ void ClearScene::Update()
 	const float tScoreS = 0.55f, tScoreE = 1.90f;
 	const float tRankS = 1.60f, tRankE = 2.20f;
 
-	//  { [ i X   o ɕK v ȏI      
 	const float tBonusStart = tScoreE + 0.10f;
 	const float bonusDur = 0.55f;
 	float tEnd = tRankE;
@@ -251,10 +250,10 @@ void ClearScene::Update()
 
 	if (pressReturn)
 	{
-		if (!animDone_) animSkip_ = true;   // アニメ中：スキップ
+		if (!animDone_) animSkip_ = true;   // アニメスキップ
 		else
 		{
-			SceneManager::ChangeScene("TITLE"); // アニメ後：タイトルへ
+			SceneManager::ChangeScene("TITLE"); // タイトルへ
 			return;
 		}
 	}
