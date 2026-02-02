@@ -45,13 +45,11 @@ PlayScene::PlayScene()
 
 	StageBGM1 = LoadSoundMem("data/BGM/Stage1.mp3");
 	StageBGM2 = LoadSoundMem("data/BGM/Stage2.mp3");
-	ChangeVolumeSoundMem(100, StageBGM1);
-	ChangeVolumeSoundMem(100, StageBGM2);
 	LastSE = LoadSoundMem("data/BGM/life_warning.mp3");
 	RetrySE = LoadSoundMem("data/BGM/Continue.mp3");
 
-	if (StageBGM1 >= 0) ChangeVolumeSoundMem(150, StageBGM1);
-	if (StageBGM2 >= 0) ChangeVolumeSoundMem(150, StageBGM2);
+	if (StageBGM1 >= 0) ChangeVolumeSoundMem(128, StageBGM1);
+	if (StageBGM2 >= 0) ChangeVolumeSoundMem(128, StageBGM2);
 
 	if (SelectedStage == 1 && StageBGM1 >= 0) PlaySoundMem(StageBGM1, DX_PLAYTYPE_LOOP);
 	if (SelectedStage == 2 && StageBGM2 >= 0) PlaySoundMem(StageBGM2, DX_PLAYTYPE_LOOP);
@@ -118,7 +116,7 @@ void PlayScene::Update()
 
 				life--;
 				retryCount++;
-				deathCount++;
+				deathCount = deathCount + 1;
 
 				g_Life = life;
 				g_RetryCount = retryCount;
