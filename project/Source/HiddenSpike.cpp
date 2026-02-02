@@ -13,6 +13,7 @@ HiddenSpike::HiddenSpike(float sx, float sy, float triggerRange)
 	this->triggerRange = triggerRange;
 
 	GetGraphSize(hImage, &width, &height);
+	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
 }
 
 HiddenSpike::~HiddenSpike()
@@ -21,6 +22,7 @@ HiddenSpike::~HiddenSpike()
 	{
 		DeleteGraph(hImage);
 	}
+	StopSoundMem(SpikeSE);
 }
 
 void HiddenSpike::Update()
@@ -64,6 +66,8 @@ void HiddenSpike::Update()
 
 		if (HitCheck_Circle_Triangle(center, cr, t1, t2, t3))
 		{
+			PlaySoundMem(SpikeSE, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(70, SpikeSE);
 			player->ForceDie();
 			player->SetDead();
 		}

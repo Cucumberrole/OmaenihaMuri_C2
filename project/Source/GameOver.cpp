@@ -73,8 +73,8 @@ GameOver::GameOver()
 	s_gameOverShownCount++;
 
 	GameOverBGM = LoadSoundMem("data/BGM/Gameover.mp3");
-	ChangeVolumeSoundMem(130, GameOverBGM);
 	PlaySoundMem(GameOverBGM, DX_PLAYTYPE_LOOP);
+	ChangeVolumeSoundMem(70, GameOverBGM);
 
 	startMs_ = GetNowCount();
 	t_ = 0.0f;

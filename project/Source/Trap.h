@@ -26,4 +26,6 @@ private:
 
 	void Activate();   // プレイヤーが踏んだときに発動
 
+	int SpikeSE;
+
 };

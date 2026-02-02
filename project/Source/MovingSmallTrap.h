@@ -17,5 +17,7 @@ private:
 	int   height = 16;
 	int SImage = -1;
 	const float tile = 64.0f;
+
+	int SpikeSE;
 };
 

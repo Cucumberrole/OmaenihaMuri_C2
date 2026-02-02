@@ -18,11 +18,13 @@ SmallTrap::SmallTrap(float sx, float sy, SmallSpikeDir dir)
 		width = w;
 		height = h;
 	}
+	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
 }
 
 SmallTrap::~SmallTrap()
 {
 	DeleteGraph(SImage);
+	StopSoundMem(SpikeSE);
 }
 
 void SmallTrap::Update()
@@ -73,6 +75,8 @@ void SmallTrap::Update()
 
 	if (HitCheck_Circle_Triangle(center, cr, t1, t2, t3))
 	{
+		PlaySoundMem(SpikeSE, DX_PLAYTYPE_BACK);
+		ChangeVolumeSoundMem(70, SpikeSE);
 		player->ForceDie();
 		player->SetDead();
 	}

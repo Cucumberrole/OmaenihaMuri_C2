@@ -48,8 +48,8 @@ PlayScene::PlayScene()
 	LastSE = LoadSoundMem("data/BGM/life_warning.mp3");
 	RetrySE = LoadSoundMem("data/BGM/Continue.mp3");
 
-	if (StageBGM1 >= 0) ChangeVolumeSoundMem(128, StageBGM1);
-	if (StageBGM2 >= 0) ChangeVolumeSoundMem(128, StageBGM2);
+	if (StageBGM1 >= 0) ChangeVolumeSoundMem(70, StageBGM1);
+	if (StageBGM2 >= 0) ChangeVolumeSoundMem(70, StageBGM2);
 
 	if (SelectedStage == 1 && StageBGM1 >= 0) PlaySoundMem(StageBGM1, DX_PLAYTYPE_LOOP);
 	if (SelectedStage == 2 && StageBGM2 >= 0) PlaySoundMem(StageBGM2, DX_PLAYTYPE_LOOP);
@@ -78,7 +78,10 @@ PlayScene::~PlayScene()
 {
 	Hud::Shutdown();
 	InitSoundMem();
-
+	StopSoundMem(StageBGM1);
+	StopSoundMem(StageBGM2);
+	StopSoundMem(LastSE);
+	StopSoundMem(RetrySE);
 }
 
 void PlayScene::Update()
@@ -121,9 +124,9 @@ void PlayScene::Update()
 				g_Life = life;
 				g_RetryCount = retryCount;
 				g_deathCount = deathCount;
+				
 				StopSoundMem(StageBGM1);
 				StopSoundMem(StageBGM2);
-
 			}
 
 			state = Playstate::Death;
@@ -149,6 +152,9 @@ void PlayScene::Update()
 
 		if (CheckHitKey(KEY_INPUT_R))
 		{
+			PlaySoundMem(RetrySE, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(70, RetrySE);
+
 			fader->FadeOut(0.5f);
 			fader->FadeIn(1.0f);
 
@@ -186,6 +192,9 @@ void PlayScene::Update()
 	{
 		if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
 		{
+			PlaySoundMem(RetrySE, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(70, RetrySE);
+
 			VanishingFloor::ResetAll();
 
 			fader->FadeOut(0.5f);

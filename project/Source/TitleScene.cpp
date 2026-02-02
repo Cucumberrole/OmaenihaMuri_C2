@@ -51,7 +51,7 @@ TitleScene::TitleScene()
 
 	// BGM
 	sHandle = LoadSoundMem("data/bgm/Title.mp3");
-	ChangeVolumeSoundMem(150, sHandle);
+	ChangeVolumeSoundMem(70, sHandle);
 	if (sHandle >= 0) PlaySoundMem(sHandle, DX_PLAYTYPE_LOOP);
 
 	// CSVロード
@@ -81,6 +81,7 @@ TitleScene::~TitleScene()
 	if (playerSheetHandle >= 0) DeleteGraph(playerSheetHandle);
 
 	if (sHandle >= 0) DeleteSoundMem(sHandle);
+	
 }
 
 void TitleScene::LoadTitleCsv(const char* path)

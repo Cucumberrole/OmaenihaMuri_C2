@@ -15,11 +15,13 @@ EnemyChaser::EnemyChaser(float sx, float sy)
 	animFrame = 0;
 
 	SetDrawOrder(10);
+	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
 }
 
 EnemyChaser::~EnemyChaser()
 {
 	DeleteGraph(hImage);
+	StopSoundMem(SpikeSE);
 }
 
 void EnemyChaser::Update()
@@ -66,9 +68,10 @@ void EnemyChaser::Update()
 
 		if (hit)
 		{
+			PlaySoundMem(SpikeSE, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(70, SpikeSE);
 			player->ForceDie();  // ƒvƒŒƒCƒ„[‚ð‘¦Ž€ˆµ‚¢‚É‚·‚éŠÖ”
 			player->SetDead();   // “®‚«‚ðŽ~‚ß‚é
-
 		}
 	}
 }

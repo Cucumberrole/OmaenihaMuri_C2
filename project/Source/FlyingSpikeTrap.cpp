@@ -70,6 +70,8 @@ FlyingSpikeTrap::FlyingSpikeTrap(
 	spikeH = 64.0f;
 
 	EnsureSharedImageLoaded();
+
+	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
 }
 
 FlyingSpikeTrap::~FlyingSpikeTrap()
@@ -81,6 +83,7 @@ FlyingSpikeTrap::~FlyingSpikeTrap()
 		sImage = -1;
 		sRefCount = 0;
 	}
+	StopSoundMem(SpikeSE);
 }
 
 void FlyingSpikeTrap::EnsureSharedImageLoaded()
@@ -311,6 +314,8 @@ void FlyingSpikeTrap::UpdateShots(Player* player, Field* field)
 
 		if (HitCheck_Circle_Triangle(pCenter, pRadius, t1, t2, t3))
 		{
+			PlaySoundMem(SpikeSE, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(70, SpikeSE);
 			player->ForceDie();
 			player->SetDead();
 			s.alive = false;

@@ -20,5 +20,6 @@ private:
 
 	int   size;        // 表示上の直径（例：64）
 
+	int SunSE;
 };
 

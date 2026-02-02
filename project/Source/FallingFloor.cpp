@@ -17,11 +17,13 @@ FallingFloor::FallingFloor(int sx, int sy)
 	gravity = 0.8f;
 
 	SetDrawOrder(-1);
+	BlockDieSE = LoadSoundMem("data/BGM/death_crushed.mp3");
 }
 
 FallingFloor::~FallingFloor()
 {
 	DeleteGraph(hImage);
+	StopSoundMem(BlockDieSE);
 }
 
 void FallingFloor::StartFalling()
@@ -113,6 +115,8 @@ void FallingFloor::Update()
 
 			if (hit)
 			{
+				PlaySoundMem(BlockDieSE, DX_PLAYTYPE_BACK);
+				ChangeVolumeSoundMem(70, BlockDieSE);
 				player->ForceDie();
 				player->SetDead();
 				if (telop)

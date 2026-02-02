@@ -24,4 +24,6 @@ private:
 	float scale;       // 500px ¨ 64px ‚Ék¬‚·‚é”{—¦
 
 	void Bounce();     // •Ç‚É“–‚½‚Á‚½‚Ì”½“]
+
+	int BallSE;
 };

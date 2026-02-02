@@ -20,4 +20,7 @@ private:
 
 	float triggerRange = 160.0f; // ‹ß‚Ã‚¢‚½‚çŒ©‚¦‚é‹——£
 	bool  revealed = false;  // true ‚É‚È‚Á‚½‚çŽp‚ðŒ©‚¹‚é & “–‚½‚è”»’è—LŒø
+
+	//SE
+	int SpikeSE;
 };

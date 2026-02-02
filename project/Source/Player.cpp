@@ -152,6 +152,8 @@ Player::~Player()
 	if (hImage != -1) DeleteGraph(hImage);
 	if (hDeadUpImage != -1) DeleteGraph(hDeadUpImage);
 	if (hDeadFallImage != -1) DeleteGraph(hDeadFallImage);
+	StopSoundMem(JumpSE);
+	StopSoundMem(DieSE);
 }
 
 //--------------------------------------
@@ -344,8 +346,8 @@ void Player::Update()
 		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
 			velocity = V0;
 			onGround = false;
-			ChangeVolumeSoundMem(180, JumpSE);
 			PlaySoundMem(JumpSE, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(70, JumpSE);
 		}
 	}
 
@@ -354,8 +356,8 @@ void Player::Update()
 		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
 			jumpcount -= 1;
 			velocity = V0;
-			ChangeVolumeSoundMem(180, JumpSE);
 			PlaySoundMem(JumpSE, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(70, JumpSE);
 		}
 	}
 
@@ -563,8 +565,8 @@ void Player::ForceDie()
 	deathState = DeathState::Up;
 	velocity = V0;
 
-	ChangeVolumeSoundMem(128, DieSE);
 	PlaySoundMem(DieSE, DX_PLAYTYPE_BACK);
+	ChangeVolumeSoundMem(70, DieSE);
 
 	TriggerHitOverlay();
 }

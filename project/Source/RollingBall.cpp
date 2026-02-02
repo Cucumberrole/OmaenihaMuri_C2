@@ -31,11 +31,14 @@ RollingBall::RollingBall(float sx, float sy, float dir)
 
 	// 回転角初期化
 	angle = 0.0f;
+
+	BallSE = LoadSoundMem("data/BGM/death_crushed.mp3");
 }
 
 RollingBall::~RollingBall()
 {
 	DeleteGraph(hImage);
+	StopSoundMem(BallSE);
 }
 
 void RollingBall::Update()
@@ -112,6 +115,8 @@ void RollingBall::Update()
 
 		if (dist2 <= rSum * rSum)
 		{
+			PlaySoundMem(BallSE, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(70, BallSE);
 			player->ForceDie();
 			player->SetDead();
 		}
