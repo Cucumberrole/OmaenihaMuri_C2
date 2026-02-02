@@ -25,4 +25,5 @@ private:
 	bool  isExtended;  // 出きった状態（出し切った後）
 
 	void Activate();   // プレイヤーが踏んだときに発動
+
 };
