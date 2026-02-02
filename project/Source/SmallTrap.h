@@ -26,4 +26,6 @@ private:
 	SmallSpikeDir dir;
 
 	int SImage = -1; // ‰æ‘œ1–‡‚ÅÏ‚Ü‚¹‚é‚È‚ç‚±‚ê‚¾‚¯
+
+	int SpikeSE;
 };

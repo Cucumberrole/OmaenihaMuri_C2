@@ -29,4 +29,6 @@ private:
 	float gravity;
 
 	void StartFalling();
+
+	int BlockDieSE;
 };

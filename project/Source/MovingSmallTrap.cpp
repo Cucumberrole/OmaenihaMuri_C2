@@ -8,10 +8,12 @@ MovingSmallTrap::MovingSmallTrap(float sx, float sy)
 	SImage = LoadGraph("data/image/Smallhari.png"); // ¬‚³‚¢j‰æ‘œ
 	x = sx;
 	y = sy;
+	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
 }
 
 MovingSmallTrap::~MovingSmallTrap()
 {
+	StopSoundMem(SpikeSE);
 }
 
 void MovingSmallTrap::Update() 
@@ -55,8 +57,11 @@ void MovingSmallTrap::Update()
 
 	if (HitCheck_Circle_Triangle(center, cr, t1, t2, t3))
 	{
+		
 		player->ForceDie();
 		player->SetDead();
+		PlaySoundMem(SpikeSE, DX_PLAYTYPE_BACK);
+		ChangeVolumeSoundMem(70, SpikeSE);
 		if (y < 384) {
 			telop->TouchedTrap1 = true;
 		}

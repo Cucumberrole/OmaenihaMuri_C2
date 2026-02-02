@@ -20,6 +20,7 @@ Trap::Trap(int sx, int sy)
 	moveSpeed = 10.0f; // 上にせり出すスピード
 
 	SetDrawOrder(100);  // 描画順序
+	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
 }
 
 //--------------------------------------
@@ -28,6 +29,7 @@ Trap::Trap(int sx, int sy)
 Trap::~Trap()
 {
 	DeleteGraph(hImage);
+	StopSoundMem(SpikeSE);
 }
 
 //--------------------------------------
@@ -110,6 +112,8 @@ void Trap::Update()
 
 		if (HitCheck_Circle_Triangle(center, radius, tri1, tri2, tri3))
 		{
+			PlaySoundMem(SpikeSE, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(70, SpikeSE);
 			player->ForceDie();
 			player->SetDead();
 		}

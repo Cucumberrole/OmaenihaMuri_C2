@@ -124,10 +124,12 @@ SelectStage::SelectStage()
 	introDone_ = false;
 
 	SelectBGM = LoadSoundMem("data/BGM/StageSelect.mp3");
-	ChangeVolumeSoundMem(130, SelectBGM);
 	PlaySoundMem(SelectBGM, DX_PLAYTYPE_LOOP);
+	ChangeVolumeSoundMem(70, SelectBGM);
 	SelectSE = LoadSoundMem("data/BGM/cursorSE.mp3");
-	ChangeVolumeSoundMem(120, SelectSE);
+	ChangeVolumeSoundMem(70, SelectSE);
+	DecisionSE = LoadSoundMem("data/BGM/Decision.mp3");
+	ChangeVolumeSoundMem(70, DecisionSE);
 }
 
 SelectStage::~SelectStage()
@@ -140,6 +142,8 @@ SelectStage::~SelectStage()
 	if (vignetteImg_ >= 0) DeleteGraph(vignetteImg_);
 
 	StopSoundMem(SelectBGM);
+	StopSoundMem(SelectSE);
+	StopSoundMem(DecisionSE);
 }
 
 void SelectStage::Decide(int stageId)
@@ -226,18 +230,24 @@ void SelectStage::Update()
 		// 左右キーでも選べるよ
 		if (KeyDown(KEY_INPUT_LEFT) || KeyDown(KEY_INPUT_A))
 		{
-			if (selected_ != 0) { selected_ = 0; PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK); }
+			if (selected_ != 0) {
+				selected_ = 0; PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);ChangeVolumeSoundMem(70, SelectSE);
+			}
 		}
 
 		if (KeyDown(KEY_INPUT_RIGHT) || KeyDown(KEY_INPUT_D))
 		{
-			if (selected_ != 1) { selected_ = 1; PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK); }
+			if (selected_ != 1) {
+				selected_ = 1; PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);ChangeVolumeSoundMem(70, SelectSE);
+			}
 		}
 
 		// 決定
 		if (CheckHitKey(KEY_INPUT_RETURN) || CheckHitKey(KEY_INPUT_Z))
 		{
 			Decide(selected_ == 0 ? 1 : 2);
+			PlaySoundMem(DecisionSE, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(70, DecisionSE);
 			return;
 		}
 

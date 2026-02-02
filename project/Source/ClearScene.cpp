@@ -184,8 +184,8 @@ ClearScene::ClearScene()
 	rankAlpha_ = 0;
 	rankOffsetY_ = -20.0f;
 	GoalBGM = LoadSoundMem("data/BGM/bgm_result.mp3");
-	ChangeVolumeSoundMem(130, GoalBGM);
 	PlaySoundMem(GoalBGM, DX_PLAYTYPE_LOOP);
+	ChangeVolumeSoundMem(70, GoalBGM);
 }
 
 ClearScene::~ClearScene()

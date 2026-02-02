@@ -47,4 +47,6 @@ private:
 
 	const char* tauntText; // ø‚è•¶š
 	bool showTaunt;        // •\¦ƒtƒ‰ƒO
+
+	int SpikeSE;
 };

@@ -19,11 +19,14 @@ Sun::Sun(float sx, float sy)
 
 	int w, h;
 	GetGraphSize(hImage, &w, &h);
+	SunSE = LoadSoundMem("data/BGM/death_scream.mp3");
 }
 
 Sun::~Sun()
 {
 	DeleteGraph(hImage);
+	StopSoundMem(SunSE);
+
 }
 
 void Sun::Update()
@@ -86,6 +89,8 @@ void Sun::Update()
 
 		if (dist2 <= rSum * rSum)
 		{
+			PlaySoundMem(SunSE, DX_PLAYTYPE_BACK);
+			ChangeVolumeSoundMem(70, SunSE);
 			player->ForceDie();
 			player->SetDead();
 		}

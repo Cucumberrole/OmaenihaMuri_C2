@@ -96,4 +96,7 @@ private:
 	// �摜�T�C�Y�ihariLeft.png ����]���ĕ`��j
 	float spikeW;
 	float spikeH;
+
+	//SE
+	int SpikeSE;
 };

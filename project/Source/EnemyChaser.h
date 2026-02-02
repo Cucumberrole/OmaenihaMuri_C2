@@ -23,4 +23,6 @@ private:
 	static const int CHARACTER_WIDTH = 640;   // 1コマの横幅
 	static const int CHARACTER_HEIGHT = 640;  // 1コマの縦幅
 	static const int ANIM_FRAME_INTERVAL = 4; // コマ切替速度
+
+	int SpikeSE;
 };
