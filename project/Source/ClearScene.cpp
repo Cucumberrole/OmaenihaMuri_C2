@@ -296,7 +296,6 @@ void ClearScene::Update()
 			const float tBonusAddS = 0.18f;
 			const float tBonusAddE = 0.55f;
 
-			// 1)  ܂   b X R A  
 			if (animTime_ <= tBaseS)
 			{
 				dispScore_ = 0;
@@ -314,7 +313,6 @@ void ClearScene::Update()
 			}
 			else
 			{
-				// 2)  { [ i X     ɉ  Z
 				int scoreNow = baseScore_;
 				bonusActiveIndex_ = -1;
 				bonusAlpha_ = 0;
@@ -328,21 +326,17 @@ void ClearScene::Update()
 				{
 					const float tFromBonus0 = animTime_ - tBonusStart;
 
-					//    łɊ        { [ i X  
 					int done = (tFromBonus0 <= 0.0f) ? 0 : (int)std::floor(tFromBonus0 / bonusDur);
 					if (done < 0) done = 0;
 					if (done > bonusCount_) done = bonusCount_;
 
-					//        ͊m    Z
 					for (int i = 0; i < done; ++i) scoreNow += bonusValue_[i];
 
-					//    ݐi s   ̃{ [ i X i    ΁j
 					if (done < bonusCount_)
 					{
 						bonusActiveIndex_ = done;
-						const float local = tFromBonus0 - (done * bonusDur); // 0..bonusDur
+						const float local = tFromBonus0 - (done * bonusDur);
 
-						//  | b v \   ialpha/scale j
 						{
 							float tp = local / tBonusPop;
 							float eA = EaseOutCubic(tp);
@@ -353,7 +347,6 @@ void ClearScene::Update()
 							bonusScale_ = LerpFloat(0.8f, 1.0f, eB);
 						}
 
-						//    Z A j   iscore + bonus * lerp j
 						{
 							float ta = (local - tBonusAddS) / (tBonusAddE - tBonusAddS);
 							float e = EaseOutCubic(ta);
