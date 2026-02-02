@@ -14,6 +14,7 @@ public:
 
 private:
 	void Decide(int stageId);
+	void DecideDebug();
 	void DrawTiledWall(int sw, int sh) const;
 	void DrawVignette(int sw, int sh) const;
 	void DrawSparkles(int sw, int sh) const;

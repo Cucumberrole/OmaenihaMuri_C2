@@ -50,6 +50,13 @@ void Player::DrawHitOverlay()
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
+static inline float ClampF(float v, float lo, float hi)
+{
+	if (v < lo) return lo;
+	if (v > hi) return hi;
+	return v;
+}
+
 //--------------------------------------
 // デフォルトコンストラクタ
 //--------------------------------------
@@ -86,9 +93,8 @@ Player::Player()
 	deathAnimEnd = false;
 
 	JumpSE = LoadSoundMem("data/sound/jump.wav");
-	ChangeVolumeSoundMem(130, JumpSE);
+
 	DieSE = LoadSoundMem("data/sound/DeathSound.mp3");
-	ChangeVolumeSoundMem(130, DieSE);
 }
 
 //--------------------------------------
@@ -160,9 +166,9 @@ void Player::PushByWall(float dx)
 	if (dx == 0.0f) return;
 
 	Field* field = FindGameObject<Field>();
-//	if (!field) { x += dx; return; }
+	//	if (!field) { x += dx; return; }
 
-//	x += dx;
+	//	x += dx;
 	pushX = dx;
 
 	int push = 0;
@@ -202,7 +208,7 @@ void Player::Update()
 	// --- 死亡演出 ---
 	if (isDead)
 	{
-		
+
 		if (!deathTelopStarted)
 		{
 			if (telop)
@@ -227,7 +233,7 @@ void Player::Update()
 		{
 			deathAnimEnd = true;
 		}
-		
+
 		return;
 	}
 
@@ -252,6 +258,7 @@ void Player::Update()
 		moveX = -WALK_SPEED;
 		frip = true;
 	}
+
 	if (IsReverse)
 	{
 		moveX *= -1;
@@ -274,14 +281,14 @@ void Player::Update()
 		int push = 0;
 
 		// --- Field 判定 ---
-		if (moveX > 0 ||pushX != 0) {
+		if (moveX > 0 || pushX != 0) {
 			// 右端は「63」にする
 			int push1 = field->HitCheckRight((int)(x + 63), (int)(y + 5));
 			int push2 = field->HitCheckRight((int)(x + 63), (int)(y + 58));
-	
+
 			push = max(push1, push2);
 		}
-		else if (moveX<0 || pushX>0){
+		else if (moveX < 0 || pushX>0) {
 			int push1 = field->HitCheckLeft((int)(x + 0), (int)(y + 5));
 			int push2 = field->HitCheckLeft((int)(x + 0), (int)(y + 58));
 			push = -max(push1, push2);
@@ -295,7 +302,7 @@ void Player::Update()
 				int p2 = f->HitCheckRight((int)(x + 63), (int)(y + 62));
 				push = max(push, max(p1, p2));
 			}
-			else if (moveX<0 || pushX>0){
+			else if (moveX < 0 || pushX>0) {
 				int p1 = f->HitCheckLeft((int)(x + 0), (int)(y + 1));
 				int p2 = f->HitCheckLeft((int)(x + 0), (int)(y + 62));
 				push = -max(-push, max(p1, p2));
@@ -307,12 +314,12 @@ void Player::Update()
 		for (auto vf : vFloors) {
 			if (!vf->IsActive()) continue;
 
-			if (moveX > 0||pushX != 0) {
+			if (moveX > 0 || pushX != 0) {
 				int p1 = vf->HitCheckRight((int)(x + 63), (int)(y + 1));
 				int p2 = vf->HitCheckRight((int)(x + 63), (int)(y + 62));
 				push = max(push, max(p1, p2));
 			}
-			else if (moveX<0 || pushX>0){
+			else if (moveX < 0 || pushX>0) {
 				int p1 = vf->HitCheckLeft((int)(x + 0), (int)(y + 1));
 				int p2 = vf->HitCheckLeft((int)(x + 0), (int)(y + 62));
 				push = -max(-push, max(p1, p2));
@@ -320,11 +327,11 @@ void Player::Update()
 		}
 
 		// 押し戻し
-		x -=push;
-//		if (push > 0) {
-//			if (moveX > 0) x -= (float)push;
-//			else           x += (float)push;
-//		}
+		x -= push;
+		//		if (push > 0) {
+		//			if (moveX > 0) x -= (float)push;
+		//			else           x += (float)push;
+		//		}
 	}
 
 	//========================================================
@@ -334,6 +341,7 @@ void Player::Update()
 		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
 			velocity = V0;
 			onGround = false;
+			ChangeVolumeSoundMem(180, JumpSE);
 			PlaySoundMem(JumpSE, DX_PLAYTYPE_BACK);
 		}
 	}
@@ -343,6 +351,7 @@ void Player::Update()
 		if (KeyTrigger::CheckTrigger(KEY_INPUT_SPACE)) {
 			jumpcount -= 1;
 			velocity = V0;
+			ChangeVolumeSoundMem(180, JumpSE);
 			PlaySoundMem(JumpSE, DX_PLAYTYPE_BACK);
 		}
 	}
@@ -410,7 +419,7 @@ void Player::Update()
 			velocity = 0;
 		}
 	}
-	
+
 	//========================================================
 	// 土管の判定（上に乗った時だけワープ）
 	//========================================================
@@ -421,6 +430,11 @@ void Player::Update()
 
 		float px = x;
 		float py = y;
+
+		int sw = 0, sh = 0;
+		GetDrawScreenSize(&sw, &sh);
+		x = ClampF(x, 0.0f, (float)sw - 64.0f);
+		y = ClampF(y, 0.0f, (float)sh - 64.0f);
 
 		float footY = py + ph;
 
@@ -445,7 +459,7 @@ void Player::Update()
 					POINT out = field->pipesOut[i % field->pipesOut.size()];
 					x = (float)out.x;
 					y = (float)out.y + ph;
-					
+
 					if (telop && !telop->TouchedTrap2)
 					{
 						telop->TouchedTrap2 = true; // 1回だけ立てる
@@ -460,6 +474,18 @@ void Player::Update()
 	//逆操作
 	//触れてたらON,触れてなかったらOFF
 	IsReverse = false;
+
+	// 画面外に出さない
+	{
+		int sw = 0, sh = 0;
+		GetDrawScreenSize(&sw, &sh);
+
+		const float pw = 64.0f;  // プレイヤー幅
+		const float ph = 64.0f;  // プレイヤー高さ
+
+		x = ClampF(x, 0.0f, (float)sw - pw);
+		y = ClampF(y, 0.0f, (float)sh - ph);
+	}
 
 	UpdateHitOverlay();
 
@@ -511,7 +537,7 @@ void Player::ForceDie()
 {
 	if (Common::GetInstance() && Common::GetInstance()->invincible)
 	{
-		
+
 		return;
 	}
 
@@ -524,6 +550,8 @@ void Player::ForceDie()
 	deathState = DeathState::Up;
 	velocity = V0;
 
+
+	ChangeVolumeSoundMem(128, DieSE);
 	PlaySoundMem(DieSE, DX_PLAYTYPE_BACK);
 
 	TriggerHitOverlay();

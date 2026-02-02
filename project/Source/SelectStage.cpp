@@ -161,6 +161,19 @@ void SelectStage::Decide(int stageId)
 	fade_ = 0.0f;
 }
 
+void SelectStage::DecideDebug()
+{
+	// デバッグステージ
+	PlayScene::SelectedStage = 3;
+
+	// 難易度・残機は好きに。ここではEasy扱い＋残機多め（任意）
+	SelectedDifficulty() = Difficulty::Easy;
+	MaxLives() = 99;
+
+	deciding_ = true;
+	fade_ = 0.0f;
+}
+
 void SelectStage::Update()
 {
 	// == キー入力の更新 ==
@@ -203,6 +216,11 @@ void SelectStage::Update()
 
 	if (!deciding_)
 	{
+		if (KeyDown(KEY_INPUT_F3))
+		{
+			DecideDebug();
+			return;
+		}
 		// E、Hキーでステージ選択
 		if (CheckHitKey(KEY_INPUT_E)) { selected_ = 0; Decide(1); return; }
 		if (CheckHitKey(KEY_INPUT_H)) { selected_ = 1; Decide(2); return; }
