@@ -28,11 +28,12 @@ void Telop::StartDeathTelop(Player* p)
 	showDeathTelop_ = true;
 
 	const char* messages[] = {
-		"‚¤‚ñ‚±‚¾‚È",
+		"‚â‚ß‚æ‚¤‚æ",
 		"’É‚¢‚æ",
 		"l‚ÌS‚Æ‚©‚È‚¢‚ñ‚©",
 		"iLEƒÖEMj",
-		"(L;ƒÖ;M)"
+		"(L;ƒÖ;M)",
+		"(@ß„tß@)"
 	};
 
 	int count = (int)(sizeof(messages) / sizeof(messages[0]));
@@ -80,26 +81,34 @@ void Telop::Draw()
 		}
 		DrawFormatString(1700, 200, GetColor(255, 255, 255), "‚â‚Á‚Ù[", FALSE);
 	}
+
 	if (TouchedTrap3)//FallingFloor‰E‰º
 	{
 		DrawFormatString(1280, 576, GetColor(255, 255, 255), "‰³‚—", FALSE);
 	}
+
 	if (TouchedTrap4)//FallingFloor‰Eã
 	{
 		DrawFormatString(1088, 256, GetColor(255, 255, 255), "‚—‚—‚—‚—‚—", FALSE);
 	}
+
 	if (TouchedTrap5)//FallingFloor¶ã
 	{
 		DrawFormatString(128, 256, GetColor(255, 255, 255), "‚¨‚µ‚¢IIII", FALSE);
 	}
+
 	if (TouchedTrap6)//VanishingFloor
 	{
 		DrawFormatString(1152, 640, GetColor(255, 255, 255), "I_(OoO)^", FALSE);
 	}
-	if (showDeathTelop_)
+
+	if (ShowDeathTelop && player)
 	{
-		float drawX = deathTelopX_ + offsetX;
-		float drawY = deathTelopY_ + offsetY;
+		float baseX = player->IsDead() ? player->GetDeathDrawX() : player->GetX();
+		float baseY = player->IsDead() ? player->GetDeathDrawY() : player->GetY();
+
+		float drawX = baseX + offsetX;
+		float drawY = baseY + offsetY;
 
 		DrawFormatString(
 			(int)drawX,
@@ -109,6 +118,7 @@ void Telop::Draw()
 			FALSE
 		);
 	}
+
 }
 
 void Telop::ShowTrap3Message(float duration)

@@ -35,4 +35,5 @@ private:
 	float deathTelopX_ = 0.0f;
 	float deathTelopY_ = 0.0f;
 	float deathTelopTimer_ = 0.0f;
+
 };

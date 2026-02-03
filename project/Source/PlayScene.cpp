@@ -77,7 +77,6 @@ PlayScene::PlayScene()
 PlayScene::~PlayScene()
 {
 	Hud::Shutdown();
-	InitSoundMem();
 	StopSoundMem(StageBGM1);
 	StopSoundMem(StageBGM2);
 	StopSoundMem(LastSE);

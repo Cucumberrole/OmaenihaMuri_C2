@@ -41,6 +41,10 @@ public:
 	//逆操作
 	void SetReverse(bool flag) { IsReverse = flag; }
 
+	// 死亡時テロップ
+	float GetDeathDrawX() const { return deathDrawX_; }
+	float GetDeathDrawY() const { return deathDrawY_; }
+
 private:
 	// --- 基本パラメータ ---
 	int hImage;
