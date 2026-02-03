@@ -1,22 +1,22 @@
-#include "PlayScene.h"
 #include "Hud.h"
+#include "PlayScene.h"
 #include "SoundCache.h"
 
-#include <DxLib.h>
 #include <cmath>
+#include <DxLib.h>
 
 #include "../Library/Time.h"
 
-#include "GameConfig.h"
-#include "GameResult.h"
-#include "SelectStage.h"
-#include "Player.h"
-#include "Field.h"
-#include "Fader.h"
-#include "Background.h"
-#include "VanishingFloor.h"
 #include "../Library/SceneManager.h"
 #include "../Library/Trigger.h"
+#include "Background.h"
+#include "Fader.h"
+#include "Field.h"
+#include "GameConfig.h"
+#include "GameResult.h"
+#include "Player.h"
+#include "SelectStage.h"
+#include "VanishingFloor.h"
 
 int PlayScene::SelectedStage = -1;
 static int g_Life = 0;          // 初期
@@ -44,13 +44,12 @@ PlayScene::PlayScene()
 	if (SelectedStage < 0) SelectedStage = 1;
 	new Field(SelectedStage);
 
-	StageBGM1 = SoundCache::Get("data/BGM/Stage1.mp3");
-	StageBGM2 = SoundCache::Get("data/BGM/Stage2.mp3");
-	LastSE = SoundCache::Get("data/BGM/life_warning.mp3");
-	RetrySE = SoundCache::Get("data/BGM/Continue.mp3");
 
-	if (StageBGM1 >= 0) ChangeVolumeSoundMem(70, StageBGM1);
-	if (StageBGM2 >= 0) ChangeVolumeSoundMem(70, StageBGM2);
+	int volume = 128;
+	StageBGM1 = SoundCache::GetWithVolume("data/BGM/Stage1.mp3", volume);
+	StageBGM2 = SoundCache::GetWithVolume("data/BGM/Stage2.mp3", volume);
+	LastSE = SoundCache::GetWithVolume("data/BGM/life_warning.mp3", volume);
+	RetrySE = SoundCache::GetWithVolume("data/BGM/Continue.mp3", volume);
 
 	if (SelectedStage == 1 && StageBGM1 >= 0) PlaySoundMem(StageBGM1, DX_PLAYTYPE_LOOP);
 	if (SelectedStage == 2 && StageBGM2 >= 0) PlaySoundMem(StageBGM2, DX_PLAYTYPE_LOOP);
@@ -124,7 +123,7 @@ void PlayScene::Update()
 				g_Life = life;
 				g_RetryCount = retryCount;
 				g_deathCount = deathCount;
-				
+
 				StopSoundMem(StageBGM1);
 				StopSoundMem(StageBGM2);
 			}
@@ -153,7 +152,6 @@ void PlayScene::Update()
 		if (CheckHitKey(KEY_INPUT_R))
 		{
 			PlaySoundMem(RetrySE, DX_PLAYTYPE_BACK);
-			ChangeVolumeSoundMem(70, RetrySE);
 
 			fader->FadeOut(0.5f);
 			fader->FadeIn(1.0f);
@@ -193,7 +191,6 @@ void PlayScene::Update()
 		if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
 		{
 			PlaySoundMem(RetrySE, DX_PLAYTYPE_BACK);
-			ChangeVolumeSoundMem(70, RetrySE);
 
 			VanishingFloor::ResetAll();
 

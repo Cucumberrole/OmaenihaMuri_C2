@@ -1,9 +1,9 @@
-#include <DxLib.h>
-#include "SmallTrap.h"
-#include "Player.h"
 #include "Collision.h"
-#include "Telop.h"
+#include "Player.h"
+#include "SmallTrap.h"
 #include "SoundCache.h"
+#include "Telop.h"
+#include <DxLib.h>
 
 SmallTrap::SmallTrap(float sx, float sy, SmallSpikeDir dir)
 {

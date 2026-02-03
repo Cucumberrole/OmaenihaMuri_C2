@@ -104,12 +104,12 @@ void GR_UpdateDuringPlay()
 // 死亡した瞬間に呼ぶ：死亡回数を増やす（確定後は増やさない）
 void GR_OnDeath()
 {
-    if (g_GameResult.fixed) return;
+	if (g_GameResult.fixed) return;
 
-    g_GameResult.deathCount++;
+	g_GameResult.deathCount++;
 
-    g_GameResult.liveScore -= DeathPenalty(g_GameResult);
-    g_GameResult.liveScore = ClampScore(g_GameResult.liveScore);
+	g_GameResult.liveScore -= DeathPenalty(g_GameResult);
+	g_GameResult.liveScore = ClampScore(g_GameResult.liveScore);
 }
 
 // 現在の経過時間を「秒」で返す（HUD表示用）

@@ -1,10 +1,10 @@
-#include "FallingSpike.h"
 #include "Collision.h"
+#include "FallingSpike.h"
 #include "Field.h"
 #include "Player.h"
 #include "SoundCache.h"
-#include <DxLib.h>
 #include <algorithm>
+#include <DxLib.h>
 #include <vector>
 
 std::vector<FallingSpike*> FallingSpike::s_allSpikes;
@@ -79,7 +79,7 @@ void FallingSpike::Update()
 
 	Field* field = FindGameObject<Field>();
 
-	
+
 
 	//----------------------------------
 	// ‚Ü‚¾—‰º’†‚È‚çd—Íˆ—

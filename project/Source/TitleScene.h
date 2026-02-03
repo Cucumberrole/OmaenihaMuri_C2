@@ -29,7 +29,7 @@ private:
 	int playerFrames = 12;
 
 	// BGM
-	int sHandle = -1;
+	int TitleHandle = -1;
 
 	// CSV
 	std::vector<std::vector<int>> maps;

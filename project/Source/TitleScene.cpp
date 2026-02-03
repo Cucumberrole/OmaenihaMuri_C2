@@ -1,12 +1,12 @@
-﻿#include "TitleScene.h"
-#include "SoundCache.h"
+﻿#include "SoundCache.h"
+#include "TitleScene.h"
 
-#include <DxLib.h>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
+#include <DxLib.h>
 
-#include "../Library/Time.h"
 #include "../Library/SceneManager.h"
+#include "../Library/Time.h"
 
 #include "CsvReader.h"
 
@@ -51,8 +51,8 @@ TitleScene::TitleScene()
 	}
 
 	// BGM
-	sHandle = SoundCache::GetWithVolume("data/bgm/Title.mp3",100);
-	PlaySoundMem(sHandle, DX_PLAYTYPE_LOOP);
+	TitleHandle = SoundCache::GetWithVolume("data/BGM/Title.mp3", 180);
+	PlaySoundMem(TitleHandle, DX_PLAYTYPE_LOOP);
 
 	// CSVロード
 	LoadTitleCsv(kTitleCsvPath);
@@ -75,13 +75,12 @@ TitleScene::TitleScene()
 
 TitleScene::~TitleScene()
 {
-	if (bgHandle >= 0) DeleteGraph(bgHandle);
-	if (logoHandle >= 0) DeleteGraph(logoHandle);
-	if (blockHandle >= 0) DeleteGraph(blockHandle);
-	if (playerSheetHandle >= 0) DeleteGraph(playerSheetHandle);
+	DeleteGraph(bgHandle);
+	DeleteGraph(logoHandle);
+	DeleteGraph(blockHandle);
+	DeleteGraph(playerSheetHandle);
+	StopSoundMem(TitleHandle);
 
-	if (sHandle >= 0) DeleteSoundMem(sHandle);
-	
 }
 
 void TitleScene::LoadTitleCsv(const char* path)

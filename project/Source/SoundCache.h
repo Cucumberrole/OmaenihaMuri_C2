@@ -1,12 +1,20 @@
 #pragma once
 #include <DxLib.h>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 class SoundCache
 {
 public:
-	// 同じパスは1回だけLoadSoundMemして、同じハンドルを返す
+	static void SetDefaultVolume(int v)
+	{
+		DefaultVolume() = v;
+		for (auto& kv : Map())
+		{
+			if (kv.second >= 0) ChangeVolumeSoundMem(v, kv.second);
+		}
+	}
+
 	static int Get(const char* path)
 	{
 		auto& m = Map();
@@ -15,10 +23,12 @@ public:
 
 		const int h = LoadSoundMem(path);
 		m.emplace(path, h);
+
+		if (h >= 0) ChangeVolumeSoundMem(DefaultVolume(), h); // 統一
 		return h;
 	}
 
-	// 音量も設定したい時
+	// 個別音量が欲しい時だけ
 	static int GetWithVolume(const char* path, int volume)
 	{
 		int h = Get(path);
@@ -26,7 +36,6 @@ public:
 		return h;
 	}
 
-	// ゲーム終了時に一括解放
 	static void ReleaseAll()
 	{
 		auto& m = Map();
@@ -42,5 +51,10 @@ private:
 	{
 		static std::unordered_map<std::string, int> s_map;
 		return s_map;
+	}
+	static int& DefaultVolume()
+	{
+		static int v = 128; // 音量変更
+		return v;
 	}
 };

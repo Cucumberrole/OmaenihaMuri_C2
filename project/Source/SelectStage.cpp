@@ -1,5 +1,5 @@
-#include "SelectStage.h"
 #include "GameConfig.h"
+#include "SelectStage.h"
 #include "SoundCache.h"
 
 #include <algorithm>
@@ -124,13 +124,14 @@ SelectStage::SelectStage()
 	introT_ = 0.0f;
 	introDone_ = false;
 
-	SelectBGM = SoundCache::Get("data/BGM/StageSelect.mp3");
+
+	int volume = 128;
+	SelectBGM = SoundCache::GetWithVolume("data/BGM/StageSelect.mp3",volume);
 	PlaySoundMem(SelectBGM, DX_PLAYTYPE_LOOP);
-	ChangeVolumeSoundMem(70, SelectBGM);
-	SelectSE = SoundCache::Get("data/BGM/cursorSE.mp3");
-	ChangeVolumeSoundMem(70, SelectSE);
-	DecisionSE = SoundCache::Get("data/BGM/Decision.mp3");
-	ChangeVolumeSoundMem(70, DecisionSE);
+
+	SelectSE = SoundCache::GetWithVolume("data/BGM/cursorSE.mp3", volume);
+	
+	DecisionSE = SoundCache::GetWithVolume("data/BGM/Decision.mp3", volume);
 }
 
 SelectStage::~SelectStage()
@@ -232,14 +233,14 @@ void SelectStage::Update()
 		if (KeyDown(KEY_INPUT_LEFT) || KeyDown(KEY_INPUT_A))
 		{
 			if (selected_ != 0) {
-				selected_ = 0; PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);ChangeVolumeSoundMem(70, SelectSE);
+				selected_ = 0; PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);
 			}
 		}
 
 		if (KeyDown(KEY_INPUT_RIGHT) || KeyDown(KEY_INPUT_D))
 		{
 			if (selected_ != 1) {
-				selected_ = 1; PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);ChangeVolumeSoundMem(70, SelectSE);
+				selected_ = 1; PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);
 			}
 		}
 
@@ -248,7 +249,6 @@ void SelectStage::Update()
 		{
 			Decide(selected_ == 0 ? 1 : 2);
 			PlaySoundMem(DecisionSE, DX_PLAYTYPE_BACK);
-			ChangeVolumeSoundMem(70, DecisionSE);
 			return;
 		}
 

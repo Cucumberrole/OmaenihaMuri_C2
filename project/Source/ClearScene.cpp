@@ -1,10 +1,10 @@
-﻿#include "ClearScene.h"
+﻿#include "../Library/SceneManager.h"
+#include "ClearScene.h"
 #include "GameResult.h"
 #include "SoundCache.h"
-#include "../Library/SceneManager.h"
-#include <DxLib.h>
 #include <cmath>
 #include <cstdio>
+#include <DxLib.h>
 
 static const char* kCharPath = "data/image/omae.png";
 
@@ -93,7 +93,6 @@ ClearScene::ClearScene()
 	// ---- build bonus list for presentation ----
 	bonusCount_ = 0;
 
-	// GameResult    ̏    ƈ v      i   Ȃ   GameResult.cpp ̏    j
 	if (g_GameResult.deathCount == 0 && bonusCount_ < kMaxBonuses)
 	{
 		bonusLabel_[bonusCount_] = "NO MISS BONUS";
@@ -182,9 +181,8 @@ ClearScene::ClearScene()
 	panelAlpha_ = 0;
 	rankAlpha_ = 0;
 	rankOffsetY_ = -20.0f;
-	GoalBGM = SoundCache::Get("data/BGM/bgm_result.mp3");
+	GoalBGM = SoundCache::GetWithVolume("data/BGM/bgm_result.mp3", 127);
 	PlaySoundMem(GoalBGM, DX_PLAYTYPE_LOOP);
-	ChangeVolumeSoundMem(70, GoalBGM);
 }
 
 ClearScene::~ClearScene()
@@ -223,8 +221,7 @@ void ClearScene::Update()
 	}
 
 	// アニメのスキップ・タイトルへ
-	const bool pressReturn =
-		CheckHitKey(KEY_INPUT_T) || CheckHitKey(KEY_INPUT_RETURN) || CheckHitKey(KEY_INPUT_SPACE);
+	const bool pressReturn = CheckHitKey(KEY_INPUT_T) || CheckHitKey(KEY_INPUT_RETURN) || CheckHitKey(KEY_INPUT_SPACE);
 
 	// dt
 	const int now = GetNowCount();
@@ -549,19 +546,15 @@ void ClearScene::Draw()
 		std::snprintf(buf, sizeof(buf), "%s +%d",
 			bonusLabel_[bonusActiveIndex_], bonusValue_[bonusActiveIndex_]);
 
-		//  \   ʒu FSCORE p l   ́u  ̗]   igap j v ɏo  
 		const int bx = panelX + 30;
-		const int by = scoreY - gapY + 6;   // SCORE ̒   iTIME  SCORE ̊ԁj
+		const int by = scoreY - gapY + 6;
 
-		//  p l   ̃t F [ h ƃ{ [ i X ̃  𗼕  l  
 		const int a = (panelAlpha_ < bonusAlpha_) ? panelAlpha_ : bonusAlpha_;
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, a);
 
-		//    h   ǂ  ̂ŉ   蕶     g  
 		DrawOutlinedTextToHandle(bx, by, buf,
 			GetColor(255, 255, 255), GetColor(60, 10, 0), fontHint_);
 
-		// UI `  ̓p l     ɖ߂ 
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, panelAlpha_);
 	}
 
