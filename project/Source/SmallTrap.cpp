@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Collision.h"
 #include "Telop.h"
+#include "SoundCache.h"
 
 SmallTrap::SmallTrap(float sx, float sy, SmallSpikeDir dir)
 {
@@ -18,7 +19,7 @@ SmallTrap::SmallTrap(float sx, float sy, SmallSpikeDir dir)
 		width = w;
 		height = h;
 	}
-	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
+	SpikeSE = SoundCache::Get("data/BGM/spikeDeath.mp3");
 }
 
 SmallTrap::~SmallTrap()

@@ -1,4 +1,5 @@
 ﻿#include "TitleScene.h"
+#include "SoundCache.h"
 
 #include <DxLib.h>
 #include <cmath>
@@ -50,9 +51,8 @@ TitleScene::TitleScene()
 	}
 
 	// BGM
-	sHandle = LoadSoundMem("data/bgm/Title.mp3");
-	ChangeVolumeSoundMem(70, sHandle);
-	if (sHandle >= 0) PlaySoundMem(sHandle, DX_PLAYTYPE_LOOP);
+	sHandle = SoundCache::GetWithVolume("data/bgm/Title.mp3",100);
+	PlaySoundMem(sHandle, DX_PLAYTYPE_LOOP);
 
 	// CSVロード
 	LoadTitleCsv(kTitleCsvPath);

@@ -1,5 +1,6 @@
 #include "PlayScene.h"
 #include "Hud.h"
+#include "SoundCache.h"
 
 #include <DxLib.h>
 #include <cmath>
@@ -43,10 +44,10 @@ PlayScene::PlayScene()
 	if (SelectedStage < 0) SelectedStage = 1;
 	new Field(SelectedStage);
 
-	StageBGM1 = LoadSoundMem("data/BGM/Stage1.mp3");
-	StageBGM2 = LoadSoundMem("data/BGM/Stage2.mp3");
-	LastSE = LoadSoundMem("data/BGM/life_warning.mp3");
-	RetrySE = LoadSoundMem("data/BGM/Continue.mp3");
+	StageBGM1 = SoundCache::Get("data/BGM/Stage1.mp3");
+	StageBGM2 = SoundCache::Get("data/BGM/Stage2.mp3");
+	LastSE = SoundCache::Get("data/BGM/life_warning.mp3");
+	RetrySE = SoundCache::Get("data/BGM/Continue.mp3");
 
 	if (StageBGM1 >= 0) ChangeVolumeSoundMem(70, StageBGM1);
 	if (StageBGM2 >= 0) ChangeVolumeSoundMem(70, StageBGM2);

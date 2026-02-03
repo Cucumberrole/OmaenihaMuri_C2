@@ -1,6 +1,7 @@
 #include "Sun.h"
 #include <DxLib.h>
 #include "Player.h"
+#include "SoundCache.h"
 
 Sun::Sun(float sx, float sy)
 {
@@ -19,7 +20,7 @@ Sun::Sun(float sx, float sy)
 
 	int w, h;
 	GetGraphSize(hImage, &w, &h);
-	SunSE = LoadSoundMem("data/BGM/death_scream.mp3");
+	SunSE = SoundCache::Get("data/BGM/death_scream.mp3");
 }
 
 Sun::~Sun()

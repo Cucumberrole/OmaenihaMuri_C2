@@ -3,6 +3,8 @@
 #include "Player.h"
 #include "Collision.h"
 
+#include "SoundCache.h"
+
 //--------------------------------------
 // コンストラクタ
 //--------------------------------------
@@ -20,7 +22,7 @@ Trap::Trap(int sx, int sy)
 	moveSpeed = 10.0f; // 上にせり出すスピード
 
 	SetDrawOrder(100);  // 描画順序
-	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
+	SpikeSE = SoundCache::Get("data/BGM/spikeDeath.mp3");
 }
 
 //--------------------------------------

@@ -2,6 +2,7 @@
 #include "Collision.h"
 #include "Field.h"
 #include "Player.h"
+#include "SoundCache.h"
 #include <DxLib.h>
 #include <algorithm>
 #include <vector>
@@ -51,7 +52,7 @@ FallingSpike::FallingSpike(int sx, int sy, bool chaseAfterLand, int triggerGroup
 
 	showTaunt = false; // ‚Ü‚¾•\Ž¦‚µ‚È‚¢
 
-	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
+	SpikeSE = SoundCache::Get("data/BGM/spikeDeath.mp3");
 }
 
 //--------------------------------------

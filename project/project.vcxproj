@@ -187,6 +187,7 @@
     <ClInclude Include="Source\SceneFactory.h" />
     <ClInclude Include="Source\SmallTrap.h" />
     <ClInclude Include="Source\SelectStage.h" />
+    <ClInclude Include="Source\SoundCache.h" />
     <ClInclude Include="Source\Sun.h" />
     <ClInclude Include="Source\Telop.h" />
     <ClInclude Include="Source\TitleScene.h" />

@@ -396,6 +396,7 @@
       <Filter>Trap</Filter>
     </ClInclude>
     <ClInclude Include="Source\Zone.h" />
+    <ClInclude Include="Source\SoundCache.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">

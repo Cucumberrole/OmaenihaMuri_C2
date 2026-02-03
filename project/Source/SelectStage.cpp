@@ -1,5 +1,6 @@
 #include "SelectStage.h"
 #include "GameConfig.h"
+#include "SoundCache.h"
 
 #include <algorithm>
 
@@ -123,12 +124,12 @@ SelectStage::SelectStage()
 	introT_ = 0.0f;
 	introDone_ = false;
 
-	SelectBGM = LoadSoundMem("data/BGM/StageSelect.mp3");
+	SelectBGM = SoundCache::Get("data/BGM/StageSelect.mp3");
 	PlaySoundMem(SelectBGM, DX_PLAYTYPE_LOOP);
 	ChangeVolumeSoundMem(70, SelectBGM);
-	SelectSE = LoadSoundMem("data/BGM/cursorSE.mp3");
+	SelectSE = SoundCache::Get("data/BGM/cursorSE.mp3");
 	ChangeVolumeSoundMem(70, SelectSE);
-	DecisionSE = LoadSoundMem("data/BGM/Decision.mp3");
+	DecisionSE = SoundCache::Get("data/BGM/Decision.mp3");
 	ChangeVolumeSoundMem(70, DecisionSE);
 }
 

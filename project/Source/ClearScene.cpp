@@ -1,5 +1,6 @@
 ﻿#include "ClearScene.h"
 #include "GameResult.h"
+#include "SoundCache.h"
 #include "../Library/SceneManager.h"
 #include <DxLib.h>
 #include <cmath>
@@ -106,7 +107,6 @@ ClearScene::ClearScene()
 		bonusCount_++;
 	}
 
-	// baseScore =  ŏI X R A -  { [ i X   v i \   p j
 	int sumBonus = 0;
 	for (int i = 0; i < bonusCount_; ++i) sumBonus += bonusValue_[i];
 
@@ -118,7 +118,6 @@ ClearScene::ClearScene()
 	bonusAlpha_ = 0;
 	bonusScale_ = 1.0f;
 
-	//  \   p e L X g E F E ꌾ   b Z [ W       ߂ 
 	// 表示用テキスト・色・一言メッセージだけ決める
 	CalcScoreAndRank();
 
@@ -183,7 +182,7 @@ ClearScene::ClearScene()
 	panelAlpha_ = 0;
 	rankAlpha_ = 0;
 	rankOffsetY_ = -20.0f;
-	GoalBGM = LoadSoundMem("data/BGM/bgm_result.mp3");
+	GoalBGM = SoundCache::Get("data/BGM/bgm_result.mp3");
 	PlaySoundMem(GoalBGM, DX_PLAYTYPE_LOOP);
 	ChangeVolumeSoundMem(70, GoalBGM);
 }

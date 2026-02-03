@@ -1,4 +1,5 @@
 #include "FlyingSpikeTrap.h"
+#include "SoundCache.h"
 #include <algorithm>
 
 int FlyingSpikeTrap::sImage = -1;
@@ -71,7 +72,7 @@ FlyingSpikeTrap::FlyingSpikeTrap(
 
 	EnsureSharedImageLoaded();
 
-	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
+	SpikeSE = SoundCache::Get("data/BGM/spikeDeath.mp3");
 }
 
 FlyingSpikeTrap::~FlyingSpikeTrap()

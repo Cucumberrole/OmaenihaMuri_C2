@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Telop.h"
 #include "Collision.h"
+#include "SoundCache.h"
 #include <DxLib.h>
 
 HiddenSpike::HiddenSpike(float sx, float sy, float triggerRange)
@@ -13,7 +14,7 @@ HiddenSpike::HiddenSpike(float sx, float sy, float triggerRange)
 	this->triggerRange = triggerRange;
 
 	GetGraphSize(hImage, &width, &height);
-	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
+	SpikeSE = SoundCache::Get("data/BGM/spikeDeath.mp3");
 }
 
 HiddenSpike::~HiddenSpike()

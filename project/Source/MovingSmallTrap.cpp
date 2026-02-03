@@ -2,13 +2,14 @@
 #include "Player.h"
 #include "Telop.h"
 #include "Collision.h"
+#include "SoundCache.h"
 
 MovingSmallTrap::MovingSmallTrap(float sx, float sy)
 {
 	SImage = LoadGraph("data/image/Smallhari.png"); // 小さい針画像
 	x = sx;
 	y = sy;
-	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
+	SpikeSE = SoundCache::Get("data/BGM/spikeDeath.mp3");
 }
 
 MovingSmallTrap::~MovingSmallTrap()
@@ -16,7 +17,7 @@ MovingSmallTrap::~MovingSmallTrap()
 	StopSoundMem(SpikeSE);
 }
 
-void MovingSmallTrap::Update() 
+void MovingSmallTrap::Update()
 {
 	Player* player = FindGameObject<Player>();
 	Telop* telop = FindGameObject<Telop>();
@@ -57,7 +58,7 @@ void MovingSmallTrap::Update()
 
 	if (HitCheck_Circle_Triangle(center, cr, t1, t2, t3))
 	{
-		
+
 		player->ForceDie();
 		player->SetDead();
 		PlaySoundMem(SpikeSE, DX_PLAYTYPE_BACK);
@@ -67,14 +68,14 @@ void MovingSmallTrap::Update()
 		}
 	}
 
-	
+
 }
 
-void MovingSmallTrap::Draw() 
+void MovingSmallTrap::Draw()
 {
 	// 中心座標（1タイル 64x64 前提）
 	float cx = x + width * 0.5f;
 	float cy = y + height * 0.5f;
 	// 拡大率 1.0（そのままの大きさ）
-	DrawRotaGraph(static_cast<int>(cx),static_cast<int>(cy),1.0,0,SImage,TRUE);
+	DrawRotaGraph(static_cast<int>(cx), static_cast<int>(cy), 1.0, 0, SImage, TRUE);
 }

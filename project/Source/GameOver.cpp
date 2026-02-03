@@ -2,6 +2,7 @@
 #include "Screen.h"
 #include "Player.h"
 #include "PlayScene.h"
+#include "SoundCache.h"
 #include <ctime>
 
 static float Clamp01(float x) { return (x < 0.f) ? 0.f : (x > 1.f ? 1.f : x); }
@@ -72,9 +73,8 @@ GameOver::GameOver()
 	}
 	s_gameOverShownCount++;
 
-	GameOverBGM = LoadSoundMem("data/BGM/Gameover.mp3");
+	GameOverBGM = SoundCache::GetWithVolume("data/BGM/Gameover.mp3",70);
 	PlaySoundMem(GameOverBGM, DX_PLAYTYPE_LOOP);
-	ChangeVolumeSoundMem(70, GameOverBGM);
 
 	startMs_ = GetNowCount();
 	t_ = 0.0f;

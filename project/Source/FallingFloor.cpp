@@ -2,6 +2,7 @@
 #include "Player.h"
 #include "Field.h"
 #include "Telop.h"
+#include "SoundCache.h"
 #include <DxLib.h>
 #include <algorithm>
 
@@ -17,7 +18,7 @@ FallingFloor::FallingFloor(int sx, int sy)
 	gravity = 0.8f;
 
 	SetDrawOrder(-1);
-	BlockDieSE = LoadSoundMem("data/BGM/death_crushed.mp3");
+	BlockDieSE = SoundCache::Get("data/BGM/death_crushed.mp3");
 }
 
 FallingFloor::~FallingFloor()

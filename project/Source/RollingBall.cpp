@@ -1,6 +1,7 @@
 ﻿#include "RollingBall.h"
 #include "Field.h"
 #include "Player.h"
+#include "SoundCache.h"
 #include <DxLib.h>
 
 RollingBall::RollingBall(float sx, float sy, float dir)
@@ -32,7 +33,7 @@ RollingBall::RollingBall(float sx, float sy, float dir)
 	// 回転角初期化
 	angle = 0.0f;
 
-	BallSE = LoadSoundMem("data/BGM/death_crushed.mp3");
+	BallSE = SoundCache::Get("data/BGM/death_crushed.mp3");
 }
 
 RollingBall::~RollingBall()

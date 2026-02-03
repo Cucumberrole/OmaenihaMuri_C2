@@ -8,6 +8,7 @@
 #include "MovingWall.h"
 #include "Common.h"
 #include "PatrolEnemy.h"
+#include "SoundCache.h"
 #include "../Library/Trigger.h"
 #include <assert.h>
 
@@ -92,8 +93,8 @@ Player::Player()
 	deathState = DeathState::None;
 	deathAnimEnd = false;
 
-	JumpSE = LoadSoundMem("data/sound/jump.wav");
-	DieSE = LoadSoundMem("data/sound/DeathSound.mp3");
+	JumpSE = SoundCache::Get("data/sound/jump.wav");
+	DieSE = SoundCache::Get("data/sound/DeathSound.mp3");
 	deathDrawX_ = x;
 	deathDrawY_ = y;
 
@@ -137,8 +138,8 @@ Player::Player(int sx, int sy)
 	SetDrawOrder(0);
 
 	pushX = 0;
-	JumpSE = LoadSoundMem("data/sound/jump.wav");
-	DieSE = LoadSoundMem("data/BGM/miss.mp3");
+	JumpSE = SoundCache::Get("data/sound/jump.wav");
+	DieSE = SoundCache::Get("data/BGM/miss.mp3");
 	deathDrawX_ = x;
 	deathDrawY_ = y;
 

@@ -1,6 +1,7 @@
 #include "DirectionalSpike.h"
 #include "Player.h"
 #include "Collision.h"
+#include "SoundCache.h"
 #include <DxLib.h>
 
 DirectionalSpike::DirectionalSpike(float sx, float sy, SpikeDir dir)
@@ -18,7 +19,7 @@ DirectionalSpike::DirectionalSpike(float sx, float sy, SpikeDir dir)
 		width = w;
 		height = h;
 	}
-	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
+	SpikeSE = SoundCache::Get("data/BGM/spikeDeath.mp3");
 }
 
 DirectionalSpike::~DirectionalSpike()

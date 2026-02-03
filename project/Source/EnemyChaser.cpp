@@ -1,5 +1,6 @@
 #include "EnemyChaser.h"
 #include "Player.h"
+#include "SoundCache.h"
 #include <DxLib.h>
 
 EnemyChaser::EnemyChaser(float sx, float sy)
@@ -15,7 +16,7 @@ EnemyChaser::EnemyChaser(float sx, float sy)
 	animFrame = 0;
 
 	SetDrawOrder(10);
-	SpikeSE = LoadSoundMem("data/BGM/spikeDeath.mp3");
+	SpikeSE = SoundCache::Get("data/BGM/spikeDeath.mp3");
 }
 
 EnemyChaser::~EnemyChaser()
