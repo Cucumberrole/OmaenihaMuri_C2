@@ -117,7 +117,6 @@ void RollingBall::Update()
 		if (dist2 <= rSum * rSum)
 		{
 			PlaySoundMem(BallSE, DX_PLAYTYPE_BACK);
-			ChangeVolumeSoundMem(70, BallSE);
 			player->ForceDie();
 			player->SetDead();
 		}

@@ -73,7 +73,7 @@ GameOver::GameOver()
 	}
 	s_gameOverShownCount++;
 
-	GameOverBGM = SoundCache::GetWithVolume("data/BGM/Gameover.mp3", 128);
+	GameOverBGM = SoundCache::Get("data/BGM/Gameover.mp3");
 	PlaySoundMem(GameOverBGM, DX_PLAYTYPE_LOOP);
 
 	startMs_ = GetNowCount();

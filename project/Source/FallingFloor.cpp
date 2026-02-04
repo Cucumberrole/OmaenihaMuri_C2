@@ -117,7 +117,6 @@ void FallingFloor::Update()
 			if (hit)
 			{
 				PlaySoundMem(BlockDieSE, DX_PLAYTYPE_BACK);
-				ChangeVolumeSoundMem(70, BlockDieSE);
 				player->ForceDie();
 				player->SetDead();
 				if (telop)

@@ -70,7 +70,6 @@ void EnemyChaser::Update()
 		if (hit)
 		{
 			PlaySoundMem(SpikeSE, DX_PLAYTYPE_BACK);
-			ChangeVolumeSoundMem(70, SpikeSE);
 			player->ForceDie();  // ƒvƒŒƒCƒ„[‚ğ‘¦€ˆµ‚¢‚É‚·‚éŠÖ”
 			player->SetDead();   // “®‚«‚ğ~‚ß‚é
 		}

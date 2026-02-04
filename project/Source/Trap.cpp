@@ -22,7 +22,7 @@ Trap::Trap(int sx, int sy)
 	moveSpeed = 10.0f; // 上にせり出すスピード
 
 	SetDrawOrder(100);  // 描画順序
-	SpikeSE = SoundCache::GetWithVolume("data/BGM/spikeDeath.mp3",128);
+	SpikeSE = SoundCache::Get("data/BGM/spikeDeath.mp3");
 }
 
 //--------------------------------------

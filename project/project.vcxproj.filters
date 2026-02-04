@@ -151,6 +151,9 @@
     <ClCompile Include="Source\ClearScene.cpp">
       <Filter>Scene\ClearScene</Filter>
     </ClCompile>
+    <ClCompile Include="Source\PlayerBullet.cpp">
+      <Filter>PlayScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Library\myDxLib.h" />
@@ -397,6 +400,9 @@
     </ClInclude>
     <ClInclude Include="Source\Zone.h" />
     <ClInclude Include="Source\SoundCache.h" />
+    <ClInclude Include="Source\PlayerBullet.h">
+      <Filter>PlayScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">

@@ -25,6 +25,8 @@ static float RandRange(float a, float b) { return a + (b - a) * Rand01(); }
 
 TitleScene::TitleScene()
 {
+	SoundCache::SetDefaultVolume(128);
+
 	bgHandle = LoadGraph(kBgPath);
 	logoHandle = LoadGraph(kLogoPath);
 	blockHandle = LoadGraph(kBlockPath);
@@ -51,7 +53,7 @@ TitleScene::TitleScene()
 	}
 
 	// BGM
-	TitleHandle = SoundCache::GetWithVolume("data/BGM/Title.mp3", 180);
+	TitleHandle = SoundCache::Get("data/BGM/Title.mp3");
 	PlaySoundMem(TitleHandle, DX_PLAYTYPE_LOOP);
 
 	// CSVロード

@@ -1,5 +1,6 @@
 #pragma once
 #include "../Library/GameObject.h"
+#include <vector>
 
 class Boss : public GameObject
 {
@@ -10,33 +11,57 @@ public:
 	void Update() override;
 	void Draw() override;
 
+	// 外部（例：プレイヤー弾）からボスにダメージを与えたい時に使う
+	void Damage(int amount);
+
+	int  GetHP() const { return hp; }
+	bool IsDead() const { return hp <= 0; }
+
+	float GetX() const { return x; }
+	float GetY() const { return y; }
+	float GetHitR() const { return hitR; }
+
 private:
-	int hImage;
-
+	// =====================
+	// 見た目・基本情報
+	// =====================
+	int   hImage;
 	float x, y;
-	float vx, vy;
-	float gravity;
+	int   hp;
 
-	int hp;
+	// ボスの当たり判定（円）
+	float hitR;
 
-	enum State {
-		STATE_IDLE,
-		STATE_WALK,
-		STATE_CHASE,
-		STATE_JUMP_ATTACK,
-		STATE_COOLDOWN
+	// =====================
+	// 弾幕（敵弾）定義
+	// =====================
+	struct EnemyBullet
+	{
+		float x, y;
+		float vx, vy;
+		float r;
+		int   color;
+		bool  alive;
 	};
-	State state;
 
-	int stateTimer;
-	bool facingLeft; // true：左向き
+	std::vector<EnemyBullet> bullets;
 
-	void ChangeState(State newState);
-	void DoIdle();
-	void DoWalk();
-	void DoChase();
-	void DoJumpAttack();
-	void DoCooldown();
-	void CollisionWithMap();
-	void AttackCheck();
+	// 弾幕用タイマー
+	int   fireTimer;
+	float phaseAngle;
+
+private:
+	// 生成・更新・当たり判定
+	void UpdateBullets();
+	void DrawBullets() const;
+	void RemoveDeadBullets();
+
+	void FirePattern_Ring(int n, float speed);
+	void FirePattern_FanToPlayer(int n, float speed, float spreadDeg);
+
+	void CheckHitPlayer();      // 敵弾→プレイヤー
+	bool CircleHit(float ax, float ay, float ar, float bx, float by, float br) const;
+
+	// UI（デバッグ用）
+	void DrawDebug() const;
 };

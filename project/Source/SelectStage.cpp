@@ -125,13 +125,12 @@ SelectStage::SelectStage()
 	introDone_ = false;
 
 
-	int volume = 128;
-	SelectBGM = SoundCache::GetWithVolume("data/BGM/StageSelect.mp3",volume);
+	SelectBGM = SoundCache::Get("data/BGM/StageSelect.mp3");
 	PlaySoundMem(SelectBGM, DX_PLAYTYPE_LOOP);
 
-	SelectSE = SoundCache::GetWithVolume("data/BGM/cursorSE.mp3", volume);
+	SelectSE = SoundCache::Get("data/BGM/cursorSE.mp3");
 	
-	DecisionSE = SoundCache::GetWithVolume("data/BGM/Decision.mp3", volume);
+	DecisionSE = SoundCache::Get("data/BGM/Decision.mp3");
 }
 
 SelectStage::~SelectStage()

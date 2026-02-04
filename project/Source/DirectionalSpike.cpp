@@ -81,7 +81,6 @@ void DirectionalSpike::Update()
 	{
 		
 		PlaySoundMem(SpikeSE, DX_PLAYTYPE_BACK);
-		ChangeVolumeSoundMem(70, SpikeSE);
 		player->ForceDie();
 		player->SetDead();
 	}

@@ -1,7 +1,7 @@
 #pragma once
 #include <DxLib.h>
-#include <string>
 #include <unordered_map>
+#include <string>
 
 class SoundCache
 {
@@ -9,6 +9,7 @@ public:
 	static void SetDefaultVolume(int v)
 	{
 		DefaultVolume() = v;
+		// すでにロード済みの分も反映
 		for (auto& kv : Map())
 		{
 			if (kv.second >= 0) ChangeVolumeSoundMem(v, kv.second);
@@ -24,11 +25,11 @@ public:
 		const int h = LoadSoundMem(path);
 		m.emplace(path, h);
 
-		if (h >= 0) ChangeVolumeSoundMem(DefaultVolume(), h); // 統一
+		if (h >= 0) ChangeVolumeSoundMem(DefaultVolume(), h); // ここで統一
 		return h;
 	}
 
-	// 個別音量が欲しい時だけ
+	// 個別で音量操作が欲しいときだけ
 	static int GetWithVolume(const char* path, int volume)
 	{
 		int h = Get(path);
@@ -54,7 +55,7 @@ private:
 	}
 	static int& DefaultVolume()
 	{
-		static int v = 128; // 音量変更
+		static int v = 128; // デフォルト
 		return v;
 	}
 };

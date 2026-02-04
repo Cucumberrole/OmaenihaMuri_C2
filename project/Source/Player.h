@@ -59,6 +59,7 @@ private:
 	//SE
 	int JumpSE;
 	int DieSE;
+	int ShotSE = -1;
 
 	
 

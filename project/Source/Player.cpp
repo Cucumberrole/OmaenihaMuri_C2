@@ -6,6 +6,7 @@
 #include "MovingWall.h"
 #include "PatrolEnemy.h"
 #include "Player.h"
+#include "PlayerBullet.h"
 #include "SoundCache.h"
 #include "Telop.h"
 #include "Trap.h"
@@ -95,6 +96,7 @@ Player::Player()
 
 	JumpSE = SoundCache::Get("data/sound/jump.wav");
 	DieSE = SoundCache::Get("data/sound/DeathSound.mp3");
+	ShotSE = SoundCache::Get("data/SE/Shot.mp3");
 	deathDrawX_ = x;
 	deathDrawY_ = y;
 
@@ -140,6 +142,7 @@ Player::Player(int sx, int sy)
 	pushX = 0;
 	JumpSE = SoundCache::Get("data/sound/jump.wav");
 	DieSE = SoundCache::Get("data/BGM/miss.mp3");
+	ShotSE = SoundCache::Get("data/SE/Shot.mp3"); // 無ければ任意のSEに
 	deathDrawX_ = x;
 	deathDrawY_ = y;
 
@@ -341,6 +344,23 @@ void Player::Update()
 	}
 
 	//========================================================
+	// 弾の処理
+	//========================================================
+	if (KeyTrigger::CheckTrigger(KEY_INPUT_J))
+	{
+		// プレイヤー中心から右へ撃つ例（左右に撃ち分けたいなら frip を使う）
+		const float cx = x + 32.0f;
+		const float cy = y + 32.0f;
+
+		const float speed = 10.0f;
+		const float dir = frip ? -1.0f : 1.0f;
+
+		new PlayerBullet(cx, cy, speed * dir, 0.0f);
+
+		if (ShotSE >= 0) PlaySoundMem(ShotSE, DX_PLAYTYPE_BACK);
+	}
+
+	//========================================================
 	// ジャンプ処理
 	//========================================================
 	if (onGround) {
@@ -348,7 +368,6 @@ void Player::Update()
 			velocity = V0;
 			onGround = false;
 			PlaySoundMem(JumpSE, DX_PLAYTYPE_BACK);
-			ChangeVolumeSoundMem(70, JumpSE);
 		}
 	}
 
@@ -358,7 +377,6 @@ void Player::Update()
 			jumpcount -= 1;
 			velocity = V0;
 			PlaySoundMem(JumpSE, DX_PLAYTYPE_BACK);
-			ChangeVolumeSoundMem(70, JumpSE);
 		}
 	}
 
@@ -567,7 +585,6 @@ void Player::ForceDie()
 	velocity = V0;
 
 	PlaySoundMem(DieSE, DX_PLAYTYPE_BACK);
-	ChangeVolumeSoundMem(70, DieSE);
 
 	TriggerHitOverlay();
 }

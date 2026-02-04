@@ -181,7 +181,7 @@ ClearScene::ClearScene()
 	panelAlpha_ = 0;
 	rankAlpha_ = 0;
 	rankOffsetY_ = -20.0f;
-	GoalBGM = SoundCache::GetWithVolume("data/BGM/bgm_result.mp3", 127);
+	GoalBGM = SoundCache::Get("data/BGM/bgm_result.mp3");
 	PlaySoundMem(GoalBGM, DX_PLAYTYPE_LOOP);
 }
 

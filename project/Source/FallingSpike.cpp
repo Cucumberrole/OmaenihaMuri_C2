@@ -175,7 +175,6 @@ void FallingSpike::Update()
 		if (HitCheck_Circle_Triangle(center, radius, t1, t2, t3))
 		{
 			PlaySoundMem(SpikeSE, DX_PLAYTYPE_BACK);
-			ChangeVolumeSoundMem(70, SpikeSE);
 			player->ForceDie();
 			player->SetDead();
 		}

@@ -45,11 +45,11 @@ PlayScene::PlayScene()
 	new Field(SelectedStage);
 
 
-	int volume = 128;
-	StageBGM1 = SoundCache::GetWithVolume("data/BGM/Stage1.mp3", volume);
-	StageBGM2 = SoundCache::GetWithVolume("data/BGM/Stage2.mp3", volume);
-	LastSE = SoundCache::GetWithVolume("data/BGM/life_warning.mp3", volume);
-	RetrySE = SoundCache::GetWithVolume("data/BGM/Continue.mp3", volume);
+
+	StageBGM1 = SoundCache::Get("data/BGM/Stage1.mp3");
+	StageBGM2 = SoundCache::Get("data/BGM/Stage2.mp3");
+	LastSE = SoundCache::Get("data/BGM/life_warning.mp3");
+	RetrySE = SoundCache::Get("data/BGM/Continue.mp3");
 
 	if (SelectedStage == 1 && StageBGM1 >= 0) PlaySoundMem(StageBGM1, DX_PLAYTYPE_LOOP);
 	if (SelectedStage == 2 && StageBGM2 >= 0) PlaySoundMem(StageBGM2, DX_PLAYTYPE_LOOP);

@@ -91,7 +91,6 @@ void Sun::Update()
 		if (dist2 <= rSum * rSum)
 		{
 			PlaySoundMem(SunSE, DX_PLAYTYPE_BACK);
-			ChangeVolumeSoundMem(70, SunSE);
 			player->ForceDie();
 			player->SetDead();
 		}

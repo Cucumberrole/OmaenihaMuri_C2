@@ -316,7 +316,6 @@ void FlyingSpikeTrap::UpdateShots(Player* player, Field* field)
 		if (HitCheck_Circle_Triangle(pCenter, pRadius, t1, t2, t3))
 		{
 			PlaySoundMem(SpikeSE, DX_PLAYTYPE_BACK);
-			ChangeVolumeSoundMem(70, SpikeSE);
 			player->ForceDie();
 			player->SetDead();
 			s.alive = false;

@@ -62,7 +62,6 @@ void MovingSmallTrap::Update()
 		player->ForceDie();
 		player->SetDead();
 		PlaySoundMem(SpikeSE, DX_PLAYTYPE_BACK);
-		ChangeVolumeSoundMem(70, SpikeSE);
 		if (y < 384) {
 			telop->TouchedTrap1 = true;
 		}
