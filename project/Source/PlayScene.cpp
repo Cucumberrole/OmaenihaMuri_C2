@@ -17,7 +17,7 @@
 #include "Player.h"
 #include "SelectStage.h"
 #include "VanishingFloor.h"
-
+#include "Boss.h"
 int PlayScene::SelectedStage = -1;
 static int g_Life = 0;          // 初期
 static int g_RetryCount = 0;    // 死んだ回数
@@ -48,11 +48,13 @@ PlayScene::PlayScene()
 
 	StageBGM1 = SoundCache::Get("data/BGM/Stage1.mp3");
 	StageBGM2 = SoundCache::Get("data/BGM/Stage2.mp3");
+	StageBGM3 = SoundCache::Get("data/BGM/Stage03Boss.ogg");
 	LastSE = SoundCache::Get("data/BGM/life_warning.mp3");
 	RetrySE = SoundCache::Get("data/BGM/Continue.mp3");
 
 	if (SelectedStage == 1 && StageBGM1 >= 0) PlaySoundMem(StageBGM1, DX_PLAYTYPE_LOOP);
 	if (SelectedStage == 2 && StageBGM2 >= 0) PlaySoundMem(StageBGM2, DX_PLAYTYPE_LOOP);
+	if (SelectedStage == 3 && StageBGM3 >= 0) PlaySoundMem(StageBGM3, DX_PLAYTYPE_LOOP);
 
 	// 新規開始時だけ初期化
 	if (!g_IsRetry)
@@ -79,6 +81,7 @@ PlayScene::~PlayScene()
 	Hud::Shutdown();
 	StopSoundMem(StageBGM1);
 	StopSoundMem(StageBGM2);
+	StopSoundMem(StageBGM3);
 	StopSoundMem(LastSE);
 	StopSoundMem(RetrySE);
 }
@@ -126,6 +129,7 @@ void PlayScene::Update()
 
 				StopSoundMem(StageBGM1);
 				StopSoundMem(StageBGM2);
+				StopSoundMem(StageBGM3);
 			}
 
 			state = Playstate::Death;
@@ -142,6 +146,23 @@ void PlayScene::Update()
 			return;
 		}
 
+		Boss* boss = FindGameObject<Boss>();
+		if (boss && boss->IsTimeUpClear())
+		{
+			// 例：Clearシーンへ
+			SceneManager::ChangeScene("CLEAR");
+		}
+
+		if (PlayScene::SelectedStage == 3)
+		{
+			const int kTimeLimitSec = 30;
+			const int elapsedSec = GR_GetElapsedSecLive();
+			if (elapsedSec >= kTimeLimitSec)
+			{
+				SceneManager::ChangeScene("CLEAR");
+				return;
+			}
+		}
 
 		// 入力など
 		if (CheckHitKey(KEY_INPUT_E)) SceneManager::ChangeScene("STAGE");
@@ -232,10 +253,21 @@ void PlayScene::Draw()
 
 	// HUD（GameResultから取得して1回だけ描画）
 	const int hudScore = GR_GetLiveScore();
-	const int hudTimeSeconds = GR_GetElapsedSecLive();
+	const int elapsedSec = GR_GetElapsedSecLive();
 	const int hudLife = life;
 
+	int hudTimeSeconds = elapsedSec;
+
+	// このステージだけカウントダウンにする
+	if (PlayScene::SelectedStage == 3) // ←対象ステージID
+	{
+		const int kTimeLimitSec = 50;  // ←制限時間（秒）
+		hudTimeSeconds = kTimeLimitSec - elapsedSec;
+		if (hudTimeSeconds < 0) hudTimeSeconds = 0;
+	}
+
 	Hud::Draw(hudScore, hudTimeSeconds, hudLife);
+
 
 	// FPS（必要なら）
 	// DrawFormatString(10, 120, GetColor(255, 255, 255), "%4.1f", 1.0f / Time::DeltaTime());

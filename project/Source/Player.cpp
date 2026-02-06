@@ -1,5 +1,6 @@
 #include "../Library/Trigger.h"
 #include "Common.h"
+#include "FakeFloor.h"
 #include "FallingFloor.h"
 #include "Field.h"
 #include "GameOver.h"
@@ -383,13 +384,14 @@ void Player::Update()
 	//========================================================
 	// 重力
 	//========================================================
-	y += velocity;
+	const float dy = velocity;  // ★重力を足す前の速度（このフレームで実際に動いた量）
+	y += dy;
 	velocity += Gravity;
 
 	//========================================================
 	// 縦方向当たり判定（床／天井）
 	//========================================================
-	if (velocity >= 0) {
+	if (dy >= 0) {
 		int push1 = field->HitCheckDown((int)(x + 5), (int)(y + 64));
 		int push2 = field->HitCheckDown((int)(x + 58), (int)(y + 64));
 		int push = max(push1, push2);
@@ -442,7 +444,28 @@ void Player::Update()
 			y += (float)push;
 			velocity = 0;
 		}
+
+		// ===== FakeFloor（偽床）に触れたら：消して、ほんの少し下へ押し出す =====
+		{
+			const float pw = 64.0f;
+			const float ph = 64.0f;
+			const float kNudgeDown = 2.0f;
+
+			auto fakeFloors = FindGameObjects<FakeFloor>();
+			for (auto ff : fakeFloors)
+			{
+				if (!ff || ff->IsVanished()) continue;
+
+				if (ff->CheckHitBall(x, y, pw, ph))
+				{
+					y += kNudgeDown;   // 少し下へ
+					velocity = 0.0f;   // 上昇を止める（ここで確実に）
+					break;             // 複数回押し出し防止
+				}
+			}
+		}
 	}
+
 
 	//========================================================
 	// 土管の判定（上に乗った時だけワープ）

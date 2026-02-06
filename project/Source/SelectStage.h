@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <DxLib.h>
 #include <tchar.h>
 #include "../Library/SceneBase.h"
@@ -20,17 +20,17 @@ private:
 	void DrawSparkles(int sw, int sh) const;
 
 private:
-	int selected_ = 0;        // 0: Easy, 1: Hard
+	int selected_ = 0;        // 0: Stage1, 1: Stage2, 2: Stage3
 	bool deciding_ = false;
-	float fade_ = 0.0f;       // 0`1
+	float fade_ = 0.0f;       // 0ã€œ1
 	int blink_ = 0;
 
-	// ‚ ‚É‚ß[‚µ‚å‚ñI
-	int   introStartMs_ = 0;   // “oêŠJn
-	float introT_ = 0.0f;      // 0.0`1.0
-	bool  introDone_ = false;  // Š®—¹ƒtƒ‰ƒO
+	// ã‚ã«ã‚ãƒ¼ã—ã‚‡ã‚“ï¼
+	int   introStartMs_ = 0;   // ç™»å ´é–‹å§‹æ™‚åˆ»
+	float introT_ = 0.0f;      // 0.0ã€œ1.0
+	bool  introDone_ = false;  // å®Œäº†ãƒ•ãƒ©ã‚°
 
-	// ƒJ[ƒh•\¦ƒAƒjƒ[ƒVƒ‡ƒ“
+	// ã‚«ãƒ¼ãƒ‰è¡¨ç¤ºã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³
 	float introElapsedSec_ = 0.0f;
 
 	// Background
@@ -43,12 +43,12 @@ private:
 	int fontCard_ = -1;
 	int fontHint_ = -1;
 
-	// ƒp[ƒeƒBƒNƒ‹
+	// ãƒ‘ãƒ¼ãƒ†ã‚£ã‚¯ãƒ«
 	struct Sparkle { float x, y, v, s; int kind; };
 	static const int kSparkleCount = 70;
 	Sparkle sp_[kSparkleCount]{};
 
-	// ‰æ–Ê‚Ìƒrƒlƒbƒg
+	// ç”»é¢ã®ãƒ“ãƒãƒƒãƒˆ
 	int vignetteImg_ = -1;
 	int vignetteSrcW_ = 0;
 	int vignetteSrcH_ = 0;
@@ -56,11 +56,11 @@ private:
 	int vignetteTargetH_ = 0;
 
 	//BGM
-	int SelectBGM;
-	int SelectSE;
-	int DecisionSE;
+	int SelectBGM = -1;
+	int SelectSE = -1;
+	int DecisionSE = -1;
 
-	int prevSelected = selected_;
+	int prevSelected_ = 0;
 
 private:
 	char keyNow_[256]{};

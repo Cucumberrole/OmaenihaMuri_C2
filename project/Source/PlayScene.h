@@ -40,6 +40,7 @@ private:
 
 	int StageBGM1;
 	int StageBGM2;
+	int StageBGM3;
 	int LastSE;
 	int RetrySE;
 };

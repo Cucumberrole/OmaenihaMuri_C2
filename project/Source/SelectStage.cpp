@@ -1,12 +1,12 @@
-#include "GameConfig.h"
+ï»¿#include "GameConfig.h"
 #include "SelectStage.h"
 #include "SoundCache.h"
 
 #include <algorithm>
-
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <tuple>
 
 #include <DxLib.h>
 
@@ -23,14 +23,14 @@ static int CreateJPFont(const TCHAR* name, int size, int thick)
 
 static inline float Clamp01(float v) { return v < 0.f ? 0.f : (v > 1.f ? 1.f : v); }
 
-// 0..1 ‚ÌŠŠ‚ç‚©‚È•âŠÔ
+// 0..1 ã®æ»‘ã‚‰ã‹ãªè£œé–“
 static inline float SmoothStep(float a, float b, float x)
 {
 	float t = Clamp01((x - a) / (b - a));
 	return t * t * (3.f - 2.f * t);
 }
 
-// ƒrƒlƒbƒg¶¬isrcW/srcH ‚Í¶¬‰ğ‘œ“xBtarget ‚ÍÅI•\¦ƒTƒCƒYj
+// ãƒ“ãƒãƒƒãƒˆç”Ÿæˆï¼ˆsrcW/srcH ã¯ç”Ÿæˆè§£åƒåº¦ã€‚target ã¯æœ€çµ‚è¡¨ç¤ºã‚µã‚¤ã‚ºï¼‰
 static int BuildVignetteGraph(int srcW, int srcH, int targetW, int targetH,
 	float inner = 0.55f, float outer = 1.05f,
 	float power = 2.2f, int maxAlpha = 190,
@@ -41,7 +41,6 @@ static int BuildVignetteGraph(int srcW, int srcH, int targetW, int targetH,
 
 	const float cx = (srcW - 1) * 0.5f;
 	const float cy = (srcH - 1) * 0.5f;
-
 
 	const float aspect = (targetH > 0) ? (float)targetW / (float)targetH : 1.0f;
 	const float invRx = 1.0f / cx;
@@ -55,11 +54,9 @@ static int BuildVignetteGraph(int srcW, int srcH, int targetW, int targetH,
 			float ny = (y - cy) * invRy;              // -1..1
 
 			ny -= centerYBias;
-
 			nx *= (1.0f / aspect);
 
 			float d = std::sqrt(nx * nx + ny * ny);   // 0..~1.4
-
 			float t = SmoothStep(inner, outer, d);
 			t = std::pow(t, power);
 
@@ -80,24 +77,24 @@ SelectStage::SelectStage()
 {
 	wallImg_ = LoadGraph(kWallPath);
 
-	fontTitle_ = CreateJPFont(TEXT("HGS‘n‰pŠpÎß¯Ìß‘Ì"), 130, 4);
+	fontTitle_ = CreateJPFont(TEXT("HGSå‰µè‹±è§’ï¾ï¾Ÿï½¯ï¾Œï¾Ÿä½“"), 130, 4);
 	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("Meiryo UI"), 84, 4);
-	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("MS ƒSƒVƒbƒN"), 84, 3);
+	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("MS ã‚´ã‚·ãƒƒã‚¯"), 84, 3);
 	if (fontTitle_ < 0) fontTitle_ = CreateJPFont(TEXT("Arial Black"), 84, 4);
 
-	fontSub_ = CreateJPFont(TEXT("HGS‘n‰pŠpÎß¯Ìß‘Ì"), 34, 2);
+	fontSub_ = CreateJPFont(TEXT("HGSå‰µè‹±è§’ï¾ï¾Ÿï½¯ï¾Œï¾Ÿä½“"), 38, 2);
 	if (fontSub_ < 0) fontSub_ = CreateJPFont(TEXT("Meiryo UI"), 34, 2);
-	if (fontSub_ < 0) fontSub_ = CreateJPFont(TEXT("MS ƒSƒVƒbƒN"), 34, 2);
+	if (fontSub_ < 0) fontSub_ = CreateJPFont(TEXT("MS ã‚´ã‚·ãƒƒã‚¯"), 34, 2);
 	if (fontSub_ < 0) fontSub_ = CreateJPFont(TEXT("Arial"), 34, 2);
 
-	fontCard_ = CreateJPFont(TEXT("BIZ UDP–¾’© Medium"), 40, 2);
+	fontCard_ = CreateJPFont(TEXT("BIZ UDPæ˜æœ Medium"), 40, 2);
 	if (fontCard_ < 0) fontCard_ = CreateJPFont(TEXT("Meiryo UI"), 34, 2);
-	if (fontCard_ < 0) fontCard_ = CreateJPFont(TEXT("MS ƒSƒVƒbƒN"), 34, 2);
+	if (fontCard_ < 0) fontCard_ = CreateJPFont(TEXT("MS ã‚´ã‚·ãƒƒã‚¯"), 34, 2);
 	if (fontCard_ < 0) fontCard_ = CreateJPFont(TEXT("Arial Black"), 34, 2);
 
-	fontHint_ = CreateJPFont(TEXT("ƒƒCƒŠƒI"), 28, 2);
+	fontHint_ = CreateJPFont(TEXT("ãƒ¡ã‚¤ãƒªã‚ª"), 28, 2);
 	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("Meiryo UI"), 28, 2);
-	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("MS ƒSƒVƒbƒN"), 28, 2);
+	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("MS ã‚´ã‚·ãƒƒã‚¯"), 28, 2);
 	if (fontHint_ < 0) fontHint_ = CreateJPFont(TEXT("Arial"), 28, 2);
 
 	// Sparkles init
@@ -112,25 +109,24 @@ SelectStage::SelectStage()
 		sp_[i].kind = GetRand(2);                       // 0..2
 	}
 
-	// 1/2‰ğ‘œ“x‚Åì‚é
+	// 1/2è§£åƒåº¦ã§ä½œã‚‹
 	vignetteTargetW_ = sw;
 	vignetteTargetH_ = sh;
 	vignetteSrcW_ = max(320, sw / 2);
 	vignetteSrcH_ = max(180, sh / 2);
-
 	vignetteImg_ = BuildVignetteGraph(vignetteSrcW_, vignetteSrcH_, sw, sh);
 
 	introStartMs_ = GetNowCount();
 	introT_ = 0.0f;
 	introDone_ = false;
 
-
 	SelectBGM = SoundCache::Get("data/BGM/StageSelect.mp3");
 	PlaySoundMem(SelectBGM, DX_PLAYTYPE_LOOP);
 
 	SelectSE = SoundCache::Get("data/BGM/cursorSE.mp3");
-	
 	DecisionSE = SoundCache::Get("data/BGM/Decision.mp3");
+
+	prevSelected_ = selected_;
 }
 
 SelectStage::~SelectStage()
@@ -149,17 +145,24 @@ SelectStage::~SelectStage()
 
 void SelectStage::Decide(int stageId)
 {
-	PlayScene::SelectedStage = stageId; // 1=Easy, 2=Hard
+	//  stageId = 1/2/3 ã‚’ PlayScene/Field ã«æ¸¡ã™
+	PlayScene::SelectedStage = stageId;
 
+	// ã“ã“ã¯å¥½ã¿ã§OKï¼ˆä¾‹ï¼šStage1=Easy, Stage2=Hard, Stage3=Easyâˆï¼‰
 	if (stageId == 1)
 	{
 		SelectedDifficulty() = Difficulty::Easy;
-		MaxLives() = 5; // ŠÈ’Pc‹@5
+		MaxLives() = 5;
 	}
-	else
+	else if (stageId == 2)
 	{
 		SelectedDifficulty() = Difficulty::Hard;
-		MaxLives() = 3; // “ï‚µ‚¢c‹@3
+		MaxLives() = 3;
+	}
+	else // stageId == 3
+	{
+		SelectedDifficulty() = Difficulty::Easy;
+		MaxLives() = 1; // â€œâˆæ‰±ã„â€ã®ãŸã‚å¤§ãã„å€¤ã«
 	}
 
 	deciding_ = true;
@@ -169,9 +172,8 @@ void SelectStage::Decide(int stageId)
 void SelectStage::DecideDebug()
 {
 	PlayScene::SelectedStage = 3;
-
 	SelectedDifficulty() = Difficulty::Easy;
-	MaxLives() = 99;
+	MaxLives() = 999;
 
 	deciding_ = true;
 	fade_ = 0.0f;
@@ -179,22 +181,21 @@ void SelectStage::DecideDebug()
 
 void SelectStage::Update()
 {
-	// == ƒL[“ü—Í‚ÌXV ==
+	// == ã‚­ãƒ¼å…¥åŠ›ã®æ›´æ–° ==
 	std::memcpy(keyPrev_, keyNow_, sizeof(keyNow_));
 	GetHitKeyStateAll(keyNow_);
 
-	// == ‘JˆÚƒAƒjƒ[ƒVƒ‡ƒ“ ==
+	// == é·ç§»ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ ==
 	{
 		const float introDurationSec = 0.25f;
 		const int now = GetNowCount();
 		const float elapsedSec = (now - introStartMs_) / 1000.0f;
 
-		introElapsedSec_ = elapsedSec;  // ƒJ[ƒh‚Ì‡”Ô•\¦
-
+		introElapsedSec_ = elapsedSec;  // ã‚«ãƒ¼ãƒ‰ã®é †ç•ªè¡¨ç¤º
 		introT_ = (introDurationSec <= 0.0f) ? 1.0f : (elapsedSec / introDurationSec);
 		if (introT_ >= 1.0f) { introT_ = 1.0f; introDone_ = true; }
 
-		// “ü—Í’â~
+		// å…¥åŠ›åœæ­¢
 		if (!introDone_)
 		{
 			blink_++;
@@ -204,13 +205,11 @@ void SelectStage::Update()
 
 	++blink_;
 
-
-
-	// ”wŒi‚ÌƒXƒNƒ[ƒ‹
+	// èƒŒæ™¯ã®ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
 	wallScroll_ += 0.6f;
 	if (wallScroll_ > 100000.0f) wallScroll_ = 0.0f;
 
-	// –ß‚é
+	// æˆ»ã‚‹
 	if (CheckHitKey(KEY_INPUT_SPACE) || CheckHitKey(KEY_INPUT_T))
 	{
 		SceneManager::ChangeScene("TITLE");
@@ -219,39 +218,43 @@ void SelectStage::Update()
 
 	if (!deciding_)
 	{
+		// éš ã—ï¼šãƒ‡ãƒãƒƒã‚°
 		if (KeyDown(KEY_INPUT_F3))
 		{
 			DecideDebug();
 			return;
 		}
-		// EAHƒL[‚ÅƒXƒe[ƒW‘I‘ğ
-		if (CheckHitKey(KEY_INPUT_E)) { selected_ = 0; Decide(1); return; }
-		if (CheckHitKey(KEY_INPUT_H)) { selected_ = 1; Decide(2); return; }
 
-		// ¶‰EƒL[‚Å‚à‘I‚×‚é‚æ
+		// ç›´æ¥é¸æŠï¼ˆä»»æ„ï¼šä¾¿åˆ©ï¼‰
+		if (KeyDown(KEY_INPUT_1)) { selected_ = 0; PlaySoundMem(DecisionSE, DX_PLAYTYPE_BACK); Decide(1); return; }
+		if (KeyDown(KEY_INPUT_2)) { selected_ = 1; PlaySoundMem(DecisionSE, DX_PLAYTYPE_BACK); Decide(2); return; }
+		if (KeyDown(KEY_INPUT_3)) { selected_ = 2; PlaySoundMem(DecisionSE, DX_PLAYTYPE_BACK); Decide(3); return; }
+
+		// AD / çŸ¢å°ã§é¸æŠï¼ˆ3æŠãƒ«ãƒ¼ãƒ—ï¼‰
 		if (KeyDown(KEY_INPUT_LEFT) || KeyDown(KEY_INPUT_A))
 		{
-			if (selected_ != 0) {
-				selected_ = 0; PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);
-			}
+			selected_ = (selected_ + 3 - 1) % 3;
 		}
-
 		if (KeyDown(KEY_INPUT_RIGHT) || KeyDown(KEY_INPUT_D))
 		{
-			if (selected_ != 1) {
-				selected_ = 1; PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);
-			}
+			selected_ = (selected_ + 1) % 3;
 		}
 
-		// Œˆ’è
-		if (CheckHitKey(KEY_INPUT_RETURN) || CheckHitKey(KEY_INPUT_Z))
+		if (selected_ != prevSelected_)
 		{
-			Decide(selected_ == 0 ? 1 : 2);
+			prevSelected_ = selected_;
+			PlaySoundMem(SelectSE, DX_PLAYTYPE_BACK);
+		}
+
+		// Enterã§æ±ºå®šï¼ˆè¦æœ›ï¼‰
+		if (KeyDown(KEY_INPUT_RETURN))
+		{
+			Decide(selected_ + 1);
 			PlaySoundMem(DecisionSE, DX_PLAYTYPE_BACK);
 			return;
 		}
 
-		if (CheckHitKey(KEY_INPUT_ESCAPE))  SceneManager::Exit();
+		if (CheckHitKey(KEY_INPUT_ESCAPE)) SceneManager::Exit();
 	}
 	else
 	{
@@ -291,7 +294,7 @@ void SelectStage::DrawTiledWall(int sw, int sh) const
 		}
 	}
 
-	// ”wŒiA•‚¢lŠpŒ`
+	// èƒŒæ™¯ã€é»’ã„å››è§’å½¢
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 90);
 	DrawBox(0, 0, sw, sh, GetColor(0, 0, 0), TRUE);
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
@@ -301,11 +304,8 @@ void SelectStage::DrawVignette(int sw, int sh) const
 {
 	if (vignetteImg_ < 0) return;
 
-	// ‹­‚³’²®
 	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 127);
-
 	DrawExtendGraph(0, 0, sw, sh, vignetteImg_, TRUE);
-
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 }
 
@@ -361,7 +361,7 @@ void SelectStage::Draw()
 		vignetteImg_ = BuildVignetteGraph(vignetteSrcW_, vignetteSrcH_, sw, sh);
 	}
 
-	// == ‘JˆÚƒAƒjƒ[ƒVƒ‡ƒ“iƒtƒF[ƒhj ==
+	// == é·ç§»ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ï¼ˆãƒ•ã‚§ãƒ¼ãƒ‰ï¼‰ ==
 	auto clamp01 = [](float t) {
 		if (t < 0.0f) return 0.0f;
 		if (t > 1.0f) return 1.0f;
@@ -374,18 +374,17 @@ void SelectStage::Draw()
 		return 1.0f - u * u * u;
 		};
 
-
 	const float e = easeOutCubic(introT_);
-	const int enterOffsetY = (int)((1.0f - e) * 50.0f); // Å‰‚Í‰º‚É50px ¨ 0
-	const int introFadeA = (int)((1.0f - e) * 255.0f); // Å‰‚Í•255 ¨ 0
+	const int enterOffsetY = (int)((1.0f - e) * 50.0f);
+	const int introFadeA = (int)((1.0f - e) * 255.0f);
 
 	DrawTiledWall(sw, sh);
 
-	// ƒAƒEƒgƒtƒŒ[ƒ€
+	// ã‚¢ã‚¦ãƒˆãƒ•ãƒ¬ãƒ¼ãƒ 
 	const int marginX = max(60, sw / 16);
 	const int marginY = max(50, sh / 14);
 	const int frameX = marginX;
-	const int frameY = marginY + enterOffsetY;  // “oêƒAƒjƒ‚Ô‚ñ‚¸‚ç‚·
+	const int frameY = marginY + enterOffsetY;
 	const int frameW = sw - marginX * 2;
 	const int frameH = sh - marginY * 2;
 
@@ -395,113 +394,121 @@ void SelectStage::Draw()
 	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
 	const int frameLine = GetColor(80, 130, 240);
-	const int frameFill = GetColor(245, 245, 245);
-
-	//DrawBox(frameX, frameY, frameX + frameW, frameY + frameH, frameFill, TRUE);
 	DrawBox(frameX, frameY, frameX + frameW, frameY + frameH, frameLine, FALSE);
 
 	DrawSparkles(sw, sh);
 
-	// ƒ^ƒCƒgƒ‹
-	const TCHAR* title = TEXT("ƒXƒe[ƒW‘I‘ğ");
+	// ã‚¿ã‚¤ãƒˆãƒ«
+	const TCHAR* title = TEXT("ã‚¹ãƒ†ãƒ¼ã‚¸é¸æŠ");
 	int tw = GetDrawStringWidthToHandle(title, (int)_tcslen(title), fontTitle_);
 	DrawStringToHandle(frameX + frameW / 2 - tw / 2, frameY + 30, title, GetColor(255, 180, 0), fontTitle_);
 
-	// ƒTƒuƒ^ƒCƒgƒ‹
-	const TCHAR* sub = TEXT("’§í‚µ‚½‚¢ƒXƒe[ƒW‚ÌƒL[‚ğ‰Ÿ‚µ‚Ä‰º‚³‚¢");
+	// ã‚µãƒ–ã‚¿ã‚¤ãƒˆãƒ«
+	const TCHAR* sub = TEXT("æŒ‘æˆ¦ã—ãŸã„ã‚¹ãƒ†ãƒ¼ã‚¸ã‚’é¸ã‚“ã§ä¸‹ã•ã„");
 	int subw = GetDrawStringWidthToHandle(sub, (int)_tcslen(sub), fontSub_);
 	DrawStringToHandle(frameX + frameW / 2 - subw / 2, frameY + 180, sub, GetColor(188, 188, 188), fontSub_);
 
-	const int innerTop = frameY + 220;
-	const int innerBottom = frameY + frameH - 140;
+	// ===== æ“ä½œãƒ’ãƒ³ãƒˆï¼ˆä¸Šã«é…ç½®ï¼‰=====
+	const TCHAR* hintSelect = TEXT("AD or â†â†’ã§é¸æŠ");
+	const TCHAR* hintEnter = TEXT("Enterã§æ±ºå®š");
 
-	const int gap = max(50, frameW / 12);
-	const int cardW = min(640, (frameW - gap) / 2);
+	int h1w = GetDrawStringWidthToHandle(hintSelect, (int)_tcslen(hintSelect), fontHint_);
+	int h2w = GetDrawStringWidthToHandle(hintEnter, (int)_tcslen(hintEnter), fontHint_);
+
+	// ã‚µãƒ–ã‚¿ã‚¤ãƒˆãƒ«ç›´ä¸‹ã«ç½®ã
+	const int hintY0 = frameY + 230;
+	DrawStringToHandle(frameX + frameW / 2 - h1w / 2, hintY0 + 0, hintSelect, GetColor(210, 210, 210), fontHint_);
+	DrawStringToHandle(frameX + frameW / 2 - h2w / 2, hintY0 + 30, hintEnter, GetColor(210, 210, 210), fontHint_);
+
+	const int innerTop = frameY + 260;
+	const int innerBottom = frameY + frameH - 170; // â†ä¸‹ã«ãƒ’ãƒ³ãƒˆ2è¡Œå¢—ãˆã‚‹ã®ã§å°‘ã—ä¸Šã’ã‚‹
+
+	// ===== 3æšã‚«ãƒ¼ãƒ‰ã«ã™ã‚‹ãŒã€ä»Šã®è¦‹ãŸç›®ï¼ˆå¤§ãã‚ã‚«ãƒ¼ãƒ‰ï¼‰ã‚’ç¶­æŒ =====
+	const int gap = max(35, frameW / 30);
+	const int cardW = min(520, (frameW - gap * 2) / 3);
 	const int cardH = min(460, innerBottom - innerTop);
 
-	const int leftX = frameX + (frameW - (cardW * 2 + gap)) / 2;
-	const int rightX = leftX + cardW + gap;
+	const int leftX0 = frameX + (frameW - (cardW * 3 + gap * 2)) / 2;
+	const int cardX0 = leftX0;
+	const int cardX1 = leftX0 + cardW + gap;
+	const int cardX2 = leftX0 + (cardW + gap) * 2;
 	const int cardY = innerTop + (innerBottom - innerTop - cardH) / 2;
 
-	// == ƒJ[ƒh‡”ÔoŒ» ==
-	const float cardDur = 0.22f; // 1–‡‚ªo‚éŠÔ
-	const float cardDelay = 0.10f; // 2–‡–Ú‚Ì’x‰„
+	// == ã‚«ãƒ¼ãƒ‰é †ç•ªå‡ºç¾ ==
+	const float cardDur = 0.22f;
+	const float cardDelay = 0.10f;
 
-	const float tL = easeOutCubic(introElapsedSec_ / cardDur);
-	const float tR = easeOutCubic((introElapsedSec_ - cardDelay) / cardDur);
+	const float t0 = easeOutCubic(introElapsedSec_ / cardDur);
+	const float t1 = easeOutCubic((introElapsedSec_ - cardDelay) / cardDur);
+	const float t2 = easeOutCubic((introElapsedSec_ - cardDelay * 2.0f) / cardDur);
 
-	// oŒ»“x‚É‰‚¶‚ÄuƒXƒ‰ƒCƒh—Êv‚Æu“§–¾“xv‚ğì‚é
-	auto makeCardAnim = [&](float t, bool fromLeft) {
-		const int a = (int)(255.0f * t);                // 0¨255
-		const int ox = (int)((1.0f - t) * (fromLeft ? -30.0f : 30.0f)); // ¶‚Í¶‚©‚ç/‰E‚Í‰E‚©‚ç
-		const int oy = (int)((1.0f - t) * 30.0f);       // ­‚µ‰º‚©‚ç
-		return std::tuple<int, int, int>(a, ox, oy);      // alpha, offsetX, offsetY
+	auto makeCardAnim = [&](float t, int dir)
+		{
+			const int a = (int)(255.0f * t);
+			const int ox = (int)((1.0f - t) * (float)(dir * 30)); // -1,0,+1
+			const int oy = (int)((1.0f - t) * 30.0f);
+			return std::tuple<int, int, int>(a, ox, oy);
 		};
 
-	auto [aL, oxL, oyL] = makeCardAnim(tL, true);
-	auto [aR, oxR, oyR] = makeCardAnim(tR, false);
+	auto [a0, ox0, oy0] = makeCardAnim(t0, -1);
+	auto [a1, ox1, oy1] = makeCardAnim(t1, 0);
+	auto [a2, ox2, oy2] = makeCardAnim(t2, 1);
 
-
-	const int easyFill = GetColor(110, 170, 70);
-	const int hardFill = GetColor(220, 40, 40);
+	const int s1Fill = GetColor(110, 170, 70);
+	const int s2Fill = GetColor(220, 40, 40);
+	const int s3Fill = GetColor(120, 90, 220);
 	const int cardBorder = GetColor(30, 80, 160);
 
-	// ŠpŠÛ”¼Œai‘å‚«‚¢‚Ù‚ÇŠÛ‚¢j
 	const int radius = 24;
 
-	// ŠpŠÛƒJ[ƒh•`‰æi“h‚è{˜gj
 	auto drawRoundCard = [&](int x, int y, int w, int h, int fillCol)
 		{
 			DrawRoundRect(x, y, x + w, y + h, radius, radius, fillCol, TRUE);
 			DrawRoundRect(x, y, x + w, y + h, radius, radius, cardBorder, FALSE);
 		};
 
-	// ===== Card shadowi‰e‚àƒJ[ƒh‚²‚Æ‚ÉƒtƒF[ƒhj=====
-	if (aL > 0)
-	{
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, (int)(110.0f * (aL / 255.0f)));
-		DrawRoundRect(leftX + oxL + 10, cardY + oyL + 12,
-			leftX + oxL + cardW + 10, cardY + oyL + cardH + 12,
-			radius, radius, GetColor(0, 0, 0), TRUE);
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-	}
-	if (aR > 0)
-	{
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, (int)(110.0f * (aR / 255.0f)));
-		DrawRoundRect(rightX + oxR + 10, cardY + oyR + 12,
-			rightX + oxR + cardW + 10, cardY + oyR + cardH + 12,
-			radius, radius, GetColor(0, 0, 0), TRUE);
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-	}
+	// ===== shadows =====
+	auto drawShadow = [&](int x, int y, int w, int h, int alpha)
+		{
+			if (alpha <= 0) return;
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, (int)(110.0f * (alpha / 255.0f)));
+			DrawRoundRect(x + 10, y + 12, x + w + 10, y + h + 12, radius, radius, GetColor(0, 0, 0), TRUE);
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		};
 
-	// ===== Card bodyiƒJ[ƒh–{‘Ì‚àƒtƒF[ƒhj=====
-	if (aL > 0)
-	{
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, aL);
-		drawRoundCard(leftX + oxL, cardY + oyL, cardW, cardH, easyFill);
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-	}
-	if (aR > 0)
-	{
-		SetDrawBlendMode(DX_BLENDMODE_ALPHA, aR);
-		drawRoundCard(rightX + oxR, cardY + oyR, cardW, cardH, hardFill);
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-	}
+	drawShadow(cardX0 + ox0, cardY + oy0, cardW, cardH, a0);
+	drawShadow(cardX1 + ox1, cardY + oy1, cardW, cardH, a1);
+	drawShadow(cardX2 + ox2, cardY + oy2, cardW, cardH, a2);
 
-	// ===== Selected highlightiƒJ[ƒh‚ªoØ‚Á‚½Œã‚¾‚¯Œõ‚ç‚¹‚éj=====
+	// ===== bodies =====
+	auto drawBody = [&](int x, int y, int w, int h, int col, int alpha)
+		{
+			if (alpha <= 0) return;
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+			drawRoundCard(x, y, w, h, col);
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		};
+
+	drawBody(cardX0 + ox0, cardY + oy0, cardW, cardH, s1Fill, a0);
+	drawBody(cardX1 + ox1, cardY + oy1, cardW, cardH, s2Fill, a1);
+	drawBody(cardX2 + ox2, cardY + oy2, cardW, cardH, s3Fill, a2);
+
+	// ===== Selected highlightï¼ˆæ—¢å­˜ã®è¦‹ãŸç›®ï¼‰=====
 	const bool blinkOn = ((blink_ / 18) % 2) == 0;
 	const int hiCol = GetColor(255, 235, 150);
 
 	if (introDone_ && blinkOn)
 	{
-		const int bx = (selected_ == 0) ? leftX : rightX;
+		const int bx =
+			(selected_ == 0) ? cardX0 :
+			(selected_ == 1) ? cardX1 : cardX2;
+
 		for (int i = 0; i < 8; ++i)
 		{
 			DrawRoundRect(bx - i, cardY - i, bx + cardW + i, cardY + cardH + i,
 				radius + i, radius + i, hiCol, FALSE);
 		}
 
-		// Shine stripe
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 90);
 		DrawBox(bx + 18, cardY + 18, bx + cardW - 18, cardY + 54, GetColor(255, 255, 255), TRUE);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
@@ -525,32 +532,38 @@ void SelectStage::Draw()
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		};
 
-	const TCHAR* easyLines[] = {
-		TEXT("ˆÕ‚µ‚¢ƒ`ƒ…[ƒgƒŠƒAƒ‹"),
-		TEXT("‚·‚®ƒCƒ‰ƒCƒ‰‚µ‚¿‚á‚¤l‚É"),
-		TEXT("‚¨‚·‚·‚ß"),
-		TEXT("c‹@” 5"),
-		TEXT("Push to [E]")
+	// è¦æœ›ï¼šStage3ã®èª¬æ˜æ–‡
+	const TCHAR* stage1Lines[] = {
+		TEXT("æ˜“ã—ã„ãƒãƒ¥ãƒ¼ãƒˆãƒªã‚¢ãƒ«"),
+		TEXT("ã™ãã‚¤ãƒ©ã‚¤ãƒ©ã—ã¡ã‚ƒã†äººã«"),
+		TEXT("ãŠã™ã™ã‚"),
+		TEXT("æ®‹æ©Ÿæ•° 5"),
 	};
-	const TCHAR* hardLines[] = {
-		TEXT("“ï‚µ‚¢"),
-		TEXT("‚½‚­‚³‚ñ€‚É‚½‚¢l‚É‚¨‚·‚·‚ß"),
-		TEXT("c‹@” 3"),
-		TEXT("Push to [H]")
+	const TCHAR* stage2Lines[] = {
+		TEXT("é›£ã—ã„"),
+		TEXT("ãŸãã•ã‚“æ­»ã«ãŸã„äººã«ãŠã™ã™ã‚"),
+		TEXT("æ®‹æ©Ÿæ•° 3"),
+	};
+	const TCHAR* stage3Lines[] = {
+		TEXT("ï¼Ÿï¼Ÿï¼Ÿ"),
+		TEXT("ä½•ãŒã‚ã‚‹ã‹ã¯ãŠæ¥½ã—ã¿"),
+		TEXT("æ®‹æ©Ÿæ•°âˆ"),
 	};
 
-	drawCenterLines(leftX + oxL + cardW / 2, (cardY + oyL) + 90, easyLines, 5, 46, fontCard_, aL);
-	drawCenterLines(rightX + oxR + cardW / 2, (cardY + oyR) + 110, hardLines, 4, 50, fontCard_, aR);
+	drawCenterLines(cardX0 + ox0 + cardW / 2, (cardY + oy0) + 110, stage1Lines, 4, 50, fontCard_, a0);
+	drawCenterLines(cardX1 + ox1 + cardW / 2, (cardY + oy1) + 135, stage2Lines, 3, 56, fontCard_, a1);
+	drawCenterLines(cardX2 + ox2 + cardW / 2, (cardY + oy2) + 135, stage3Lines, 3, 56, fontCard_, a2);
 
-	// Bottom hint
-	const TCHAR* bottom = TEXT("ƒ^ƒCƒgƒ‹‚Ö–ß‚é  Push to [Space]");
-	int bw = GetDrawStringWidthToHandle(bottom, (int)_tcslen(bottom), fontHint_);
-	DrawStringToHandle(frameX + frameW / 2 - bw / 2, frameY + frameH - 80, bottom, GetColor(188, 188, 188), fontHint_);
+	// ===== Bottom hintsï¼ˆè¦æœ›ã®2è¡Œè¿½åŠ ï¼‰=====
+	const TCHAR* hintBack = TEXT("ã‚¿ã‚¤ãƒˆãƒ«ã¸æˆ»ã‚‹  Push to [Space]");
+	int w3 = GetDrawStringWidthToHandle(hintBack, (int)_tcslen(hintBack), fontHint_);
+	DrawStringToHandle(frameX + frameW / 2 - w3 / 2, frameY + frameH - 60, hintBack, GetColor(188, 188, 188), fontHint_);
+
 
 	DrawVignette(sw, sh);
 
-	// “oêƒtƒF[ƒh
-	if (introFadeA > 0 && !deciding_) // deciding_’†‚ÍŒˆ’èƒtƒF[ƒh‚ğ—Dæ‚µ‚½‚¢‚Ì‚Å
+	// ç™»å ´ãƒ•ã‚§ãƒ¼ãƒ‰
+	if (introFadeA > 0 && !deciding_)
 	{
 		SetDrawBlendMode(DX_BLENDMODE_ALPHA, introFadeA);
 		DrawBox(0, 0, sw, sh, GetColor(0, 0, 0), TRUE);

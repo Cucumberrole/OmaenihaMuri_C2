@@ -256,7 +256,7 @@ Field::Field(int stage)
 			}
 			else if (cell == 91)
 			{
-				new Boss(xx * 64, yy * 64 - 192);
+				new Boss(xx * 64, yy * 64);
 			}
 
 			else if (cell >= 110 && cell <= 117)
