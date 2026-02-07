@@ -162,7 +162,7 @@ void SelectStage::Decide(int stageId)
 	else // stageId == 3
 	{
 		SelectedDifficulty() = Difficulty::Easy;
-		MaxLives() = 1; // “∞扱い”のため大きい値に
+		MaxLives() = 1; // ライフ値設定
 	}
 
 	deciding_ = true;
@@ -534,20 +534,20 @@ void SelectStage::Draw()
 
 	// 要望：Stage3の説明文
 	const TCHAR* stage1Lines[] = {
-		TEXT("易しいチュートリアル"),
+		TEXT("やさしい ちゅーとりある"),
 		TEXT("すぐイライラしちゃう人に"),
 		TEXT("おすすめ"),
 		TEXT("残機数 5"),
 	};
 	const TCHAR* stage2Lines[] = {
-		TEXT("難しい"),
+		TEXT("むずかしい"),
 		TEXT("たくさん死にたい人におすすめ"),
 		TEXT("残機数 3"),
 	};
 	const TCHAR* stage3Lines[] = {
 		TEXT("？？？"),
 		TEXT("何があるかはお楽しみ"),
-		TEXT("残機数∞"),
+		TEXT("残機数 ？"),
 	};
 
 	drawCenterLines(cardX0 + ox0 + cardW / 2, (cardY + oy0) + 110, stage1Lines, 4, 50, fontCard_, a0);

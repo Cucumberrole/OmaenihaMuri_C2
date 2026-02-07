@@ -9,7 +9,7 @@ static inline float Deg2Rad(float deg) { return deg * 3.1415926535f / 180.0f; }
 Boss::Boss(int sx, int sy)
 {
 	hImage = LoadGraph("data/image/sui2.png");
-	bulletImage = LoadGraph("data/image/sui1.png"); // ←自機の画像ファイル名に変更
+	bulletImage = LoadGraph("data/image/sui1.png");
 
 	x = (float)sx;
 	y = (float)sy;
@@ -132,28 +132,38 @@ void Boss::Update()
 	if (hp > 0)
 	{
 		fireTimer++;
+		// phaseAngle を増やすほど、スパイラル系の弾が回転して「弾幕の表情」が変わります
+		// ここを変えると、全体の回転速度が変わります（例：2.0f→4.0fで倍速）
 		phaseAngle += Deg2Rad(2.0f); // 回転速度（弾幕の表情が変わる）
 
-		// フェーズ切り替え（例：300フレーム周期）
+		// ===== 弾幕フェーズ（状態）切り替え =====
+		// fireTimer を 400 で割った商を 0,1,2... と増やし、%3 で 0/1/2 を繰り返しています。
+		// つまり「400フレームごとに弾幕状態が変わる」設計です。
 		const int phase = (fireTimer / 400) % 3;
-
+		// ===== フェーズごとの弾幕内容（ここをいじると弾幕の状態が変わります）=====
+		// ・撃つ間隔（% 12, % 90 など）
+		// ・呼ぶパターン関数（AimAtPlayer / Ring / Spiral...）
+		// ・各パターンの引数（弾数n, 速度speed, 広がりspreadDeg など）
+		// を変えると弾幕が変化します。
 		if (phase == 0)
 		{
 			// 基本：自機狙い＋時々リング
 			if (fireTimer % 12 == 0) FirePattern_AimAtPlayer(5.0f);
-			if (fireTimer % 90 == 0) FirePattern_Ring(24, 3.0f);
+			if (fireTimer % 60 == 0) FirePattern_Ring(24, 3.0f);
 		}
 		else if (phase == 1)
 		{
 			// スパイラル：毎フレーム薄く吐く（n小さめ推奨）
 			if (fireTimer % 2 == 0)  FirePattern_Spiral(2, 3.2f, Deg2Rad(22.0f));
 			if (fireTimer % 60 == 0) FirePattern_FanToPlayer(9, 4.0f, 60.0f);
+			if (fireTimer % 90 == 0) FirePattern_Ring(24, 3.0f);
 		}
 		else
 		{
 			// デュアルスパイラル＋ウェーブリング
 			if (fireTimer % 3 == 0)  FirePattern_SpiralDual(1, 3.0f, Deg2Rad(30.0f));
 			if (fireTimer % 45 == 0) FirePattern_WaveRing(28, 2.4f, 1.2f, 120.0f);
+			if (fireTimer % 60 == 0) FirePattern_Ring(24, 3.0f);
 		}
 	}
 	else
@@ -331,6 +341,7 @@ void Boss::FirePattern_FanToPlayer(int n, float speed, float spreadDeg)
 	}
 }
 
+// 円同士の当たり判定（距離^2 <= (半径和)^2）
 bool Boss::CircleHit(float ax, float ay, float ar, float bx, float by, float br) const
 {
 	float dx = ax - bx;
@@ -341,18 +352,19 @@ bool Boss::CircleHit(float ax, float ay, float ar, float bx, float by, float br)
 
 void Boss::CheckHitPlayer()
 {
+	// ===== プレイヤーの当たり判定（敵弾→プレイヤー） =====
 	Player* player = FindGameObject<Player>();
 	if (!player) return;
 
-	const float playerR = 10.0f;
-	float px = (float)player->GetX();
-	float py = (float)player->GetY();
+	// ★当たり判定は Player 側に集約（変更すると判定もデバッグ表示も自動で揃う）
+	float px, py, pr;
+	player->GetBulletHitCircle(px, py, pr);
 
 	for (auto& b : bullets)
 	{
 		if (!b.alive) continue;
 
-		if (CircleHit(b.x, b.y, b.r, px, py, playerR))
+		if (CircleHit(b.x, b.y, b.r, px, py, pr))
 		{
 			b.alive = false;
 			player->ForceDie();
@@ -360,6 +372,7 @@ void Boss::CheckHitPlayer()
 		}
 	}
 }
+
 
 void Boss::Draw()
 {
@@ -409,19 +422,31 @@ void Boss::DrawBullets() const
 
 void Boss::DrawDebug() const
 {
-	//SetFontSize(24);
-	//int h = GetFontSize();
+	// ===== デバッグ表示：当たり判定の可視化 =====
+	// ・ボスの当たり判定（円）
+	// ・プレイヤーの当たり判定（弾幕用の小さい円）
+	//
+	// いつでも表示したくない場合は、ここをキー入力でON/OFFするようにしてください。
 
-	//int remain = (clearFrame - surviveFrame);
-	//if (remain < 0) remain = 0;
+	// プレイヤー当たり判定（弾幕用の小さい当たり中心を「点」で表示）
+	{
+		Player* player = FindGameObject<Player>();
+		if (player)
+		{
+			// ※当たり判定の中心は「プレイヤー画像(64x64)の中央」を想定
+			//   すでに中心修正済みなら、この計算に合わせてください（GetX/GetYが左上なら +32,+32）
+			float px, py, pr;
+			player->GetBulletHitCircle(px, py, pr);
 
-	//DrawFormatString(20, 50, GetColor(255, 255, 255),
-	//	"TIME: %d", remain / 60);
+			const int cx = (int)px;
+			const int cy = (int)py;
+			const int col = GetColor(0, 0, 0);
 
-	//DrawFormatString(0, 200 + h * 0, GetColor(255, 255, 255), "BossX: %.2f", x);
-	//DrawFormatString(0, 200 + h * 1, GetColor(255, 255, 255), "BossY: %.2f", y);
-	//DrawFormatString(0, 200 + h * 2, GetColor(255, 255, 255), "BossHP: %d", hp);
-	//DrawFormatString(0, 200 + h * 3, GetColor(200, 200, 200), "EnemyBullets: %d", (int)bullets.size());
-	//DrawFormatString(0, 200 + h * 4, GetColor(200, 200, 200), "fireTimer: %d", fireTimer);
-
+			// 1ピクセルだと見えにくいので「点（3x3）」として描画
+			DrawBox(cx - 1, cy - 1, cx + 2, cy + 2, col, TRUE);
+			// さらに分かりやすくするなら十字を有効化（不要なら消してください）
+			DrawLine(cx - 6, cy, cx + 6, cy, col);
+			DrawLine(cx, cy - 6, cx, cy + 6, col);
+		}
+	}
 }

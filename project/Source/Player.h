@@ -31,6 +31,10 @@ public:
 	float GetRadius() const { return hitRadius; }
 	void GetHitCircle(float& outX, float& outY, float& outRadius) const;
 
+
+	// 弾幕（ボス弾）用の小さい当たり判定（中心＋半径）
+	float GetBulletHitRadius() const { return bulletHitRadius; }
+	void  GetBulletHitCircle(float& outX, float& outY, float& outRadius) const;
 	void PushByWall(float dx);
 	// （もしデバッグ用に描画したければ）
 	// void DrawHitCircleDebug() const;
@@ -68,6 +72,8 @@ private:
 	// 円当たり判定用 (中心からの半径だけ持っておく)
 	float hitRadius;
 
+	// 弾幕（ボス弾）用の当たり判定半径（小さめ）
+	float bulletHitRadius;
 	// --- アニメーション設定 ---
 	static const int CHARACTER_WIDTH = 64;
 	static const int CHARACTER_HEIGHT = 64;

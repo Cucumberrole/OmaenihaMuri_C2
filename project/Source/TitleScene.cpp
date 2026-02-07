@@ -61,7 +61,7 @@ TitleScene::TitleScene()
 
 	// ロゴバウンス初期化
 	int sw, sh;
-	GetDrawScreenSize(&sw, &sh);
+	DxLib::GetDrawScreenSize(&sw, &sh);
 
 	logoX = (sw - logoW) * 0.5f;
 	logoTargetY = sh * 0.12f;
@@ -166,7 +166,7 @@ int TitleScene::HitCheckLeft(int px_, int py_) const
 void TitleScene::ResetParticle(int i)
 {
 	int sw, sh;
-	GetDrawScreenSize(&sw, &sh);
+	DxLib::GetDrawScreenSize(&sw, &sh);
 
 	Particle& p = particles[i];
 	p.x = RandRange(0.0f, (float)sw);
@@ -195,7 +195,7 @@ void TitleScene::ResetParticle(int i)
 void TitleScene::Update()
 {
 	// SHIFTで次へ
-	if (CheckHitKey(KEY_INPUT_LSHIFT) || CheckHitKey(KEY_INPUT_RSHIFT))
+	if (CheckHitKey(KEY_INPUT_RETURN))
 	{
 		SceneManager::ChangeScene("STAGE");
 		return;
@@ -289,7 +289,7 @@ void TitleScene::Update()
 
 	// 画面外に出ないように制限
 	int sw, sh;
-	GetDrawScreenSize(&sw, &sh);
+	DxLib::GetDrawScreenSize(&sw, &sh);
 	if (px < 0) px = 0;
 	if (px > sw - playerFrameW) px = (float)(sw - playerFrameW);
 
@@ -318,7 +318,7 @@ void TitleScene::Update()
 void TitleScene::Draw()
 {
 	int sw, sh;
-	GetDrawScreenSize(&sw, &sh);
+	DxLib::GetDrawScreenSize(&sw, &sh);
 
 	// -----------------------------
 	// 背景
@@ -410,9 +410,9 @@ void TitleScene::Draw()
 	}
 
 	// -----------------------------
-	// push to shift
+	// push to enter
 	// -----------------------------
-	const char* text = "push to shift";
+	const char* text = "Push to [Enter]";
 	SetFontSize(36);
 
 	int th = GetFontSize();

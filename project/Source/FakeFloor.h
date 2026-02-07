@@ -1,6 +1,7 @@
 #pragma once
 #include "../Library/GameObject.h"
 
+// è§¦ã‚ŒãŸã‚‰æ¶ˆãˆã‚‹åºŠ
 class FakeFloor : public GameObject
 {
 public:
@@ -10,16 +11,17 @@ public:
 	void Update() override;
 	void Draw() override;
 
-	// px,py,pw,ph = ƒvƒŒƒCƒ„[“™‚Ì‹éŒ`
-	// G‚ê‚½‚ç true ‚ğ•Ô‚µAFakeFloor ‚ÍÁ‚¦‚é
+	// px,py,pw,ph = ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®çŸ©å½¢ï¼ˆå·¦ä¸Šåº§æ¨™ï¼‹å¹…é«˜ã•ï¼‰
+	// è§¦ã‚ŒãŸã‚‰ true ã‚’è¿”ã—ã€ã“ã®åºŠã¯æ¶ˆãˆã¾ã™
 	bool CheckHitBall(float px, float py, float pw, float ph);
 
-	// •K—v‚È‚çŠO•”‚ÅŠm”F—p
+	// æ¶ˆãˆãŸã‹ã©ã†ã‹
 	bool IsVanished() const { return vanished_; }
 
 private:
-	int hImage;
-	float x, y;
+	int hImage = -1;
+	float x = 0.0f, y = 0.0f;
+
 	static const int width = 64;
 	static const int height = 64;
 

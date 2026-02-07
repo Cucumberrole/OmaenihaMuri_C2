@@ -155,7 +155,7 @@ void PlayScene::Update()
 
 		if (PlayScene::SelectedStage == 3)
 		{
-			const int kTimeLimitSec = 30;
+			const int kTimeLimitSec = 50;
 			const int elapsedSec = GR_GetElapsedSecLive();
 			if (elapsedSec >= kTimeLimitSec)
 			{
@@ -170,15 +170,26 @@ void PlayScene::Update()
 		if (CheckHitKey(KEY_INPUT_C)) SceneManager::ChangeScene("CLEAR");
 		if (CheckHitKey(KEY_INPUT_O) || CheckHitKey(KEY_INPUT_T)) SceneManager::ChangeScene("TITLE");
 
-		if (CheckHitKey(KEY_INPUT_R))
+		if (KeyTrigger::CheckTrigger(KEY_INPUT_R))
 		{
+			// ===== プレイ中R：完全リセット（タイマー/スコア/残機） =====
 			PlaySoundMem(RetrySE, DX_PLAYTYPE_BACK);
+
+			// 床などのギミック状態も初期化したい場合はここでリセット
+			VanishingFloor::ResetAll();
+
+			// 走行結果（タイマー/スコア等）を初期状態へ
+			g_Life = MaxLives();
+			g_RetryCount = 0;
+			g_deathCount = 0;
+			GR_ResetRun(ToCourseType(SelectedDifficulty()));
 
 			fader->FadeOut(0.5f);
 			fader->FadeIn(1.0f);
 
-			GR_ResumeTimer();
-			g_IsRetry = true;
+			// 「新規開始扱い」にしてPlaySceneコンストラクタの初期化も通す
+			g_IsRetry = false;
+
 			SceneManager::ForceChangeScene("PLAY");
 		}
 
@@ -261,7 +272,7 @@ void PlayScene::Draw()
 	// このステージだけカウントダウンにする
 	if (PlayScene::SelectedStage == 3) // ←対象ステージID
 	{
-		const int kTimeLimitSec = 50;  // ←制限時間（秒）
+		const int kTimeLimitSec = 30;  // ←制限時間（秒）
 		hudTimeSeconds = kTimeLimitSec - elapsedSec;
 		if (hudTimeSeconds < 0) hudTimeSeconds = 0;
 	}

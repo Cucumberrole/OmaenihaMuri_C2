@@ -19,18 +19,21 @@ FallingFloor::FallingFloor(int sx, int sy)
 
 	SetDrawOrder(-1);
 	BlockDieSE = SoundCache::Get("data/BGM/death_crushed.mp3");
+	BlockFallSE = SoundCache::Get("data/BGM/block_fall.mp3");
 }
 
 FallingFloor::~FallingFloor()
 {
 	DeleteGraph(hImage);
 	StopSoundMem(BlockDieSE);
+	StopSoundMem(BlockFallSE);
 }
 
 void FallingFloor::StartFalling()
 {
 	isFalling = true;
 	velocityY = 0.0f;
+	PlaySoundMem(BlockFallSE, DX_PLAYTYPE_BACK);
 }
 
 void FallingFloor::Update()

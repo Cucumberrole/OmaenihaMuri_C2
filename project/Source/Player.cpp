@@ -87,6 +87,8 @@ Player::Player()
 	// 円当たり判定の半径
 	hitRadius = 22.0f;
 
+	// 弾幕（ボス弾）用の当たり判定半径（小さめ）
+	bulletHitRadius = 6.0f;
 	hDeadUpImage = LoadGraph("data/image/Death.png");
 	hDeadFallImage = LoadGraph("data/image/DeathBottom.png");
 	assert(hDeadUpImage != -1);
@@ -138,6 +140,8 @@ Player::Player(int sx, int sy)
 	// 半径設定
 	hitRadius = 22.0f;
 
+	// 弾幕（ボス弾）用の当たり判定半径（小さめ）
+	bulletHitRadius = 16.0f;
 	SetDrawOrder(0);
 
 	pushX = 0;
@@ -180,6 +184,15 @@ void Player::GetHitCircle(float& outX, float& outY, float& outRadius) const
 	outY = y + CHARACTER_HEIGHT / 2.0f;
 	outRadius = hitRadius;
 }
+
+void Player::GetBulletHitCircle(float& outX, float& outY, float& outRadius) const
+{
+	// プレイヤー画像(64x64)の中央を当たり中心にする
+	outX = x + 32.0f;
+	outY = y + 32.0f;
+	outRadius = bulletHitRadius;
+}
+
 
 void Player::PushByWall(float dx)
 {
@@ -260,18 +273,26 @@ void Player::Update()
 	//========================================================
 	int moveX = 0;
 
-	if (CheckHitKey(KEY_INPUT_D)) {
-		moveX = WALK_SPEED;
-		frip = false;
+	if (!IsReverse) {
+		if (CheckHitKey(KEY_INPUT_D)) {
+			moveX = WALK_SPEED;
+			frip = false;
+		}
+		else if (CheckHitKey(KEY_INPUT_A)) {
+			moveX = -WALK_SPEED;
+			frip = true;
+		}
 	}
-	else if (CheckHitKey(KEY_INPUT_A)) {
-		moveX = -WALK_SPEED;
-		frip = true;
-	}
-
 	if (IsReverse)
 	{
-		moveX *= -1;
+		if (CheckHitKey(KEY_INPUT_D)) {
+			moveX = -WALK_SPEED;
+			frip = false;
+		}
+		else if (CheckHitKey(KEY_INPUT_A)) {
+			moveX = WALK_SPEED;
+			frip = true;
+		}
 	}
 
 	// 歩行アニメーション（常時アニメしたいなら moveX 判定を外す）
@@ -419,6 +440,28 @@ void Player::Update()
 		else {
 			onGround = false;
 		}
+		// ===== FakeFloor（偽床）：上から踏んだ時だけ反応させる =====
+		// dy >= 0（落下／降下中）の時に、足元が偽床に触れたら床を消してプレイヤーを少し押し出す
+		{
+			const float pw = 0.0f;
+			const float ph = 0.0f;
+			const float kNudgeDown = 2.0f; // 少し下へ押し出す（埋まり防止＆確実に落下させる）
+
+			auto fakeFloors = FindGameObjects<FakeFloor>();
+			for (auto ff : fakeFloors)
+			{
+				if (!ff || ff->IsVanished()) continue;
+
+				// ここで当たったら FakeFloor 側で消える（CheckHitBall 内で vanished_ を立てている想定）
+				if (ff->CheckHitBall(x, y, pw, ph))
+				{
+					y += kNudgeDown;   // 少し下へ押し出す
+					onGround = false; // 偽床なので「地面の上」扱いにしない（このまま落下する）
+					break;
+				}
+			}
+		}
+
 	}
 	else {
 		int push1 = field->HitCheckUp((int)(x + 5), (int)(y + 1));
@@ -445,98 +488,78 @@ void Player::Update()
 			velocity = 0;
 		}
 
-		// ===== FakeFloor（偽床）に触れたら：消して、ほんの少し下へ押し出す =====
+		//========================================================
+	// 土管の判定（上に乗った時だけワープ）
+	//========================================================
+		if (field)
 		{
 			const float pw = 64.0f;
 			const float ph = 64.0f;
-			const float kNudgeDown = 2.0f;
 
-			auto fakeFloors = FindGameObjects<FakeFloor>();
-			for (auto ff : fakeFloors)
+			float px = x;
+			float py = y;
+
+			int sw = 0, sh = 0;
+			GetDrawScreenSize(&sw, &sh);
+			x = ClampF(x, 0.0f, (float)sw - 64.0f);
+			y = ClampF(y, 0.0f, (float)sh - 64.0f);
+
+			float footY = py + ph;
+
+			for (int i = 0; i < (int)field->pipesIn.size(); i++)
 			{
-				if (!ff || ff->IsVanished()) continue;
+				POINT in = field->pipesIn[i];
 
-				if (ff->CheckHitBall(x, y, pw, ph))
+				float pipeLeft = (float)in.x;
+				float pipeRight = (float)in.x + 64.0f;
+				float pipeTop = (float)in.y;
+
+				bool overlapX =
+					(px + pw > pipeLeft) &&
+					(px < pipeRight);
+
+				bool onPipeTop = (footY >= pipeTop - 2.0f) && (footY <= pipeTop + 16.0f);
+
+				if (overlapX && onPipeTop)
 				{
-					y += kNudgeDown;   // 少し下へ
-					velocity = 0.0f;   // 上昇を止める（ここで確実に）
-					break;             // 複数回押し出し防止
-				}
-			}
-		}
-	}
-
-
-	//========================================================
-	// 土管の判定（上に乗った時だけワープ）
-	//========================================================
-	if (field)
-	{
-		const float pw = 64.0f;
-		const float ph = 64.0f;
-
-		float px = x;
-		float py = y;
-
-		int sw = 0, sh = 0;
-		GetDrawScreenSize(&sw, &sh);
-		x = ClampF(x, 0.0f, (float)sw - 64.0f);
-		y = ClampF(y, 0.0f, (float)sh - 64.0f);
-
-		float footY = py + ph;
-
-		for (int i = 0; i < (int)field->pipesIn.size(); i++)
-		{
-			POINT in = field->pipesIn[i];
-
-			float pipeLeft = (float)in.x;
-			float pipeRight = (float)in.x + 64.0f;
-			float pipeTop = (float)in.y;
-
-			bool overlapX =
-				(px + pw > pipeLeft) &&
-				(px < pipeRight);
-
-			bool onPipeTop = (footY >= pipeTop - 2.0f) && (footY <= pipeTop + 16.0f);
-
-			if (overlapX && onPipeTop)
-			{
-				if (!field->pipesOut.empty())
-				{
-					POINT out = field->pipesOut[i % field->pipesOut.size()];
-					x = (float)out.x;
-					y = (float)out.y + ph;
-
-					if (telop && !telop->TouchedTrap2)
+					if (!field->pipesOut.empty())
 					{
-						telop->TouchedTrap2 = true; // 1回だけ立てる
-						telop->displayTimer = 1.0f;
+						POINT out = field->pipesOut[i % field->pipesOut.size()];
+						x = (float)out.x;
+						y = (float)out.y + ph;
+
+						if (telop && !telop->TouchedTrap2)
+						{
+							telop->TouchedTrap2 = true; // 1回だけ立てる
+							telop->displayTimer = 1.0f;
+						}
 					}
+					return;
 				}
-				return;
 			}
 		}
+
+		//逆操作
+		//触れてたらON,触れてなかったらOFF
+		//IsReverse = false;
+
+		// 画面外に出さない
+		{
+			int sw = 0, sh = 0;
+			GetDrawScreenSize(&sw, &sh);
+
+			const float pw = 64.0f;  // プレイヤー幅
+			const float ph = 64.0f;  // プレイヤー高さ
+
+			x = ClampF(x, 0.0f, (float)sw - pw);
+			y = ClampF(y, 0.0f, (float)sh - ph);
+		}
+
+		UpdateHitOverlay();
+
+		pushX = 0;
 	}
 
-	//逆操作
-	//触れてたらON,触れてなかったらOFF
-	IsReverse = false;
-
-	// 画面外に出さない
-	{
-		int sw = 0, sh = 0;
-		GetDrawScreenSize(&sw, &sh);
-
-		const float pw = 64.0f;  // プレイヤー幅
-		const float ph = 64.0f;  // プレイヤー高さ
-
-		x = ClampF(x, 0.0f, (float)sw - pw);
-		y = ClampF(y, 0.0f, (float)sh - ph);
-	}
-
-	UpdateHitOverlay();
-
-	pushX = 0;
 }
 
 

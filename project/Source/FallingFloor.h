@@ -31,4 +31,5 @@ private:
 	void StartFalling();
 
 	int BlockDieSE;
+	int BlockFallSE;
 };

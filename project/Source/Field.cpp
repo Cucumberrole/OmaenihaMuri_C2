@@ -250,6 +250,10 @@ Field::Field(int stage)
 			{
 				new PatrolEnemy(xx * 64, yy * 64);
 			}
+			else if (cell == 77)
+			{
+				new Zone(x * 64.0f, y * 64.0f, 64.0f, 64.0f);
+			}
 			else if (cell == 90)
 			{
 				new EnemyChaser(xx * 64, yy * 64);

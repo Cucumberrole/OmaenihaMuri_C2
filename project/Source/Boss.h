@@ -42,6 +42,9 @@ private:
 
 	std::vector<EnemyBullet> bullets;
 
+	// ===== 弾幕（攻撃パターン）制御 =====
+	// fireTimer : フレームカウンタ（弾を撃つ周期・フェーズ切替に使用）
+	// phaseAngle: スパイラル等の回転基準角（毎フレーム増やして回転させる）
 	int   fireTimer = 0;
 	float phaseAngle = 0.0f;
 
@@ -50,6 +53,11 @@ private:
 	void DrawBullets() const;
 	void RemoveDeadBullets();
 
+	// =====================
+	// 攻撃パターン（弾幕）
+	// ここで「どんな弾を生成するか」を定義しています。
+	// Update() の phase 分岐から呼ばれます。
+	// =====================
 	// Patterns
 	void FirePattern_Ring(int n, float speed);
 	void FirePattern_AimAtPlayer(float speed);              // <- single aimed shot
