@@ -19,6 +19,9 @@
 #include "VanishingFloor.h"
 #include "Boss.h"
 int PlayScene::SelectedStage = -1;
+
+// Stage3（ボス）の制限時間（秒）: Updateのクリア判定とHUD表示で共通に使う
+static const int kStage3TimeLimitSec = 50;
 static int g_Life = 0;          // 初期
 static int g_RetryCount = 0;    // 死んだ回数
 float g_ClearTimeSeconds = 0.0f;
@@ -155,9 +158,8 @@ void PlayScene::Update()
 
 		if (PlayScene::SelectedStage == 3)
 		{
-			const int kTimeLimitSec = 50;
 			const int elapsedSec = GR_GetElapsedSecLive();
-			if (elapsedSec >= kTimeLimitSec)
+			if (elapsedSec >= kStage3TimeLimitSec)
 			{
 				SceneManager::ChangeScene("CLEAR");
 				return;
@@ -272,8 +274,8 @@ void PlayScene::Draw()
 	// このステージだけカウントダウンにする
 	if (PlayScene::SelectedStage == 3) // ←対象ステージID
 	{
-		const int kTimeLimitSec = 30;  // ←制限時間（秒）
-		hudTimeSeconds = kTimeLimitSec - elapsedSec;
+		// Update() のクリア判定と同じ制限時間を使う
+		hudTimeSeconds = kStage3TimeLimitSec - elapsedSec;
 		if (hudTimeSeconds < 0) hudTimeSeconds = 0;
 	}
 

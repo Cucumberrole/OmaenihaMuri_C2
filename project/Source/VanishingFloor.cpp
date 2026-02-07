@@ -49,7 +49,7 @@ void VanishingFloor::Update()
 		float dy = cy - (y + 32.0f);
 		float dist2 = dx * dx + dy * dy;
 
-		if (dist2 < vanishRange * vanishRange)
+		if (dist2 <= vanishRange * vanishRange)
 		{
 			s_triggered = true;
 		}
@@ -103,7 +103,7 @@ int VanishingFloor::HitCheckDown(int px, int py)
 	if (!isActive) return 0;          // °‚ªÁ‚¦‚Ä‚¢‚½‚ç‘«ê‚É‚È‚ç‚È‚¢
 
 	// px,py ‚ª‚±‚Ì°ƒ^ƒCƒ‹‚Ì”ÍˆÍ“à‚©‚Ç‚¤‚©
-	if (px < x || px >= x + 64) return 0;
+	if (px < x || px > x + 64) return 0;
 
 	int localY = static_cast<int>(py - y);
 	if (localY >= 0 && localY < 64)
@@ -118,7 +118,7 @@ int VanishingFloor::HitCheckUp(int px, int py)
 {
 	if (!isActive) return 0;
 
-	if (px < x || px >= x + 64) return 0;
+	if (px < x || px > x + 64) return 0;
 
 	int localY = static_cast<int>(py - y);
 	if (localY >= 0 && localY < 64)
@@ -133,7 +133,7 @@ int VanishingFloor::HitCheckLeft(int px, int py)
 {
 	if (!isActive) return 0;
 
-	if (py < y || py >= y + 64) return 0;
+	if (py < y || py > y + 64) return 0;
 
 	int localX = static_cast<int>(px - x);
 	if (localX >= 0 && localX < 64)
@@ -148,7 +148,7 @@ int VanishingFloor::HitCheckRight(int px, int py)
 {
 	if (!isActive) return 0;
 
-	if (py < y || py >= y + 64) return 0;
+	if (py < y || py > y + 64) return 0;
 
 	int localX = static_cast<int>(px - x);
 	if (localX >= 0 && localX < 64)

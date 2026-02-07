@@ -99,6 +99,6 @@ private:
 
 private:
 	int  surviveFrame = 0;     // 経過フレーム
-	int  clearFrame = 60 * 30; // 例：30秒生き残りでクリア（60FPS想定）
+	int  clearFrame = 60 * 50; // 例：30秒生き残りでクリア（60FPS想定）
 	bool timeUpClear = false;
 };
