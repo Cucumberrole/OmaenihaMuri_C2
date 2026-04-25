@@ -459,7 +459,7 @@ void SelectStage::Draw()
 	const int s3Fill = GetColor(120, 90, 220);
 	const int cardBorder = GetColor(30, 80, 160);
 
-	const int radius = 24;
+	const int radius = 23;
 
 	auto drawRoundCard = [&](int x, int y, int w, int h, int fillCol)
 		{
